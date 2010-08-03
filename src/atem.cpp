@@ -12,7 +12,7 @@
 
 
 
-static char *ms_dirp = NULL;
+static const char *ms_dirp = ".";
 
 
 
@@ -107,7 +107,9 @@ int main(int argc, char *argv[])
 		// do something with rest
 	}
 	
-	if( ms_dirp != NULL ) {
-		// do something
+	Metastock ms;
+	if( ! ms.setDir( ms_dirp ) ) {
+		fprintf( stderr, "error: %s\n",
+			ms.lastError() );
 	}
 }
