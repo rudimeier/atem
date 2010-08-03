@@ -16,7 +16,12 @@ class MasterFile
 		static bool checkHeader( const char* buf );
 		static bool checkRecord( const char* buf, int record  );
 		
+		bool check() const;
+		unsigned char countRecords() const;
+		
 	private:
+		static const unsigned int record_length = 53;
+		
 		const char * const buf;
 		const int size;
 };
@@ -29,8 +34,11 @@ MasterFile::MasterFile( const char *_buf, int _size ) :
 }
 
 
-bool MasterFile::checkHeader( const char* buf )
+bool MasterFile::check() const
 {
+	Q_ASSERT( countRecords() == buf[2] );
+	Q_ASSERT( countRecords() == size / record_length - 1 && size % record_length == 0 );
+	
 	unsigned char countRecords = buf[0];
 	Q_ASSERT( buf[1] == '\0' );
 	unsigned char lastUsedRecord = buf[2];
@@ -45,6 +53,14 @@ bool MasterFile::checkHeader( const char* buf )
 	
 	return true;
 }
+
+
+unsigned char MasterFile::countRecords() const
+{
+	return buf[0];
+}
+
+
 
 
 
@@ -164,7 +180,8 @@ void Metastock::dumpInfo() const
 //	}
 //	}
 	
-	MasterFile::checkHeader(ba_master->constData());
+	MasterFile mf( ba_master->constData(), ba_master->size() );
+	mf.check();
 	
 	{
 	int i = 1;
