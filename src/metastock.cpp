@@ -110,4 +110,39 @@ const char* Metastock::lastError() const
 
 void Metastock::dumpInfo() const
 {
+//	{
+//	int i = 1;
+//	while( (i*53) < ba_master->size() ) {
+//		qDebug() << i;
+//		const char *c = ba_master->constData() + (i*53) + 7;
+//		qDebug() << c;
+//		i = i + 1;
+//	}
+//	}
+	{
+	int i = 1;
+	int count = ba_master->size() / 53;
+	while( i <= count ) {
+		qDebug() << i;
+		const char *c;
+		c = ba_master->constData() + (i*53) + 7;
+		qDebug() << c;
+		c = ba_emaster->constData() + (i*192) + 12;
+		qDebug() << c;
+		c = ba_emaster->constData() + (i*192) + 32;
+		qDebug() << c;
+		c = ba_emaster->constData() + (i*192) + 139;
+		qDebug() << c;
+		i = i + 1;
+	}
+	}
+//	{
+//	int i = 1;
+//	while( (i*53) < ba_master->size() ) {
+//		qDebug() << i;
+//		const char *c = ba_master->constData() + (i*53) + 7;
+//		qDebug() << c;
+//		i = i + 1;
+//	}
+//	}
 }
