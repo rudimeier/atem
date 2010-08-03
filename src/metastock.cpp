@@ -11,9 +11,22 @@
 class MasterFile
 {
 	public:
+		MasterFile( const char *buf, int size );
+		
 		static bool checkHeader( const char* buf );
 		static bool checkRecord( const char* buf, int record  );
+		
+	private:
+		const char * const buf;
+		const int size;
 };
+
+
+MasterFile::MasterFile( const char *_buf, int _size ) :
+	buf( _buf ),
+	size( _size )
+{
+}
 
 
 bool MasterFile::checkHeader( const char* buf )
