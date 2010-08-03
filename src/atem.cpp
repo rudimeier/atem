@@ -12,6 +12,7 @@
 
 
 
+static char *ms_dirp = NULL;
 
 
 
@@ -40,6 +41,8 @@ static void displayArgs( poptContext con, poptCallbackReason /*foo*/,
 
 
 static struct poptOption flow_opts[] = {
+	{"msdir", 'i', POPT_ARG_STRING, &ms_dirp, 0,
+		"input metastock directory", NULL},
 	POPT_TABLEEND
 };
 
@@ -102,5 +105,9 @@ int main(int argc, char *argv[])
 	const char **rest = atem_parse_cl(argc, (const char **)argv);
 	if( rest != NULL ) {
 		// do something with rest
+	}
+	
+	if( ms_dirp != NULL ) {
+		// do something
 	}
 }
