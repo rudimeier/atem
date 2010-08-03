@@ -20,6 +20,9 @@ class MasterFile
 		unsigned char countRecords() const;
 		
 	private:
+		bool checkRecords() const;
+		bool checkRecord( unsigned char r ) const;
+		
 		static const unsigned int record_length = 53;
 		
 		const char * const buf;
@@ -36,7 +39,7 @@ MasterFile::MasterFile( const char *_buf, int _size ) :
 
 bool MasterFile::check() const
 {
-	Q_ASSERT( countRecords() == buf[2] );
+	Q_ASSERT( countRecords() == (unsigned char) buf[2] );
 	Q_ASSERT( countRecords() == size / record_length - 1 && size % record_length == 0 );
 	
 	unsigned char countRecords = buf[0];
@@ -50,6 +53,55 @@ bool MasterFile::check() const
 	for( int i=49; i<53; i++ ) {
 		// unknown
 	}
+	
+	checkRecords();
+	return true;
+}
+
+
+bool MasterFile::checkRecords() const
+{
+	for( int i = 1; i <= countRecords(); i++ ) {
+		bool ok = checkRecord( i );
+		if( !ok ) {
+			return false;
+		}
+	}
+	return true;
+}
+
+
+bool MasterFile::checkRecord( unsigned char r ) const
+{
+	Q_ASSERT( r > 0 );
+	const char *record = buf + (record_length * r);
+	Q_ASSERT( record[0] != '\0' ); // F#.dat
+	Q_ASSERT( record[1] == 0x65 );
+	Q_ASSERT( record[2] == '\0' );
+	Q_ASSERT( record[3] == 0x1c ); // record length
+	Q_ASSERT( record[4] == 0x07 ); // record count
+	Q_ASSERT( record[5] == 0x00 );
+	Q_ASSERT( record[6] == 0x00 );
+	for( int i=7; i < 23; i++ ) {
+		//just a string "issue name"
+	}
+	Q_ASSERT( record[23] == '\0' );
+	Q_ASSERT( record[24] == '\0' );
+	for( int i=25; i < 29; i++ ) {
+		//just a date
+	}
+	for( int i=29; i < 33; i++ ) {
+		//just a date
+	}
+	Q_ASSERT( record[33] == 'D' ); // time frame
+	for( int i=34; i < 36; i++ ) {
+		//just a intraday time frame
+	}
+	for( int i=36; i < 52; i++ ) {
+		//just a string "symbol", space padded?
+	}
+	Q_ASSERT( record[52] == '\0' );
+	
 	
 	return true;
 }
@@ -182,7 +234,7 @@ void Metastock::dumpInfo() const
 	
 	MasterFile mf( ba_master->constData(), ba_master->size() );
 	mf.check();
-	
+	return;
 	{
 	int i = 1;
 	int count = ba_master->size() / 53;
