@@ -8,7 +8,7 @@
 
 
 
-class MasterRecord
+class MasterFile
 {
 	public:
 		static bool checkHeader( const char* buf );
@@ -16,7 +16,7 @@ class MasterRecord
 };
 
 
-bool MasterRecord::checkHeader( const char* buf )
+bool MasterFile::checkHeader( const char* buf )
 {
 	unsigned char countRecords = buf[0];
 	Q_ASSERT( buf[1] == '\0' );
@@ -151,7 +151,7 @@ void Metastock::dumpInfo() const
 //	}
 //	}
 	
-	MasterRecord::checkHeader(ba_master->constData());
+	MasterFile::checkHeader(ba_master->constData());
 	
 	{
 	int i = 1;
