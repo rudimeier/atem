@@ -75,3 +75,8 @@ const char* Metastock::lastError() const
 {
 	return error;
 }
+
+
+void Metastock::dumpInfo() const
+{
+}

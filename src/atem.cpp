@@ -112,4 +112,6 @@ int main(int argc, char *argv[])
 		fprintf( stderr, "error: %s\n",
 			ms.lastError() );
 	}
+	
+	ms.dumpInfo();
 }
