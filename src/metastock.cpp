@@ -33,14 +33,14 @@ Metastock::~Metastock()
 }
 
 
-QFileInfo* Metastock::findMaster( const char* name )
+QFile* Metastock::findMaster( const char* name )
 {
-	QStringList sl;
-	sl = dir->entryList( QStringList() << name );
-	if( sl.size() != 1 ) {
+	QFileInfoList fil;
+	fil = dir->entryInfoList( QStringList() << name );
+	if( fil.size() != 1 ) {
 		return NULL;
 	} else {
-		return new QFileInfo( *dir, sl.first() );
+		return new QFile( fil.first().absoluteFilePath() );
 	}
 }
 

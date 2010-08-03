@@ -5,7 +5,7 @@
 
 
 class QDir;
-class QFileInfo;
+class QFile;
 
 
 class Metastock
@@ -20,12 +20,12 @@ class Metastock
 		const char* lastError() const;
 		
 	private:
-		QFileInfo* findMaster( const char *name );
+		QFile* findMaster( const char *name );
 		
 		QDir *dir;
-		QFileInfo *master;
-		QFileInfo *emaster;
-		QFileInfo *xmaster;
+		QFile *master;
+		QFile *emaster;
+		QFile *xmaster;
 		
 		const char* error;
 };
