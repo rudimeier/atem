@@ -12,6 +12,9 @@ Metastock::Metastock() :
 	master(NULL),
 	emaster(NULL),
 	xmaster(NULL),
+	ba_master( new QByteArray() ),
+	ba_emaster( new QByteArray() ),
+	ba_xmaster( new QByteArray() ),
 	error("")
 {
 }
@@ -26,6 +29,9 @@ Metastock::Metastock() :
 
 Metastock::~Metastock()
 {
+	delete ba_xmaster;
+	delete ba_emaster;
+	delete ba_master;
 	SAFE_DELETE( xmaster );
 	SAFE_DELETE( emaster );
 	SAFE_DELETE( master );
@@ -67,7 +73,32 @@ bool Metastock::setDir( const char* d )
 	// xmaster is optional
 	xmaster = findMaster( "XMASTER" );
 	
+	readMasters();
+	
 	return true;
+}
+
+
+void readMaster( QFile *m, QByteArray *ba )
+{
+	if( m != NULL ) {
+		m->open( QIODevice::ReadOnly );
+		*ba = m->readAll ();
+		Q_ASSERT( ba->size() == m->size() ); //TODO
+	} else {
+		ba->clear();
+	}
+}
+
+
+void Metastock::readMasters()
+{
+	readMaster( master, ba_master );
+	readMaster( emaster, ba_emaster );
+	readMaster( xmaster, ba_xmaster );
+	qDebug() << ba_master->size() << (double)ba_master->size()/53;
+	qDebug() << ba_emaster->size() << (double)ba_emaster->size()/192;
+	qDebug() << ba_xmaster->size() << (double)ba_xmaster->size()/150;
 }
 
 

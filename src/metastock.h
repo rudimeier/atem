@@ -1,11 +1,11 @@
 #ifndef METASTOCK_H
-#define METASTOCK_H_H
-
+#define METASTOCK_H
 
 
 
 class QDir;
 class QFile;
+class QByteArray;
 
 
 class Metastock
@@ -15,6 +15,7 @@ class Metastock
 		~Metastock();
 		
 		bool setDir( const char* dir );
+		void readMasters();
 		
 		void dumpInfo() const;
 		const char* lastError() const;
@@ -26,6 +27,10 @@ class Metastock
 		QFile *master;
 		QFile *emaster;
 		QFile *xmaster;
+		
+		QByteArray *ba_master;
+		QByteArray *ba_emaster;
+		QByteArray *ba_xmaster;
 		
 		const char* error;
 };
