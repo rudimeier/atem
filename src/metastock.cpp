@@ -7,6 +7,37 @@
 
 
 
+
+class MasterRecord
+{
+	public:
+		static bool checkHeader( const char* buf );
+		static bool checkRecord( const char* buf, int record  );
+};
+
+
+bool MasterRecord::checkHeader( const char* buf )
+{
+	unsigned char countRecords = buf[0];
+	Q_ASSERT( buf[1] == '\0' );
+	unsigned char lastUsedRecord = buf[2];
+	Q_ASSERT( buf[3] == '\0' );
+	Q_ASSERT( countRecords == lastUsedRecord );
+	for( int i=4; i<49; i++ ) {
+		Q_ASSERT( buf[i] == '\0' );
+	}
+	for( int i=49; i<53; i++ ) {
+		// unknown
+	}
+	
+	return true;
+}
+
+
+
+
+
+
 Metastock::Metastock() :
 	dir(NULL),
 	master(NULL),
@@ -119,6 +150,9 @@ void Metastock::dumpInfo() const
 //		i = i + 1;
 //	}
 //	}
+	
+	MasterRecord::checkHeader(ba_master->constData());
+	
 	{
 	int i = 1;
 	int count = ba_master->size() / 53;
