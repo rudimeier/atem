@@ -22,6 +22,8 @@ class MasterFile
 	private:
 		bool checkRecords() const;
 		bool checkRecord( unsigned char r ) const;
+		void printRecord( const char *record ) const;
+		
 		
 		static const unsigned int record_length = 53;
 		
@@ -75,6 +77,7 @@ bool MasterFile::checkRecord( unsigned char r ) const
 {
 	Q_ASSERT( r > 0 );
 	const char *record = buf + (record_length * r);
+	printRecord( record );
 	Q_ASSERT( record[0] != '\0' ); // F#.dat
 	Q_ASSERT( record[1] == 0x65 );
 	Q_ASSERT( record[2] == '\0' );
@@ -104,6 +107,14 @@ bool MasterFile::checkRecord( unsigned char r ) const
 	
 	
 	return true;
+}
+
+
+void MasterFile::printRecord( const char *record ) const
+{
+	qDebug() << "F.dat:" << "'" << (unsigned char)record[0] << "'";
+	qDebug() << "name:" << "'" << record + 7 << "'";
+	qDebug() << "symbol:" << "'" << record + 36 << "'";
 }
 
 
