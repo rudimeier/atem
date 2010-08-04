@@ -411,14 +411,50 @@ bool XMasterFile::checkRecord( int r ) const
 	// char 0 always '\x01'?
 	// char 1 - 14 symbol?
 	// char 15 always zero
-	// char 16 -  name?
-	// char 41 -  always '\xff'
-	char b_46 = readChar( record, 46);
+	// char 16 - ? name
+	// char 61 always '\x00'
+	// char 62 time frame
+	// char 63 always '\x00'
+	// char 64 always '\x00'
+	// char 65 - 66 F#.mwd
+	// char 67 always '\x00'
+	// char 68 always '\x00'
+	// char 69 always '\x00'
+	// char 70 fields bit set, always '\x7f' or '\x3f'
+	// char 71 - 79 always '\x00'
+	// char 80 - 83 start date
+	// char 84 - 86 short start date
+	// char 87 - 103 always '\x00'
+	// char 104 - 107 first date
+	// char 108 - 111 last date
+	// char 112 - 115 always '\x00'
+	// char 116 - 119 last date
+	// char 120 - 149 always '\x00'
 	
 	
 	Q_ASSERT( readChar( record, 0) == '\x01' );
 	Q_ASSERT( readChar( record, 15) == '\x00' );
-// 	Q_ASSERT( readChar( record, 41) == '\xff' );
+	Q_ASSERT( readChar( record, 61) == '\x00' );
+	Q_ASSERT( readChar( record, 62) == 'D' );
+	Q_ASSERT( readChar( record, 63) == '\x00' );
+	Q_ASSERT( readChar( record, 64) == '\x00' );
+	Q_ASSERT( readChar( record, 67) == '\x00' );
+	Q_ASSERT( readChar( record, 68) == '\x00' );
+	Q_ASSERT( readChar( record, 69) == '\x00' );
+	Q_ASSERT( readChar( record, 70) == '\x7f' || readChar( record, 70) == '\x3f' );
+	for( int i = 71; i<=79; i++ ) {
+		Q_ASSERT( readChar( record, i ) == '\x00' );
+	}
+	Q_ASSERT( readChar( record, 70) == '\x7f' || readChar( record, 70) == '\x3f' );
+	for( int i = 87; i<=103; i++ ) {
+		Q_ASSERT( readChar( record, i ) == '\x00' );
+	}
+	for( int i = 112; i<=115; i++ ) {
+		Q_ASSERT( readChar( record, i ) == '\x00' );
+	}
+	for( int i = 120; i<=149; i++ ) {
+		Q_ASSERT( readChar( record, i ) == '\x00' );
+	}
 // 	Q_ASSERT( b_46 == '\x7f' );
 	
 	return true;
@@ -428,7 +464,7 @@ bool XMasterFile::checkRecord( int r ) const
 void XMasterFile::printRecord( const char *record ) const
 {
 	fprintf( stdout, "F.dat:\t'%d'\nSymbol:\t'%s'\nName:\t'%s'\n",
-		readUnsignedChar( record, 0 ),
+		readUnsignedShort( record, 65 ),
 		record + 1,
 		record + 16 );
 }
