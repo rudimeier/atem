@@ -28,6 +28,110 @@ unsigned short readUnsignedShort( const char *c, int offset )
 }
 
 
+/**
+ Read a signed four byte int, least significant byte first
+ */
+int readInt( const char *c, int offset )
+{
+	unsigned int b0 = (unsigned char) c[offset];
+	unsigned int b1 = (unsigned char) c[offset+1];
+	unsigned int b2 = (unsigned char) c[offset+2];
+	unsigned int b3 = (char) c[offset+3];
+	
+	return (b0 | b1 << 8 | b2 << 16 | b3 << 24);
+}
+
+
+/**
+ Read a four-byte Microsoft QBasic format float,
+ convert to IEEE standard float for Java.
+ <pre>
+ Microsoft 4 byte float
+         31     24 23 22                       0
+         .-------------------------------------.
+         | 8 bits |s|msb  23 bit mantissa   lsb|
+         `-------------------------------------'
+              |    |              `----------------  mantissa
+              |    `----------------------------  sign bit
+              `------------------------------  biased exponent (81h)
+
+ b0        b1        b2        b3
+ Microsoft Basic LE
+ mmmm|mmmm mmmm|mmmm smmm|mmmm eeee|eeee
+ BE
+ eeee|eeee smmm|mmmm mmmm|mmmm mmmm|mmmm
+
+ IEEE 4 byte float
+         31 30    23 22                        0
+         .-------------------------------------.
+         |s| 8 bits |msb   23 bit mantissa  lsb|
+         `-------------------------------------'
+          |      |                `----------------  mantissa
+          |      `--------------------------------  biased exponent (7fh)
+          `-------------------------------------  sign bit
+
+ IEEE LE
+ mmmm|mmmm mmmm|mmmm emmm|mmmm seee|eeee
+ BE
+ seee|eeee emmm|mmmm mmmm|mmmm mmmm|mmmm
+ </pre>
+ [diagram by verec in http://www.jfb-city.co.uk/code/Metastock_Reader.zip
+ released to public domain in
+ http://www.turtletradingsoftware.com/forum/viewtopic.php?t=742]
+ */
+float readFloat( const char *c, int offset )
+{
+	int b0 = (unsigned char) c[offset];
+	int b1 = (unsigned char) c[offset+1];
+	int b2 = (unsigned char) c[offset+2];
+	int b3 = (unsigned char) c[offset+3];
+	int mantissa = (b2 << 16 | b1 << 8 | b0) & 0x7fffff;
+	int sign = b2 & 0x80;
+	int exponent = b3 - 2;
+	int ieeeFloatBits = sign << 24 | exponent << 23 | mantissa;
+	float ret = (float) ieeeFloatBits;
+	return ret;
+}
+
+/**
+ Convert an integer YYMMDD or YYYMMDD or YYYYMMDD to java.util.Date.
+ 1900 is added to years less than 1000, so 1040101 is read as 20040101.
+ */
+// private Date toDate(int i)
+// {
+// 	int dateOfMonth = i % 100;
+// 	i /= 100;
+// 	int month = i % 100;
+// 	i /= 100;
+// 	int year = i;
+// 	if (year < 1000)
+// 		year += 1900;
+// 	calendar.clear();
+// 	calendar.set(year, month - 1, dateOfMonth);
+// 	int parsedYear = calendar.get(Calendar.YEAR);
+// 	return calendar.getTime();
+// }
+
+/**
+ Read date formatted as a float YYMMDD or YYYMMDD or YYYYMMDD.
+ 1900 is added to years less than 1000, so 1040101 is read as 20040101.
+ */
+// public Date readFloatDate() throws IOException
+// {
+// 	float f = readFloat();
+// 	return toDate((int) f);
+// }
+
+
+/**
+ Read date formatted as an integer YYMMDD or YYYMMDD or YYYYMMDD.
+ 1900 is added to years less than 1000, so 1040101 is read as 20040101.
+ */
+// public Date readIntegerDate() throws IOException
+// {
+// 	int i = readInt();
+// 	return toDate(i);
+// }
 
 
 
