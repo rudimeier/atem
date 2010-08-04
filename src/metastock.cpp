@@ -17,6 +17,16 @@ unsigned char readUnsignedChar( const char *c, int offset )
 	return (unsigned char) c[offset];
 }
 
+unsigned short readUnsignedShort( const char *c, int offset )
+{
+// 	const unsigned short bla = *(const unsigned short*) (c + offset);
+	
+	unsigned short a = (unsigned char) c[offset];
+	unsigned short b = (unsigned char) c[offset+1];
+	
+	return a | (b << 8);
+}
+
 
 
 
@@ -310,6 +320,132 @@ unsigned char EMasterFile::countRecords() const
 
 
 
+class XMasterFile
+{
+	public:
+		XMasterFile( const char *buf, int size );
+		
+		static bool checkHeader( const char* buf );
+		static bool checkRecord( const char* buf, int record  );
+		
+		bool check() const;
+		inline unsigned short countRecords() const;
+		
+	private:
+		bool checkHeader() const;
+		bool checkRecords() const;
+		bool checkRecord( int r ) const;
+		void printRecord( const char *record ) const;
+		
+		
+		static const unsigned int record_length = 150;
+		
+		const char * const buf;
+		const int size;
+};
+
+
+XMasterFile::XMasterFile( const char *_buf, int _size ) :
+	buf( _buf ),
+	size( _size )
+{
+}
+
+
+bool XMasterFile::check() const
+{
+	checkHeader();
+	checkRecords();
+	return true;
+}
+
+
+bool XMasterFile::checkHeader() const
+{
+	Q_ASSERT( size % record_length == 0 );
+	qDebug() << countRecords() << (size / record_length - 1);
+	Q_ASSERT( countRecords() == (size / record_length - 1) );
+	
+	Q_ASSERT( readChar(buf, 0) == '\x5d' );
+	Q_ASSERT( readChar(buf, 1) == '\xFE' );
+	Q_ASSERT( readChar(buf, 2) == 'X' );
+	Q_ASSERT( readChar(buf, 3) == 'M' );
+	// char 4 - 9 unknown
+	Q_ASSERT( readUnsignedShort(buf, 10) ==  countRecords() );
+	Q_ASSERT( readChar( buf, 12 ) == '\x00' );
+	Q_ASSERT( readChar( buf, 13 ) == '\x00' );
+	Q_ASSERT( readUnsignedShort(buf, 14) ==  countRecords() );
+	Q_ASSERT( readChar( buf, 16 ) == '\x00' );
+	Q_ASSERT( readChar( buf, 17 ) == '\x00' );
+	
+	// last used + 1 !?
+	Q_ASSERT( readUnsignedShort(buf, 18) > countRecords() );
+	Q_ASSERT( readChar( buf, 20 ) == '\x00' );
+	Q_ASSERT( readChar( buf, 21 ) == '\x00' );
+	
+	// char 22 -191 unknown
+	
+	return true;
+}
+
+
+bool XMasterFile::checkRecords() const
+{
+	qDebug() << "KKK" << countRecords();
+	for( int i = 1; i <= countRecords(); i++ ) {
+		bool ok = checkRecord( i );
+		if( !ok ) {
+			return false;
+		}
+	}
+	return true;
+}
+
+
+bool XMasterFile::checkRecord( int r ) const
+{
+	Q_ASSERT( r > 0 );
+	const char *record = buf + (record_length * r);
+	printRecord( record );
+	
+	// char 0 always '\x01'?
+	// char 1 - 14 symbol?
+	// char 15 always zero
+	// char 16 -  name?
+	// char 41 -  always '\xff'
+	char b_46 = readChar( record, 46);
+	
+	
+	Q_ASSERT( readChar( record, 0) == '\x01' );
+	Q_ASSERT( readChar( record, 15) == '\x00' );
+// 	Q_ASSERT( readChar( record, 41) == '\xff' );
+// 	Q_ASSERT( b_46 == '\x7f' );
+	
+	return true;
+}
+
+
+void XMasterFile::printRecord( const char *record ) const
+{
+	fprintf( stdout, "F.dat:\t'%d'\nSymbol:\t'%s'\nName:\t'%s'\n",
+		readUnsignedChar( record, 0 ),
+		record + 1,
+		record + 16 );
+}
+
+
+unsigned short XMasterFile::countRecords() const
+{
+	return readUnsignedShort( buf, 10 );
+}
+
+
+
+
+
+
+
+
 Metastock::Metastock() :
 	dir(NULL),
 	master(NULL),
@@ -426,7 +562,9 @@ void Metastock::dumpInfo() const
 	MasterFile mf( ba_master->constData(), ba_master->size() );
 // 	mf.check();
 	EMasterFile emf( ba_emaster->constData(), ba_emaster->size() );
-	emf.check();
+// 	emf.check();
+	XMasterFile xmf( ba_xmaster->constData(), ba_xmaster->size() );
+	xmf.check();
 	return;
 	{
 	int i = 1;
