@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
 	if( ! ms.setDir( ms_dirp ) ) {
 		fprintf( stderr, "error: %s\n",
 			ms.lastError() );
+	} else {
+		ms.dumpInfo();
 	}
-	
-	ms.dumpInfo();
 }

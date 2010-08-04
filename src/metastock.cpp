@@ -7,6 +7,20 @@
 
 
 
+char readChar( const char *c, int offset )
+{
+	return (char)(c[offset]);
+}
+
+unsigned char readUnsignedChar( const char *c, int offset )
+{
+	return (unsigned char) c[offset];
+}
+
+
+
+
+
 
 class MasterFile
 {
@@ -17,9 +31,10 @@ class MasterFile
 		static bool checkRecord( const char* buf, int record  );
 		
 		bool check() const;
-		unsigned char countRecords() const;
+		inline unsigned char countRecords() const;
 		
 	private:
+		bool checkHeader() const;
 		bool checkRecords() const;
 		bool checkRecord( unsigned char r ) const;
 		void printRecord( const char *record ) const;
@@ -41,22 +56,27 @@ MasterFile::MasterFile( const char *_buf, int _size ) :
 
 bool MasterFile::check() const
 {
-	Q_ASSERT( countRecords() == (unsigned char) buf[2] );
-	Q_ASSERT( countRecords() == size / record_length - 1 && size % record_length == 0 );
+	checkHeader();
+	checkRecords();
+	return true;
+}
+
+
+bool MasterFile::checkHeader() const
+{
+	Q_ASSERT( size % record_length == 0 );
+	Q_ASSERT( countRecords() == (size / record_length - 1) );
 	
-	unsigned char countRecords = buf[0];
-	Q_ASSERT( buf[1] == '\0' );
-	unsigned char lastUsedRecord = buf[2];
-	Q_ASSERT( buf[3] == '\0' );
-	Q_ASSERT( countRecords == lastUsedRecord );
+	Q_ASSERT( readUnsignedChar(buf, 0) == countRecords() );
+	Q_ASSERT( readChar(buf, 1) == '\x00' );
+	Q_ASSERT( readUnsignedChar(buf, 2) == countRecords() );
+	Q_ASSERT( readChar(buf, 3) == '\x00' );
 	for( int i=4; i<49; i++ ) {
-		Q_ASSERT( buf[i] == '\0' );
+		Q_ASSERT( readChar(buf, i) == '\x00' );
 	}
 	for( int i=49; i<53; i++ ) {
 		// unknown
 	}
-	
-	checkRecords();
 	return true;
 }
 
@@ -78,13 +98,13 @@ bool MasterFile::checkRecord( unsigned char r ) const
 	Q_ASSERT( r > 0 );
 	const char *record = buf + (record_length * r);
 	printRecord( record );
-	Q_ASSERT( record[0] != '\0' ); // F#.dat
-	Q_ASSERT( record[1] == 0x65 );
-	Q_ASSERT( record[2] == '\0' );
-	Q_ASSERT( record[3] == 0x1c ); // record length
-	Q_ASSERT( record[4] == 0x07 ); // record count
-	Q_ASSERT( record[5] == 0x00 );
-	Q_ASSERT( record[6] == 0x00 );
+	Q_ASSERT( readUnsignedChar( record, 0) > 0 ); // F#.dat
+	Q_ASSERT( readChar( record, 1 ) == '\x65' );
+	Q_ASSERT( readChar( record, 2 ) == '\x00' );
+	Q_ASSERT( readChar( record, 3 ) == '\x1c' ); // record length
+	Q_ASSERT( readChar( record, 4 ) == '\x07' ); // record count
+	Q_ASSERT( readChar( record, 5 ) == '\x00' );
+	Q_ASSERT( readChar( record, 6 ) == '\x00' );
 	for( int i=7; i < 23; i++ ) {
 		//just a string "issue name"
 	}
@@ -103,7 +123,7 @@ bool MasterFile::checkRecord( unsigned char r ) const
 	for( int i=36; i < 52; i++ ) {
 		//just a string "symbol", space padded?
 	}
-	Q_ASSERT( record[52] == '\0' );
+	Q_ASSERT( readChar( record, 52 ) == '\0' );
 	
 	
 	return true;
@@ -112,15 +132,16 @@ bool MasterFile::checkRecord( unsigned char r ) const
 
 void MasterFile::printRecord( const char *record ) const
 {
-	qDebug() << "F.dat:" << "'" << (unsigned char)record[0] << "'";
-	qDebug() << "name:" << "'" << record + 7 << "'";
-	qDebug() << "symbol:" << "'" << record + 36 << "'";
+	fprintf( stdout, "F.dat:\t'%d'\nSymbol:\t'%s'\nName:\t'%s'\n",
+		readUnsignedChar( record, 0 ),
+		record + 36,
+		record + 7 );
 }
 
 
 unsigned char MasterFile::countRecords() const
 {
-	return buf[0];
+	return readChar( buf, 0 );
 }
 
 
