@@ -91,10 +91,7 @@ float readFloat( const char *c, int offset )
 	int ieeeFloatBits = sign << 24 | exponent << 23 | mantissa;
 	float *fp = (float*)&ieeeFloatBits;
 	
-	qDebug() << "AA" << ieeeFloatBits;
-	qDebug() << "BB" << *fp;
-	float ret = (float) ieeeFloatBits;
-	return ret;
+	return *fp;
 }
 
 /**
@@ -598,6 +595,105 @@ unsigned short XMasterFile::countRecords() const
 
 
 
+class FDat
+{
+	public:
+		FDat( const char *buf, int size );
+		
+		static bool checkHeader( const char* buf );
+		static bool checkRecord( const char* buf, int record  );
+		
+		bool check() const;
+		inline unsigned short countRecords() const;
+		
+	private:
+		bool checkHeader() const;
+		bool checkRecords() const;
+		bool checkRecord( int r ) const;
+		void printRecord( const char *record ) const;
+		
+		
+		static const unsigned int header_length = 28;
+		static const unsigned int record_length = 28;
+		
+		const char * const buf;
+		const int size;
+};
+
+
+FDat::FDat( const char *_buf, int _size ) :
+	buf( _buf ),
+	size( _size )
+{
+}
+
+
+bool FDat::check() const
+{
+	checkHeader();
+	checkRecords();
+	return true;
+}
+
+
+bool FDat::checkHeader() const
+{
+	Q_ASSERT( (size - header_length) % record_length == 0 );
+	qDebug() << "FFF" << countRecords() << ((size - header_length) / record_length);
+	Q_ASSERT( countRecords() == (size - header_length) / record_length);
+	
+// 	Q_ASSERT( readChar(buf, 0) == '\x5d' );
+	
+	return true;
+}
+
+
+bool FDat::checkRecords() const
+{
+	qDebug() << "FFF" << countRecords();
+	for( int i = 1; i <= countRecords(); i++ ) {
+		bool ok = checkRecord( i );
+		if( !ok ) {
+			return false;
+		}
+	}
+	return true;
+}
+
+
+bool FDat::checkRecord( int r ) const
+{
+	Q_ASSERT( r > 0 );
+	const char *record = buf + (record_length * r);
+	printRecord( record );
+	
+
+	
+	return true;
+}
+
+
+void FDat::printRecord( const char *record ) const
+{
+	fprintf( stdout, "date:\t'%f'\nopen:\t'%f'\nhigh:\t'%f'\n",
+		readFloat( record, 0 ),
+		readFloat( record, 4 ),
+		readFloat( record, 8 ));
+}
+
+
+unsigned short FDat::countRecords() const
+{
+	return readUnsignedShort( buf, 2 ) -1;
+}
+
+
+
+
+
+
+
+
 Metastock::Metastock() :
 	dir(NULL),
 	master(NULL),
@@ -731,6 +827,8 @@ void Metastock::dumpInfo() const
 // 	emf.check();
 	XMasterFile xmf( ba_xmaster->constData(), ba_xmaster->size() );
 // 	xmf.check();
+	FDat datfile( ba_fdat->constData(), ba_fdat->size() );
+	datfile.check();
 	return;
 	{
 	int i = 1;
