@@ -89,6 +89,10 @@ float readFloat( const char *c, int offset )
 	int sign = b2 & 0x80;
 	int exponent = b3 - 2;
 	int ieeeFloatBits = sign << 24 | exponent << 23 | mantissa;
+	float *fp = (float*)&ieeeFloatBits;
+	
+	qDebug() << "AA" << ieeeFloatBits;
+	qDebug() << "BB" << *fp;
 	float ret = (float) ieeeFloatBits;
 	return ret;
 }
@@ -358,16 +362,19 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	char b_60 = readChar( record, 60); // time frame 'D'
 	// char 61 - 63 always zero
 	// char 64 - 67 first date
+	qDebug() << "EEE 1 int" << readFloat( record, 64 );
 	// char 68 - 71 always zero
 	// char 72 - 75 last date
+	qDebug() << "EEE 2 int" << readFloat( record, 72 );
 	// char 76 - 125 always zero (start/end times could be here)
 	// char 126 - 129 last date in long format
+	qDebug() << "EEE 3 int" << readFloat( record, 126 );
 	// char 130 - 138 always zero
 	// char 139 - 191 long name?
 	char b_191 = readChar( record, 191); // last byte always zero
 	
-	Q_ASSERT( b_0 == '\x36' || b_0 == '\x00' );
-	Q_ASSERT( b_1 == b_0 );
+// 	Q_ASSERT( b_0 == '\x36' || b_0 == '\x00' );
+// 	Q_ASSERT( b_1 == b_0 );
 	Q_ASSERT( b_2 > 0 && b_2 <= countRecords() );
 	for( int i = 3; i<=5; i++ ) {
 		Q_ASSERT( readChar( record, i ) == '\x00' );
@@ -405,10 +412,11 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 
 void EMasterFile::printRecord( const char *record ) const
 {
-	fprintf( stdout, "F.dat:\t'%d'\nSymbol:\t'%s'\nName:\t'%s'\n",
+	fprintf( stdout, "F.dat:\t'%d'\nSymbol:\t'%s'\nName1:\t'%s'\nName2:\t'%s'\n",
 		readUnsignedChar( record, 0 ),
-		record + 36,
-		record + 7 );
+		record + 11,
+		record + 32,
+		record + 139 );
 }
 
 
@@ -527,12 +535,16 @@ bool XMasterFile::checkRecord( int r ) const
 	// char 70 fields bit set, always '\x7f' or '\x3f'
 	// char 71 - 79 always '\x00'
 	// char 80 - 83 start date
-	// char 84 - 86 short start date
+	qDebug() << "XXX 1 int" << readInt( record, 80 );
+	// char 84 - 86 short start date ???
 	// char 87 - 103 always '\x00'
 	// char 104 - 107 first date
+	qDebug() << "XXX 2 int" << readInt( record, 104 );
 	// char 108 - 111 last date
+	qDebug() << "XXX 3 int" << readInt( record, 108 );
 	// char 112 - 115 always '\x00'
 	// char 116 - 119 last date
+	qDebug() << "XXX 4 int" << readInt( record, 116 );
 	// char 120 - 149 always '\x00'
 	
 	
@@ -700,9 +712,9 @@ void Metastock::dumpInfo() const
 //	}
 	
 	MasterFile mf( ba_master->constData(), ba_master->size() );
-// 	mf.check();
+	mf.check();
 	EMasterFile emf( ba_emaster->constData(), ba_emaster->size() );
-// 	emf.check();
+	emf.check();
 	XMasterFile xmf( ba_xmaster->constData(), ba_xmaster->size() );
 	xmf.check();
 	return;
