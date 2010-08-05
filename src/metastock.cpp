@@ -687,10 +687,14 @@ bool FDat::checkRecord( int r ) const
 
 void FDat::printRecord( const char *record ) const
 {
-	fprintf( stdout, "date:\t'%f'\nopen:\t'%f'\nhigh:\t'%f'\n",
-		readFloat( record, 0 ),
+	fprintf( stdout, "%d\t%.5f\t%.5f\t%.5f\t%.5f\t%g\t%g\n",
+		floatToIntDate_YYY( readFloat( record, 0 ) ),
 		readFloat( record, 4 ),
-		readFloat( record, 8 ));
+		readFloat( record, 8 ),
+		readFloat( record, 12 ),
+		readFloat( record, 16 ),
+		readFloat( record, 20 ),
+		readFloat( record, 24 ));
 }
 
 
@@ -777,7 +781,7 @@ bool Metastock::setDir( const char* d )
 	xmaster = findMaster( "XMASTER" );
 	
 	//just test
-	fdat = findMaster("f1.dat");
+	fdat = findMaster("f14.dat");
 	if( fdat == NULL ) {
 		error = "no fdat found";
 		return false;
