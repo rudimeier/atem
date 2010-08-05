@@ -259,10 +259,15 @@ bool MasterFile::checkRecord( unsigned char r ) const
 
 void MasterFile::printRecord( const char *record ) const
 {
-	fprintf( stdout, "F.dat:\t'%d'\nSymbol:\t'%s'\nName:\t'%s'\n",
-		readUnsignedChar( record, 0 ),
-		record + 36,
-		record + 7 );
+	fprintf( stdout, "F%d.dat\t%d\t%d\t%d\t%d\t'%s'\t'%s'\n",
+		readUnsignedChar( record, 0 ), // F#.dat
+		readChar( record, 3 ), // dat record length in bytes
+		readChar( record, 4 ), // dat fields count per record
+		floatToIntDate_YYY( readFloat( record, 25 ) ),
+		floatToIntDate_YYY( readFloat( record, 29 ) ),
+		record + 36, // symbol
+		record + 7 // name
+		);
 }
 
 
@@ -824,7 +829,7 @@ const char* Metastock::lastError() const
 void Metastock::dumpInfo() const
 {
 	MasterFile mf( ba_master->constData(), ba_master->size() );
-// 	mf.check();
+	mf.check();
 	EMasterFile emf( ba_emaster->constData(), ba_emaster->size() );
 // 	emf.check();
 	XMasterFile xmf( ba_xmaster->constData(), ba_xmaster->size() );
