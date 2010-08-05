@@ -499,6 +499,8 @@ class XMasterFile
 		bool checkHeader() const;
 		bool checkRecords() const;
 		bool checkRecord( int r ) const;
+		
+		void printHeader() const;
 		void printRecord( const char *record ) const;
 		
 		
@@ -527,8 +529,9 @@ bool XMasterFile::check() const
 bool XMasterFile::checkHeader() const
 {
 	Q_ASSERT( size % record_length == 0 );
-	qDebug() << countRecords() << (size / record_length - 1);
 	Q_ASSERT( countRecords() == (size / record_length - 1) );
+	
+	printHeader();
 	
 	Q_ASSERT( readChar(buf, 0) == '\x5d' );
 	Q_ASSERT( readChar(buf, 1) == '\xFE' );
@@ -553,9 +556,19 @@ bool XMasterFile::checkHeader() const
 }
 
 
+void XMasterFile::printHeader() const
+{
+	fprintf( stdout, "XMASTER:\t%d\t%d\t%d\t'%s'\n",
+		readUnsignedShort(buf, 10), // count records (stored in master?)
+		readUnsignedShort(buf, 14), // count records (the same?)
+		readUnsignedShort(buf, 18), // last used record
+		buf + 22 //  // unkown, equis sends a string
+		);
+}
+
+
 bool XMasterFile::checkRecords() const
 {
-	qDebug() << "KKK" << countRecords();
 	for( int i = 1; i <= countRecords(); i++ ) {
 		bool ok = checkRecord( i );
 		if( !ok ) {
