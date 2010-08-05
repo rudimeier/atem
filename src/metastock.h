@@ -27,10 +27,12 @@ class Metastock
 		QFile *master;
 		QFile *emaster;
 		QFile *xmaster;
+		QFile *fdat;
 		
 		QByteArray *ba_master;
 		QByteArray *ba_emaster;
 		QByteArray *ba_xmaster;
+		QByteArray *ba_fdat;
 		
 		const char* error;
 };

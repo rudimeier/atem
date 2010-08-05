@@ -603,9 +603,11 @@ Metastock::Metastock() :
 	master(NULL),
 	emaster(NULL),
 	xmaster(NULL),
+	fdat(NULL),
 	ba_master( new QByteArray() ),
 	ba_emaster( new QByteArray() ),
 	ba_xmaster( new QByteArray() ),
+	ba_fdat( new QByteArray() ),
 	error("")
 {
 }
@@ -620,9 +622,11 @@ Metastock::Metastock() :
 
 Metastock::~Metastock()
 {
+	delete ba_fdat;
 	delete ba_xmaster;
 	delete ba_emaster;
 	delete ba_master;
+	SAFE_DELETE( fdat );
 	SAFE_DELETE( xmaster );
 	SAFE_DELETE( emaster );
 	SAFE_DELETE( master );
@@ -664,6 +668,13 @@ bool Metastock::setDir( const char* d )
 	// xmaster is optional
 	xmaster = findMaster( "XMASTER" );
 	
+	//just test
+	fdat = findMaster("f1.dat");
+	if( fdat == NULL ) {
+		error = "no fdat found";
+		return false;
+	}
+	
 	readMasters();
 	
 	return true;
@@ -690,6 +701,9 @@ void Metastock::readMasters()
 	qDebug() << ba_master->size() << (double)ba_master->size()/53;
 	qDebug() << ba_emaster->size() << (double)ba_emaster->size()/192;
 	qDebug() << ba_xmaster->size() << (double)ba_xmaster->size()/150;
+	
+	readMaster( fdat, ba_fdat );
+	qDebug() << ba_fdat->size() << (double)(ba_fdat->size()-28)/32;
 }
 
 
@@ -712,11 +726,11 @@ void Metastock::dumpInfo() const
 //	}
 	
 	MasterFile mf( ba_master->constData(), ba_master->size() );
-	mf.check();
+// 	mf.check();
 	EMasterFile emf( ba_emaster->constData(), ba_emaster->size() );
-	emf.check();
+// 	emf.check();
 	XMasterFile xmf( ba_xmaster->constData(), ba_xmaster->size() );
-	xmf.check();
+// 	xmf.check();
 	return;
 	{
 	int i = 1;
