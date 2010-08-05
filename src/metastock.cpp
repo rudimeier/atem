@@ -600,16 +600,12 @@ bool XMasterFile::checkRecord( int r ) const
 	// char 70 fields bit set, always '\x7f' or '\x3f'
 	// char 71 - 79 always '\x00'
 	// char 80 - 83 start date
-	qDebug() << "XXX 1 int" << readInt( record, 80 );
 	// char 84 - 86 short start date ???
 	// char 87 - 103 always '\x00'
 	// char 104 - 107 first date
-	qDebug() << "XXX 2 int" << readInt( record, 104 );
 	// char 108 - 111 last date
-	qDebug() << "XXX 3 int" << readInt( record, 108 );
 	// char 112 - 115 always '\x00'
 	// char 116 - 119 last date
-	qDebug() << "XXX 4 int" << readInt( record, 116 );
 	// char 120 - 149 always '\x00'
 	
 	
@@ -644,10 +640,18 @@ bool XMasterFile::checkRecord( int r ) const
 
 void XMasterFile::printRecord( const char *record ) const
 {
-	fprintf( stdout, "F.dat:\t'%d'\nSymbol:\t'%s'\nName:\t'%s'\n",
-		readUnsignedShort( record, 65 ),
-		record + 1,
-		record + 16 );
+	fprintf( stdout, "F%4d.mwd\t%c\t%d\t%d\t%d\t%d\t%d\t'%s'\t'%s'\n",
+		readUnsignedShort( record, 65 ), // F#.mwd
+		readChar( record, 62 ), // time frame 'D'
+		readUnsignedChar( record, 70 ), // fields bitset
+		readInt( record, 80 ), // some date ?
+// 		readInt( record, 84 ), // stupid date? forst 3 bytes equal 
+		readInt( record, 104 ), // some date ?
+		readInt( record, 108 ), // some date ?
+		readInt( record, 116 ), // some date ?
+		record + 1, // symbol
+		record + 16 // name
+		);
 }
 
 
