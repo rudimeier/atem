@@ -312,6 +312,8 @@ class EMasterFile
 		bool checkHeader() const;
 		bool checkRecords() const;
 		bool checkRecord( unsigned char r ) const;
+		
+		void printHeader() const;
 		void printRecord( const char *record ) const;
 		
 		
@@ -342,6 +344,8 @@ bool EMasterFile::checkHeader() const
 	Q_ASSERT( size % record_length == 0 );
 	Q_ASSERT( countRecords() == (size / record_length - 1) );
 	
+	printHeader();
+	
 	Q_ASSERT( readUnsignedChar(buf, 0) == countRecords() );
 	Q_ASSERT( readChar(buf, 1) == '\x00' );
 	Q_ASSERT( readUnsignedChar(buf, 2) == countRecords() );
@@ -349,10 +353,21 @@ bool EMasterFile::checkHeader() const
 	for( int i=4; i<49; i++ ) {
 		Q_ASSERT( readChar(buf, i) == '\x00' );
 	}
-	for( int i=49; i<53; i++ ) {
+	for( int i=49; i<52; i++ ) {
 		// unknown
 	}
 	return true;
+}
+
+
+void EMasterFile::printHeader() const
+{
+	fprintf( stdout, "EMASTER:\t%d\t%d\t%X\t'%s'\n",
+		readUnsignedChar(buf, 0), // count records (stored in master?)
+		readUnsignedChar(buf, 2), // count records (existing dat files?)
+		readInt(buf, 49), // unknown - just print as hex
+		buf + 53 // unkown, equis sends a string
+		);
 }
 
 
