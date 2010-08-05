@@ -94,6 +94,18 @@ float readFloat( const char *c, int offset )
 	return *fp;
 }
 
+
+
+int floatToIntDate_YYY( float d )
+{
+	// between 1900-01-01 and 2099-12-31
+	Q_ASSERT( d>=101 && d <= 1991231 );
+	// is integer
+	Q_ASSERT( (int)d == d );
+	return ((int)d) + 19000000;
+}
+
+
 /**
  Convert an integer YYMMDD or YYYMMDD or YYYYMMDD to java.util.Date.
  1900 is added to years less than 1000, so 1040101 is read as 20040101.
