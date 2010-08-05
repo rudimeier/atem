@@ -273,7 +273,7 @@ bool MasterFile::checkRecord( unsigned char r ) const
 
 void MasterFile::printRecord( const char *record ) const
 {
-	fprintf( stdout, "F%d.dat\t%d\t%d\t%d\t%d\t'%s'\t'%s'\n",
+	fprintf( stdout, "F%4d.dat\t%d\t%d\t%d\t%d\t'%s'\t'%s'\n",
 		readUnsignedChar( record, 0 ), // F#.dat
 		readChar( record, 3 ), // dat record length in bytes
 		readChar( record, 4 ), // dat fields count per record
@@ -405,13 +405,10 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	char b_60 = readChar( record, 60); // time frame 'D'
 	// char 61 - 63 always zero
 	// char 64 - 67 first date
-	qDebug() << "EEE 1 int" << readFloat( record, 64 );
 	// char 68 - 71 always zero
 	// char 72 - 75 last date
-	qDebug() << "EEE 2 int" << readFloat( record, 72 );
 	// char 76 - 125 always zero (start/end times could be here)
 	// char 126 - 129 last date in long format
-	qDebug() << "EEE 3 int" << readFloat( record, 126 );
 	// char 130 - 138 always zero
 	// char 139 - 191 long name?
 	char b_191 = readChar( record, 191); // last byte always zero
@@ -455,11 +452,23 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 
 void EMasterFile::printRecord( const char *record ) const
 {
-	fprintf( stdout, "F.dat:\t'%d'\nSymbol:\t'%s'\nName1:\t'%s'\nName2:\t'%s'\n",
-		readUnsignedChar( record, 0 ),
-		record + 11,
-		record + 32,
-		record + 139 );
+// 	fprintf( stdout, "F%d.dat\t%d\t%d\t%d\t%d\t'%s'\t'%s'\n",
+	fprintf( stdout, "F%4d.dat\t%d\t%d\t%c\t%X\t%X\t'%s'\t'%s'\t'%s'\n",
+		readUnsignedChar( record, 2),  // F#.dat
+		readChar( record, 7 ), // fields bit set
+		readChar( record, 6 ), // dat fields count per record
+		readChar( record, 60 ), // time frame 'D'
+		// never saw these floats
+// 		readFloat( record, 64 ),
+// 		readFloat( record, 72 ),
+// 		readFloat( record, 126 ),
+// 		readFloat( record, 131 ),
+// 		readFloat( record, 135 ),
+		readUnsignedChar( record, 0 ), // unknown, just print hex
+		readUnsignedChar( record, 1 ), // unknown, just print hex
+		record + 11, // symbol
+		record + 32, // name
+		record + 139 ); // name when "too long"
 }
 
 
