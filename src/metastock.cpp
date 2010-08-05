@@ -810,12 +810,8 @@ void Metastock::readMasters()
 	readMaster( master, ba_master );
 	readMaster( emaster, ba_emaster );
 	readMaster( xmaster, ba_xmaster );
-	qDebug() << ba_master->size() << (double)ba_master->size()/53;
-	qDebug() << ba_emaster->size() << (double)ba_emaster->size()/192;
-	qDebug() << ba_xmaster->size() << (double)ba_xmaster->size()/150;
 	
 	readMaster( fdat, ba_fdat );
-	qDebug() << ba_fdat->size() << (double)(ba_fdat->size()-28)/32;
 }
 
 
@@ -827,16 +823,6 @@ const char* Metastock::lastError() const
 
 void Metastock::dumpInfo() const
 {
-//	{
-//	int i = 1;
-//	while( (i*53) < ba_master->size() ) {
-//		qDebug() << i;
-//		const char *c = ba_master->constData() + (i*53) + 7;
-//		qDebug() << c;
-//		i = i + 1;
-//	}
-//	}
-	
 	MasterFile mf( ba_master->constData(), ba_master->size() );
 // 	mf.check();
 	EMasterFile emf( ba_emaster->constData(), ba_emaster->size() );
@@ -844,32 +830,5 @@ void Metastock::dumpInfo() const
 	XMasterFile xmf( ba_xmaster->constData(), ba_xmaster->size() );
 // 	xmf.check();
 	FDat datfile( ba_fdat->constData(), ba_fdat->size() );
-	datfile.check();
-	return;
-	{
-	int i = 1;
-	int count = ba_master->size() / 53;
-	while( i <= count ) {
-		qDebug() << i;
-		const char *c;
-		c = ba_master->constData() + (i*53) + 7;
-		qDebug() << c;
-		c = ba_emaster->constData() + (i*192) + 12;
-		qDebug() << c;
-		c = ba_emaster->constData() + (i*192) + 32;
-		qDebug() << c;
-		c = ba_emaster->constData() + (i*192) + 139;
-		qDebug() << c;
-		i = i + 1;
-	}
-	}
-//	{
-//	int i = 1;
-//	while( (i*53) < ba_master->size() ) {
-//		qDebug() << i;
-//		const char *c = ba_master->constData() + (i*53) + 7;
-//		qDebug() << c;
-//		i = i + 1;
-//	}
-//	}
+// 	datfile.check();
 }
