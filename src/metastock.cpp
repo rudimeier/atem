@@ -164,6 +164,8 @@ class MasterFile
 		bool checkHeader() const;
 		bool checkRecords() const;
 		bool checkRecord( unsigned char r ) const;
+		
+		void printHeader() const;
 		void printRecord( const char *record ) const;
 		
 		
@@ -194,6 +196,8 @@ bool MasterFile::checkHeader() const
 	Q_ASSERT( size % record_length == 0 );
 	Q_ASSERT( countRecords() == (size / record_length - 1) );
 	
+	printHeader();
+	
 	Q_ASSERT( readUnsignedChar(buf, 0) == countRecords() );
 	Q_ASSERT( readChar(buf, 1) == '\x00' );
 	Q_ASSERT( readUnsignedChar(buf, 2) == countRecords() );
@@ -205,6 +209,16 @@ bool MasterFile::checkHeader() const
 		// unknown
 	}
 	return true;
+}
+
+
+void MasterFile::printHeader() const
+{
+	fprintf( stdout, "MASTER:\t%d\t%d\t%X\n",
+		readUnsignedChar(buf, 0), // count records (stored in master?)
+		readUnsignedChar(buf, 2), // count records (existing dat files?)
+		readInt(buf, 49) // unknown - just print as hex
+		);
 }
 
 
