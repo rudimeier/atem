@@ -13,6 +13,10 @@
 
 
 static const char *ms_dirp = ".";
+static int dumpmasterp = 0;
+static int dumpemasterp = 0;
+static int dumpxmasterp = 0;
+static int dumpdatap = 0;
 
 
 
@@ -43,6 +47,14 @@ static void displayArgs( poptContext con, poptCallbackReason /*foo*/,
 static struct poptOption flow_opts[] = {
 	{"msdir", 'i', POPT_ARG_STRING, &ms_dirp, 0,
 		"input metastock directory", NULL},
+	{"dump-masterp", 'm', POPT_ARG_NONE, &dumpmasterp, 0,
+		"Dump MASTER file.", NULL},
+	{"dump-emasterp", 'e', POPT_ARG_NONE, &dumpemasterp, 0,
+		"Dump EMASTER file.", NULL},
+	{"dump-xmasterp", 'x', POPT_ARG_NONE, &dumpxmasterp, 0,
+		"Dump XMASTER file.", NULL},
+	{"dump-data", 'd', POPT_ARG_NONE, &dumpdatap, 0,
+		"Dump data files.", NULL},
 	POPT_TABLEEND
 };
 
@@ -115,7 +127,19 @@ int main(int argc, char *argv[])
 	if( ! ms.setDir( ms_dirp ) ) {
 		fprintf( stderr, "error: %s\n",
 			ms.lastError() );
-	} else {
-		ms.dumpInfo();
+			exit(2);
+	}
+	
+	if( dumpmasterp == 1 ) {
+		ms.dumpMaster();
+	}
+	if( dumpemasterp == 1 ) {
+		ms.dumpEMaster();
+	}
+	if( dumpxmasterp == 1 ) {
+		ms.dumpXMaster();
+	}
+	if( dumpdatap == 1 ) {
+		ms.dumpData();
 	}
 }

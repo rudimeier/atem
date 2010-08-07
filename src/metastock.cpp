@@ -881,14 +881,29 @@ const char* Metastock::lastError() const
 }
 
 
-void Metastock::dumpInfo() const
+void Metastock::dumpMaster() const
 {
 	MasterFile mf( ba_master->constData(), ba_master->size() );
 	mf.check();
+}
+
+
+void Metastock::dumpEMaster() const
+{
 	EMasterFile emf( ba_emaster->constData(), ba_emaster->size() );
-// 	emf.check();
+	emf.check();
+}
+
+
+void Metastock::dumpXMaster() const
+{
 	XMasterFile xmf( ba_xmaster->constData(), ba_xmaster->size() );
-// 	xmf.check();
+	xmf.check();
+}
+
+
+void Metastock::dumpData() const
+{
 	FDat datfile( ba_fdat->constData(), ba_fdat->size() );
-// 	datfile.check();
+	datfile.check();
 }

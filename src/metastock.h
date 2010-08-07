@@ -17,7 +17,10 @@ class Metastock
 		bool setDir( const char* dir );
 		void readMasters();
 		
-		void dumpInfo() const;
+		void dumpMaster() const;
+		void dumpEMaster() const;
+		void dumpXMaster() const;
+		void dumpData() const;
 		const char* lastError() const;
 		
 	private:
