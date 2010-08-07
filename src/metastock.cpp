@@ -895,10 +895,12 @@ void Metastock::dumpData() const
 }
 
 
-void Metastock::dumpData( int number ) const
+void Metastock::dumpData( int n ) const
 {
-	//just test
-	QFile *fdat = findMaster("f14.dat");
+	QString tmp = QString("f") + QString::number(n) +
+		((n <= 255) ? QString(".dat") : QString(".mwd"));
+	
+	QFile *fdat = findMaster( tmp.toAscii().constData() );
 	if( fdat == NULL ) {
 		error = "no fdat found";
 		return /*false*/;
