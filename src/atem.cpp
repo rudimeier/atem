@@ -92,7 +92,13 @@ static const char** atem_parse_cl(size_t argc, const char *argv[])
 		exit(2); // TODO we shouldn't exit here
 	}
 	
-	return poptGetArgs(opt_ctx);
+	const char** rest = poptGetArgs(opt_ctx);
+	if( rest != NULL ) {
+		fprintf( stderr, "error: bad usage\n" );
+		exit(2);
+	}
+	
+	return rest;
 }
 
 
@@ -103,9 +109,7 @@ int main(int argc, char *argv[])
 	QCoreApplication app(argc, argv);
 	
 	const char **rest = atem_parse_cl(argc, (const char **)argv);
-	if( rest != NULL ) {
-		// do something with rest
-	}
+	Q_ASSERT( rest == NULL );
 	
 	Metastock ms;
 	if( ! ms.setDir( ms_dirp ) ) {
