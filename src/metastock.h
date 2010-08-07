@@ -21,23 +21,22 @@ class Metastock
 		void dumpEMaster() const;
 		void dumpXMaster() const;
 		void dumpData() const;
+		void dumpData( int number ) const;
 		const char* lastError() const;
 		
 	private:
-		QFile* findMaster( const char *name );
+		QFile* findMaster( const char *name ) const;
 		
 		QDir *dir;
 		QFile *master;
 		QFile *emaster;
 		QFile *xmaster;
-		QFile *fdat;
 		
 		QByteArray *ba_master;
 		QByteArray *ba_emaster;
 		QByteArray *ba_xmaster;
-		QByteArray *ba_fdat;
 		
-		const char* error;
+		mutable const char* error;
 };
 
 
