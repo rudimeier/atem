@@ -1,5 +1,7 @@
 #include "metastock.h"
 
+#include <math.h>
+
 #include <QtCore/QDebug>
 #include <QtCore/QStringList>
 #include <QtCore/QFileInfo>
@@ -101,7 +103,9 @@ int floatToIntDate_YYY( float d )
 	// between 1900-01-01 and 2099-12-31
 	Q_ASSERT( d>=101 && d <= 1991231 );
 	// is integer
-	Q_ASSERT( (int)d == d );
+	
+	float tmp;
+	Q_ASSERT( modff(d,&tmp) == 0.0f );
 	return ((int)d) + 19000000;
 }
 
