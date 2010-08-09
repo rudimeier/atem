@@ -918,3 +918,9 @@ void Metastock::dumpData( int n ) const
 	delete fdat;
 
 }
+
+
+bool Metastock::hasXMaster() const
+{
+	return( xmaster != NULL  );
+}

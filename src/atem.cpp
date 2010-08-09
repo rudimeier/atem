@@ -137,7 +137,11 @@ int main(int argc, char *argv[])
 		ms.dumpEMaster();
 	}
 	if( dumpxmasterp == 1 ) {
-		ms.dumpXMaster();
+		if( ms.hasXMaster() ) {
+			ms.dumpXMaster();
+		} else {
+			fprintf( stderr, "warning: %s\n", "no XMASTER found" );
+		}
 	}
 	if( dumpdatap == 1 ) {
 		ms.dumpData();

@@ -14,6 +14,8 @@ class Metastock
 		Metastock();
 		~Metastock();
 		
+		bool hasXMaster() const;
+		
 		bool setDir( const char* dir );
 		void readMasters();
 		
