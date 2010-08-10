@@ -953,22 +953,39 @@ void Metastock::dumpXMaster() const
 }
 
 
-void Metastock::dumpData() const
+void Metastock::dumpData( int f ) const
 {
-	dumpDataDAT();
-	if( hasXMaster() ) {
-		dumpDataMWD();
+	if( f <= 0 ) {
+		dumpDataDAT();
+		if( hasXMaster() ) {
+			dumpDataMWD();
+		}
+	} else if( f <= 255 ) {
+		dumpDataDAT( f );
+	} else {
+		dumpDataMWD( f );
 	}
 }
 
 
-void Metastock::dumpDataDAT() const
+void Metastock::dumpDataDAT( int f ) const
 {
 	MasterFile mf( ba_master->constData(), ba_master->size() );
 	EMasterFile emf( ba_emaster->constData(), ba_emaster->size() );
 	int cntMaster = mf.countRecords();
-	
 	Q_ASSERT( cntMaster == emf.countRecords() );
+	
+	if( f!=0 ) {
+		int num_m = mf.fileNumber( f );
+		int num_e = emf.fileNumber( f );
+		Q_ASSERT( num_m == num_e );
+		int l_m = mf.dataLength( f );
+		int l_e = mf.dataLength( f );
+		Q_ASSERT( l_m == l_e );
+		dumpData( num_m, l_m );
+		return;
+	}
+	
 	for( int i = 1; i<=cntMaster; i++ ) {
 		int num_m = mf.fileNumber( i );
 		int num_e = emf.fileNumber( i );
@@ -981,10 +998,18 @@ void Metastock::dumpDataDAT() const
 }
 
 
-void Metastock::dumpDataMWD() const
+void Metastock::dumpDataMWD( int f ) const
 {
 	XMasterFile xmf( ba_xmaster->constData(), ba_xmaster->size() );
 	int cntMaster = xmf.countRecords();
+	
+	if( f!=0 ) {
+		int num_x = xmf.fileNumber( f );
+		int l = xmf.dataLength( f );
+		Q_ASSERT( num_x > 255 );
+		dumpData( num_x, l );
+		return;
+	}
 	
 	for( int i = 1; i<=cntMaster; i++ ) {
 		int num_x = xmf.fileNumber( i );
@@ -1011,7 +1036,8 @@ void Metastock::dumpData( int n, int l ) const
 	readMaster( fdat, &ba_fdat );
 	
 	FDat datfile( ba_fdat.constData(), ba_fdat.size(), l );
-	qDebug() << tmp << datfile.countRecords() << "x" << l << "bytes";
+	fprintf( stdout, "%s: %d x %d bytes\n",
+		tmp.toAscii().constData(), datfile.countRecords(), l );
 	datfile.check();
 	delete fdat;
 
