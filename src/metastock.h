@@ -23,6 +23,8 @@ class Metastock
 		void dumpEMaster() const;
 		void dumpXMaster() const;
 		void dumpData() const;
+		void dumpDataDAT() const;
+		void dumpDataMWD() const;
 		void dumpData( int number ) const;
 		const char* lastError() const;
 		

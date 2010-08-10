@@ -927,6 +927,15 @@ void Metastock::dumpXMaster() const
 
 void Metastock::dumpData() const
 {
+	dumpDataDAT();
+	if( hasXMaster() ) {
+		dumpDataMWD();
+	}
+}
+
+
+void Metastock::dumpDataDAT() const
+{
 	MasterFile mf( ba_master->constData(), ba_master->size() );
 	EMasterFile emf( ba_emaster->constData(), ba_emaster->size() );
 	int cntMaster = mf.countRecords();
@@ -938,15 +947,18 @@ void Metastock::dumpData() const
 		Q_ASSERT( num_m == num_e );
 		dumpData( num_m );
 	}
-	if( hasXMaster() ) {
-		XMasterFile xmf( ba_xmaster->constData(), ba_xmaster->size() );
-		int cntMaster = xmf.countRecords();
-		
-		for( int i = 1; i<=cntMaster; i++ ) {
-			int num_x = xmf.fileNumber( i );
-			Q_ASSERT( num_x > 255 );
-			dumpData( num_x );
-		}
+}
+
+
+void Metastock::dumpDataMWD() const
+{
+	XMasterFile xmf( ba_xmaster->constData(), ba_xmaster->size() );
+	int cntMaster = xmf.countRecords();
+	
+	for( int i = 1; i<=cntMaster; i++ ) {
+		int num_x = xmf.fileNumber( i );
+		Q_ASSERT( num_x > 255 );
+		dumpData( num_x );
 	}
 }
 
