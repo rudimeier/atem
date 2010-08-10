@@ -44,57 +44,66 @@ int readInt( const char *c, int offset )
 }
 
 
-/**
- Read a four-byte Microsoft QBasic format float,
- convert to IEEE standard float for Java.
- <pre>
- Microsoft 4 byte float
-         31     24 23 22                       0
-         .-------------------------------------.
-         | 8 bits |s|msb  23 bit mantissa   lsb|
-         `-------------------------------------'
-              |    |              `----------------  mantissa
-              |    `----------------------------  sign bit
-              `------------------------------  biased exponent (81h)
-
- b0        b1        b2        b3
- Microsoft Basic LE
- mmmm|mmmm mmmm|mmmm smmm|mmmm eeee|eeee
- BE
- eeee|eeee smmm|mmmm mmmm|mmmm mmmm|mmmm
-
- IEEE 4 byte float
-         31 30    23 22                        0
-         .-------------------------------------.
-         |s| 8 bits |msb   23 bit mantissa  lsb|
-         `-------------------------------------'
-          |      |                `----------------  mantissa
-          |      `--------------------------------  biased exponent (7fh)
-          `-------------------------------------  sign bit
-
- IEEE LE
- mmmm|mmmm mmmm|mmmm emmm|mmmm seee|eeee
- BE
- seee|eeee emmm|mmmm mmmm|mmmm mmmm|mmmm
- </pre>
- [diagram by verec in http://www.jfb-city.co.uk/code/Metastock_Reader.zip
- released to public domain in
- http://www.turtletradingsoftware.com/forum/viewtopic.php?t=742]
- */
-float readFloat( const char *c, int offset )
+float readFloat(const char *c, int offset)
 {
-	int b0 = (unsigned char) c[offset];
-	int b1 = (unsigned char) c[offset+1];
-	int b2 = (unsigned char) c[offset+2];
-	int b3 = (unsigned char) c[offset+3];
-	int mantissa = (b2 << 16 | b1 << 8 | b0) & 0x7fffff;
-	int sign = b2 & 0x80;
-	int exponent = b3 - 2;
-	int ieeeFloatBits = sign << 24 | exponent << 23 | mantissa;
-	float *fp = (float*)&ieeeFloatBits;
+	const float *src4 = (const float*) (c+offset);
+	float retVal;
+	float *dest4 = &retVal;
 	
-	return *fp;
+	unsigned char *msbin = (unsigned char *)src4;
+	unsigned char *ieee = (unsigned char *)dest4;
+	unsigned char sign = 0x00;
+	unsigned char ieee_exp = 0x00;
+	int i;
+
+	/* MS Binary Format                         */
+	/* byte order =>    m3 | m2 | m1 | exponent */
+	/* m1 is most significant byte => sbbb|bbbb */
+	/* m3 is the least significant byte         */
+	/*      m = mantissa byte                   */
+	/*      s = sign bit                        */
+	/*      b = bit                             */
+
+	sign = msbin[2] & 0x80;      /* 1000|0000b  */
+
+	/* IEEE Single Precision Float Format       */
+	/*    m3        m2        m1     exponent   */
+	/* mmmm|mmmm mmmm|mmmm emmm|mmmm seee|eeee  */
+	/*          s = sign bit                    */
+	/*          e = exponent bit                */
+	/*          m = mantissa bit                */
+
+	for (i=0; i<4; i++) ieee[i] = 0;
+
+	/* any msbin w/ exponent of zero = zero */
+	if (msbin[3] == 0) return retVal;
+
+	ieee[3] |= sign;
+
+	/* MBF is bias 128 and IEEE is bias 127. ALSO, MBF places   */
+	/* the decimal point before the assumed bit, while          */
+	/* IEEE places the decimal point after the assumed bit.     */
+
+	ieee_exp = msbin[3] - 2;    /* actually, msbin[3]-1-128+127 */
+
+	/* the first 7 bits of the exponent in ieee[3] */
+	ieee[3] |= ieee_exp >> 1;
+
+	/* the one remaining bit in first bin of ieee[2] */
+	ieee[2] |= ieee_exp << 7;
+
+	/* 0111|1111b : mask out the msbin sign bit */
+	ieee[2] |= msbin[2] & 0x7f;
+
+	ieee[1] = msbin[1];
+	ieee[0] = msbin[0];
+
+	return retVal;
 }
+
+
+
+
 
 
 
