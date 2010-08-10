@@ -927,7 +927,27 @@ void Metastock::dumpXMaster() const
 
 void Metastock::dumpData() const
 {
-	dumpData( 14 );
+	MasterFile mf( ba_master->constData(), ba_master->size() );
+	EMasterFile emf( ba_emaster->constData(), ba_emaster->size() );
+	int cntMaster = mf.countRecords();
+	
+	Q_ASSERT( cntMaster == emf.countRecords() );
+	for( int i = 1; i<=cntMaster; i++ ) {
+		int num_m = mf.fileNumber( i );
+		int num_e = emf.fileNumber( i );
+		Q_ASSERT( num_m == num_e );
+		dumpData( num_m );
+	}
+	if( hasXMaster() ) {
+		XMasterFile xmf( ba_xmaster->constData(), ba_xmaster->size() );
+		int cntMaster = xmf.countRecords();
+		
+		for( int i = 1; i<=cntMaster; i++ ) {
+			int num_x = xmf.fileNumber( i );
+			Q_ASSERT( num_x > 255 );
+			dumpData( num_x );
+		}
+	}
 }
 
 
@@ -938,6 +958,7 @@ void Metastock::dumpData( int n ) const
 	
 	QFile *fdat = findMaster( tmp.toAscii().constData() );
 	if( fdat == NULL ) {
+		Q_ASSERT(false);
 		error = "no fdat found";
 		return /*false*/;
 	}
