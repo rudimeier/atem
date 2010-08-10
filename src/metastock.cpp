@@ -163,6 +163,7 @@ class MasterFile
 		
 		bool check() const;
 		inline unsigned char countRecords() const;
+		int fileNumber( int record ) const;
 		
 	private:
 		bool checkHeader() const;
@@ -295,6 +296,15 @@ unsigned char MasterFile::countRecords() const
 }
 
 
+int MasterFile::fileNumber( int r ) const
+{
+	const char *record = buf + (record_length * r);
+	int fileNumber = readUnsignedChar( record, 0);
+	qDebug() << r << fileNumber;
+	Q_ASSERT( fileNumber > 0 && fileNumber <= 255 );
+	return fileNumber;
+}
+
 
 
 
@@ -311,6 +321,7 @@ class EMasterFile
 		
 		bool check() const;
 		inline unsigned char countRecords() const;
+		int fileNumber( int record ) const;
 		
 	private:
 		bool checkHeader() const;
@@ -482,6 +493,16 @@ unsigned char EMasterFile::countRecords() const
 }
 
 
+int EMasterFile::fileNumber( int r ) const
+{
+	const char *record = buf + (record_length * r);
+	int fileNumber = readUnsignedChar( record, 2);
+	Q_ASSERT( fileNumber > 0 && fileNumber <= 255 );
+	return fileNumber;
+	
+}
+
+
 
 
 
@@ -498,6 +519,7 @@ class XMasterFile
 		
 		bool check() const;
 		inline unsigned short countRecords() const;
+		int fileNumber( int record ) const;
 		
 	private:
 		bool checkHeader() const;
@@ -662,6 +684,16 @@ void XMasterFile::printRecord( const char *record ) const
 unsigned short XMasterFile::countRecords() const
 {
 	return readUnsignedShort( buf, 10 );
+}
+
+
+int XMasterFile::fileNumber( int r ) const
+{
+	const char *record = buf + (record_length * r);
+	int fileNumber = readUnsignedShort( record, 65 );
+	qDebug() << r << fileNumber;
+	Q_ASSERT( fileNumber > 255 );
+	return fileNumber;
 }
 
 
