@@ -21,12 +21,7 @@ unsigned char readUnsignedChar( const char *c, int offset )
 
 unsigned short readUnsignedShort( const char *c, int offset )
 {
-// 	const unsigned short bla = *(const unsigned short*) (c + offset);
-	
-	unsigned short a = (unsigned char) c[offset];
-	unsigned short b = (unsigned char) c[offset+1];
-	
-	return a | (b << 8);
+	return  *( (unsigned short*)(c + offset) );
 }
 
 
