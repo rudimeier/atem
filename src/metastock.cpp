@@ -164,6 +164,7 @@ class MasterFile
 		bool check() const;
 		inline unsigned char countRecords() const;
 		int fileNumber( int record ) const;
+		int dataLength( int record ) const;
 		
 	private:
 		bool checkHeader() const;
@@ -306,6 +307,13 @@ int MasterFile::fileNumber( int r ) const
 }
 
 
+int MasterFile::dataLength( int r ) const
+{
+	const char *record = buf + (record_length * r);
+	return readUnsignedChar( record, 3 );
+}
+
+
 
 
 
@@ -322,6 +330,7 @@ class EMasterFile
 		bool check() const;
 		inline unsigned char countRecords() const;
 		int fileNumber( int record ) const;
+		int dataLength( int record ) const;
 		
 	private:
 		bool checkHeader() const;
@@ -503,6 +512,13 @@ int EMasterFile::fileNumber( int r ) const
 }
 
 
+int EMasterFile::dataLength( int r ) const
+{
+	const char *record = buf + (record_length * r);
+	return readUnsignedChar( record, 6 );
+}
+
+
 
 
 
@@ -520,6 +536,7 @@ class XMasterFile
 		bool check() const;
 		inline unsigned short countRecords() const;
 		int fileNumber( int record ) const;
+		int dataLength( int record ) const;
 		
 	private:
 		bool checkHeader() const;
@@ -697,6 +714,17 @@ int XMasterFile::fileNumber( int r ) const
 }
 
 
+int XMasterFile::dataLength( int r ) const
+{
+	const char *record = buf + (record_length * r);
+	unsigned char v = readUnsignedChar( record, 70 );
+	unsigned char c; // c accumulates the total bits set in v
+	for (c = 0; v; v >>= 1) {
+		c += v & 1;
+	}
+	return 4 * c;
+}
+
 
 
 
@@ -706,7 +734,7 @@ int XMasterFile::fileNumber( int r ) const
 class FDat
 {
 	public:
-		FDat( const char *buf, int size );
+		FDat( const char *buf, int size, int l );
 		
 		static bool checkHeader( const char* buf );
 		static bool checkRecord( const char* buf, int record  );
@@ -721,15 +749,17 @@ class FDat
 		void printRecord( const char *record ) const;
 		
 		
-		static const unsigned int header_length = 28;
-		static const unsigned int record_length = 28;
+		const unsigned int header_length;
+		const unsigned int record_length;
 		
 		const char * const buf;
 		const int size;
 };
 
 
-FDat::FDat( const char *_buf, int _size ) :
+FDat::FDat( const char *_buf, int _size, int l ) :
+	header_length( l ),
+	record_length( l),
 	buf( _buf ),
 	size( _size )
 {
@@ -747,7 +777,6 @@ bool FDat::check() const
 bool FDat::checkHeader() const
 {
 	Q_ASSERT( (size - header_length) % record_length == 0 );
-	qDebug() << "FFF" << countRecords() << ((size - header_length) / record_length);
 	Q_ASSERT( countRecords() == (size - header_length) / record_length);
 	
 // 	Q_ASSERT( readChar(buf, 0) == '\x5d' );
@@ -758,7 +787,6 @@ bool FDat::checkHeader() const
 
 bool FDat::checkRecords() const
 {
-	qDebug() << "FFF" << countRecords();
 	for( int i = 1; i <= countRecords(); i++ ) {
 		bool ok = checkRecord( i );
 		if( !ok ) {
@@ -790,7 +818,7 @@ void FDat::printRecord( const char *record ) const
 		readFloat( record, 12 ),
 		readFloat( record, 16 ),
 		readFloat( record, 20 ),
-		readFloat( record, 24 ));
+		(record_length >= 28) ? readFloat( record, 24 ) : NAN);
 }
 
 
@@ -945,7 +973,10 @@ void Metastock::dumpDataDAT() const
 		int num_m = mf.fileNumber( i );
 		int num_e = emf.fileNumber( i );
 		Q_ASSERT( num_m == num_e );
-		dumpData( num_m );
+		int l_m = mf.dataLength( i );
+		int l_e = mf.dataLength( i );
+		Q_ASSERT( l_m == l_e );
+		dumpData( num_m, l_m );
 	}
 }
 
@@ -957,13 +988,14 @@ void Metastock::dumpDataMWD() const
 	
 	for( int i = 1; i<=cntMaster; i++ ) {
 		int num_x = xmf.fileNumber( i );
+		int l = xmf.dataLength( i );
 		Q_ASSERT( num_x > 255 );
-		dumpData( num_x );
+		dumpData( num_x, l );
 	}
 }
 
 
-void Metastock::dumpData( int n ) const
+void Metastock::dumpData( int n, int l ) const
 {
 	QString tmp = QString("f") + QString::number(n) +
 		((n <= 255) ? QString(".dat") : QString(".mwd"));
@@ -978,7 +1010,8 @@ void Metastock::dumpData( int n ) const
 	QByteArray ba_fdat;
 	readMaster( fdat, &ba_fdat );
 	
-	FDat datfile( ba_fdat.constData(), ba_fdat.size() );
+	FDat datfile( ba_fdat.constData(), ba_fdat.size(), l );
+	qDebug() << tmp << datfile.countRecords() << "x" << l << "bytes";
 	datfile.check();
 	delete fdat;
 

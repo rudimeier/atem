@@ -25,7 +25,7 @@ class Metastock
 		void dumpData() const;
 		void dumpDataDAT() const;
 		void dumpDataMWD() const;
-		void dumpData( int number ) const;
+		void dumpData( int number, int l ) const;
 		const char* lastError() const;
 		
 	private:
