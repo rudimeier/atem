@@ -753,7 +753,6 @@ class FDat
 		void printRecord( const char *record ) const;
 		
 		
-		const unsigned int header_length;
 		const unsigned int record_length;
 		
 		const char * const buf;
@@ -762,7 +761,6 @@ class FDat
 
 
 FDat::FDat( const char *_buf, int _size, int l ) :
-	header_length( l ),
 	record_length( l),
 	buf( _buf ),
 	size( _size )
@@ -780,8 +778,8 @@ bool FDat::check() const
 
 bool FDat::checkHeader() const
 {
-	Q_ASSERT( (size - header_length) % record_length == 0 );
-	Q_ASSERT( countRecords() == (size - header_length) / record_length);
+	Q_ASSERT( size % record_length == 0 );
+	Q_ASSERT( countRecords() == (size / record_length) - 1 );
 	
 // 	Q_ASSERT( readChar(buf, 0) == '\x5d' );
 	
