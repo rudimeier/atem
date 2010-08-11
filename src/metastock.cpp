@@ -1036,10 +1036,15 @@ void Metastock::dumpDataMWD( int f ) const
 
 void Metastock::dumpData( int n, int l ) const
 {
-	QString tmp = QString("F") + QString::number(n) +
-		((n <= 255) ? QString(".DAT") : QString(".MWD"));
+	char tmp[17];
 	
-	QFile *fdat = findMaster( tmp.toAscii().constData() );
+	if( n <= 255 ) {
+		sprintf( tmp, "F%d.DAT", n ) ;
+	} else {
+		sprintf( tmp, "F%d.MWD", n );
+	}
+	
+	QFile *fdat = findMaster( tmp );
 	if( fdat == NULL ) {
 		Q_ASSERT(false);
 		error = "no fdat found";
@@ -1051,7 +1056,7 @@ void Metastock::dumpData( int n, int l ) const
 	
 	FDat datfile( ba_fdat.constData(), ba_fdat.size(), l );
 	fprintf( stdout, "%s: %d x %d bytes\n",
-		tmp.toAscii().constData(), datfile.countRecords(), l );
+		tmp, datfile.countRecords(), l );
 	datfile.check();
 	delete fdat;
 
