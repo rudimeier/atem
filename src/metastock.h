@@ -1,11 +1,12 @@
 #ifndef METASTOCK_H
 #define METASTOCK_H
 
-
+#include <QtCore/QtContainerFwd>
 
 class QDir;
 class QFile;
 class QByteArray;
+class QFileInfo;
 
 
 class Metastock
@@ -29,12 +30,14 @@ class Metastock
 		const char* lastError() const;
 		
 	private:
+		void findFiles();
 		QFile* findMaster( const char *name ) const;
 		
 		QDir *dir;
 		QFile *master;
 		QFile *emaster;
 		QFile *xmaster;
+		QHash<QString, QFileInfo> *files;
 		
 		QByteArray *ba_master;
 		QByteArray *ba_emaster;

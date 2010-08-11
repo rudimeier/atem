@@ -843,6 +843,7 @@ Metastock::Metastock() :
 	master(NULL),
 	emaster(NULL),
 	xmaster(NULL),
+	files( new QHash<QString, QFileInfo>() ),
 	ba_master( new QByteArray() ),
 	ba_emaster( new QByteArray() ),
 	ba_xmaster( new QByteArray() ),
@@ -863,6 +864,7 @@ Metastock::~Metastock()
 	delete ba_xmaster;
 	delete ba_emaster;
 	delete ba_master;
+	delete files;
 	SAFE_DELETE( xmaster );
 	SAFE_DELETE( emaster );
 	SAFE_DELETE( master );
@@ -870,14 +872,23 @@ Metastock::~Metastock()
 }
 
 
+void Metastock::findFiles()
+{
+	QFileInfoList fil = dir->entryInfoList();
+	foreach( QFileInfo fi, fil ) {
+		QString key = fi.fileName().toUpper();
+		Q_ASSERT( !files->contains(key) ); // TODO handle ambiguous file error
+		files->insert( key, fi );
+	}
+}
+
+
 QFile* Metastock::findMaster( const char* name ) const
 {
-	QFileInfoList fil;
-	fil = dir->entryInfoList( QStringList() << name );
-	if( fil.size() != 1 ) {
-		return NULL;
+	if( files->contains( QString(name)) ) {
+		return new QFile( files->value(QString(name)).absoluteFilePath() );
 	} else {
-		return new QFile( fil.first().absoluteFilePath() );
+		return NULL;
 	}
 }
 
@@ -890,6 +901,7 @@ bool Metastock::setDir( const char* d )
 	SAFE_DELETE( dir );
 	
 	dir = new QDir(d);
+	findFiles();
 	
 	master = findMaster( "MASTER" );
 	if( master == NULL ) {
@@ -1026,8 +1038,8 @@ void Metastock::dumpDataMWD( int f ) const
 
 void Metastock::dumpData( int n, int l ) const
 {
-	QString tmp = QString("f") + QString::number(n) +
-		((n <= 255) ? QString(".dat") : QString(".mwd"));
+	QString tmp = QString("F") + QString::number(n) +
+		((n <= 255) ? QString(".DAT") : QString(".MWD"));
 	
 	QFile *fdat = findMaster( tmp.toAscii().constData() );
 	if( fdat == NULL ) {
