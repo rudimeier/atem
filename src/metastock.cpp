@@ -30,19 +30,19 @@ void reverse( char *s, int l )
 int ltoa( long n, char *s )
 {
 	char *begin = s;
+	char *rev = s;
 	
 	if( n < 0 ) {
 		 // forget about the sign, don't reverse it later
 		*s++ = '-';
-	} else {
-		// make n negative, this way because |LONG_MIN| > |LONG_MAX|
-		n = -n;
+		*s++ = -(n % 10) + '0';
+		n /= -10;
+		rev++;
 	}
 	
-	char *rev = s;
 	do {       /* generate digits in reverse order */
-		*s++ = -(n % 10) + '0';   /* get next digit */
-	} while ((n /= 10) < 0);     /* delete it */
+		*s++ = (n % 10) + '0';   /* get next digit */
+	} while ((n /= 10) > 0);     /* delete it */
 	
 	reverse( rev, s - rev);
 	*s++ = '\0';
