@@ -45,7 +45,6 @@ int ltoa( long n, char *s )
 	} while ((n /= 10) > 0);     /* delete it */
 	
 	reverse( rev, s - rev);
-	*s++ = '\0';
 	
 	return s - begin;
 }
@@ -68,7 +67,7 @@ int ftoa(float f, char *s)
 	} else {
 		b_ /= 10;
 	}
-	buf += ltoa(a, buf) - 1;
+	buf += ltoa(a, buf);
 	int d = ltoa( 100000 + b_, buf);
 	*buf = '.';
 	return buf + d - s;
@@ -882,19 +881,19 @@ void FDat::printRecord( const char *record ) const
 #if ! defined USE_FPRINTF
 	char buf[512];
 	char *s = buf;
-	s += ltoa( floatToIntDate_YYY( readFloat( record, 0 )), s ) - 1;
+	s += ltoa( floatToIntDate_YYY( readFloat( record, 0 )), s );
 	*s++ = '\t';
-	s += ftoa( readFloat( record, 4 ), s ) - 1;
+	s += ftoa( readFloat( record, 4 ), s );
 	*s++ = '\t';
-	s += ftoa( readFloat( record, 8 ), s ) - 1;
+	s += ftoa( readFloat( record, 8 ), s );
 	*s++ = '\t';
-	s += ftoa( readFloat( record, 12 ), s ) - 1;
+	s += ftoa( readFloat( record, 12 ), s );
 	*s++ = '\t';
-	s += ftoa( readFloat( record, 16 ), s ) - 1;
+	s += ftoa( readFloat( record, 16 ), s );
 	*s++ = '\t';
-	s += ftoa( readFloat( record, 20 ), s ) - 1;
+	s += ftoa( readFloat( record, 20 ), s );
 	*s++ = '\t';
-	s += ftoa( record_length >= 28 ? readFloat( record, 24 ) : 0.0f, s ) - 1;
+	s += ftoa( record_length >= 28 ? readFloat( record, 24 ) : 0.0f, s );
 	*s++ = '\n';
 	*s++ = '\0';
 	
