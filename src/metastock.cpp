@@ -879,6 +879,27 @@ bool FDat::checkRecord( int r ) const
 
 void FDat::printRecord( const char *record ) const
 {
+#if ! defined USE_FPRINTF
+	char buf[512];
+	char *s = buf;
+	s += ltoa( floatToIntDate_YYY( readFloat( record, 0 )), s ) - 1;
+	*s++ = '\t';
+	s += ftoa( readFloat( record, 4 ), s ) - 1;
+	*s++ = '\t';
+	s += ftoa( readFloat( record, 8 ), s ) - 1;
+	*s++ = '\t';
+	s += ftoa( readFloat( record, 12 ), s ) - 1;
+	*s++ = '\t';
+	s += ftoa( readFloat( record, 16 ), s ) - 1;
+	*s++ = '\t';
+	s += ftoa( readFloat( record, 20 ), s ) - 1;
+	*s++ = '\t';
+	s += ftoa( record_length >= 28 ? readFloat( record, 24 ) : 0.0f, s ) - 1;
+	*s++ = '\n';
+	*s++ = '\0';
+	
+	fputs( buf, stdout );
+#else
 	fprintf( stdout, "%d\t%.5f\t%.5f\t%.5f\t%.5f\t%g\t%g\n",
 		floatToIntDate_YYY( readFloat( record, 0 ) ),
 		readFloat( record, 4 ),
@@ -887,6 +908,7 @@ void FDat::printRecord( const char *record ) const
 		readFloat( record, 16 ),
 		readFloat( record, 20 ),
 		(record_length >= 28) ? readFloat( record, 24 ) : NAN);
+#endif
 }
 
 
