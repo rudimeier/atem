@@ -27,8 +27,10 @@ void reverse( char *s, int l )
 /**
  * itoa:  convert n to characters in s
  */
-void ltoa( long n, char *s )
+int ltoa( long n, char *s )
 {
+	char *begin = s;
+	
 	if( n < 0 ) {
 		 // forget about the sign, don't reverse it later
 		*s++ = '-';
@@ -37,13 +39,15 @@ void ltoa( long n, char *s )
 		n = -n;
 	}
 	
-	int i = 0;
+	char *rev = s;
 	do {       /* generate digits in reverse order */
-		s[i++] = -(n % 10) + '0';   /* get next digit */
+		*s++ = -(n % 10) + '0';   /* get next digit */
 	} while ((n /= 10) < 0);     /* delete it */
 	
-	reverse(s, i);
-	s[i++] = '\0';
+	reverse( rev, s - rev);
+	*s++ = '\0';
+	
+	return s - begin;
 }
 
 
