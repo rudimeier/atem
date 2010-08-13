@@ -24,3 +24,5 @@ LIBS += \
   -lpopt \
 
 TARGET = atem
+
+QMAKE_CXXFLAGS += -O3
