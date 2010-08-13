@@ -102,13 +102,14 @@ float readFloat(const char *c, int offset)
 
 int floatToIntDate_YYY( float d )
 {
-	// between 1900-01-01 and 2099-12-31
-	Q_ASSERT( d>=101 && d <= 1991231 );
-	// is integer
+	int i = (int)d;
 	
-// 	float tmp;
-// 	Q_ASSERT( modff(d,&tmp) == 0.0f );
-	return ((int)d) + 19000000;
+	// between 1900-01-01 and 2099-12-31
+	Q_ASSERT( i>=101 && i <= 1991231 );
+	// is integer
+	Q_ASSERT( d == i );
+	
+	return i + 19000000;
 }
 
 
