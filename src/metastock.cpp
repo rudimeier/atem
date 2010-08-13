@@ -752,7 +752,7 @@ class FDat
 		inline unsigned short countRecords() const;
 		
 	private:
-		void printRecord( const char *record ) const;
+		int record_to_string( const char *record, char *s ) const;
 		
 		
 		const unsigned int record_length;
@@ -785,19 +785,23 @@ void FDat::print() const
 {
 	const char *record = buf + record_length;
 	const char *end = buf + size;
+	char buf[512];
 	
 	while( record < end ) {
-		printRecord( record );
+		record_to_string( record, buf );
 		record += record_length;
+		
+		fputs( buf, stdout );
 	}
 }
 
 
-void FDat::printRecord( const char *record ) const
+int FDat::record_to_string( const char *record, char *s ) const
 {
+	int ret;
+	
 #if ! defined USE_FPRINTF
-	char buf[512];
-	char *s = buf;
+	char *begin = s;
 	s += ltoa( floatToIntDate_YYY( readFloat( record, 0 )), s );
 	*s++ = '\t';
 	s += ftoa( readFloat( record, 4 ), s );
@@ -812,11 +816,11 @@ void FDat::printRecord( const char *record ) const
 	*s++ = '\t';
 	s += ftoa( record_length >= 28 ? readFloat( record, 24 ) : 0.0f, s );
 	*s++ = '\n';
-	*s++ = '\0';
+	*s = '\0';
 	
-	fputs( buf, stdout );
+	ret = s - begin;
 #else
-	fprintf( stdout, "%d\t%.5f\t%.5f\t%.5f\t%.5f\t%g\t%g\n",
+	ret = sprintf( s, "%d\t%.5f\t%.5f\t%.5f\t%.5f\t%g\t%g\n",
 		floatToIntDate_YYY( readFloat( record, 0 ) ),
 		readFloat( record, 4 ),
 		readFloat( record, 8 ),
@@ -825,6 +829,8 @@ void FDat::printRecord( const char *record ) const
 		readFloat( record, 20 ),
 		(record_length >= 28) ? readFloat( record, 24 ) : NAN);
 #endif
+	
+	return ret;
 }
 
 
