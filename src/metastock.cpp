@@ -10,6 +10,7 @@
 #include "util.h"
 
 
+#define USE_FPRINTF
 
 
 char readChar( const char *c, int offset )
