@@ -3,7 +3,10 @@
 
 
 
-
+/**
+ * ltoa:  convert n to characters in s
+ */
+extern int ltoa( long n, char *s );
 
 
 
