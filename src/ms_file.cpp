@@ -33,12 +33,7 @@ unsigned short readUnsignedShort( const char *c, int offset )
  */
 int readInt( const char *c, int offset )
 {
-	unsigned int b0 = (unsigned char) c[offset];
-	unsigned int b1 = (unsigned char) c[offset+1];
-	unsigned int b2 = (unsigned char) c[offset+2];
-	unsigned int b3 = (char) c[offset+3];
-	
-	return (b0 | b1 << 8 | b2 << 16 | b3 << 24);
+	return  *( (int*)(c + offset) );
 }
 
 
