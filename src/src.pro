@@ -13,10 +13,12 @@ CONFIG -= \
 
 SOURCES += \
   atem.cpp \
-  metastock.cpp
+  metastock.cpp \
+  util.cpp
 
 HEADERS += \
-  metastock.h
+  metastock.h \
+  util.h
 
 LIBS += \
   -lpopt \
