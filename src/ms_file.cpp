@@ -1,6 +1,6 @@
 #include "ms_file.h"
 
-#include <QtCore/QtGlobal> // Q_ASSERT, replace that
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h> // NAN, really needed?
@@ -100,9 +100,9 @@ int floatToIntDate_YYY( float d )
 	int i = (int)d;
 	
 	// between 1900-01-01 and 2099-12-31
-	Q_ASSERT( i>=101 && i <= 1991231 );
+	assert( i>=101 && i <= 1991231 );
 	// is integer
-	Q_ASSERT( d == i );
+	assert( d == i );
 	
 	return i + 19000000;
 }
@@ -131,17 +131,17 @@ bool MasterFile::check() const
 
 bool MasterFile::checkHeader() const
 {
-	Q_ASSERT( size % record_length == 0 );
-	Q_ASSERT( countRecords() == (size / record_length - 1) );
+	assert( size % record_length == 0 );
+	assert( countRecords() == (size / record_length - 1) );
 	
 	printHeader();
 	
-	Q_ASSERT( readUnsignedChar(buf, 0) == countRecords() );
-	Q_ASSERT( readChar(buf, 1) == '\x00' );
-	Q_ASSERT( readUnsignedChar(buf, 2) == countRecords() );
-	Q_ASSERT( readChar(buf, 3) == '\x00' );
+	assert( readUnsignedChar(buf, 0) == countRecords() );
+	assert( readChar(buf, 1) == '\x00' );
+	assert( readUnsignedChar(buf, 2) == countRecords() );
+	assert( readChar(buf, 3) == '\x00' );
 	for( int i=4; i<49; i++ ) {
-		Q_ASSERT( readChar(buf, i) == '\x00' );
+		assert( readChar(buf, i) == '\x00' );
 	}
 	for( int i=49; i<53; i++ ) {
 		// unknown
@@ -174,35 +174,35 @@ bool MasterFile::checkRecords() const
 
 bool MasterFile::checkRecord( unsigned char r ) const
 {
-	Q_ASSERT( r > 0 );
+	assert( r > 0 );
 	const char *record = buf + (record_length * r);
 	printRecord( record );
-	Q_ASSERT( readUnsignedChar( record, 0) > 0 ); // F#.dat
-	Q_ASSERT( readChar( record, 1 ) == '\x65' );
-	Q_ASSERT( readChar( record, 2 ) == '\x00' );
-	Q_ASSERT( readChar( record, 3 ) == '\x1c' ); // record length
-	Q_ASSERT( readChar( record, 4 ) == '\x07' ); // record count
-	Q_ASSERT( readChar( record, 5 ) == '\x00' );
-	Q_ASSERT( readChar( record, 6 ) == '\x00' );
+	assert( readUnsignedChar( record, 0) > 0 ); // F#.dat
+	assert( readChar( record, 1 ) == '\x65' );
+	assert( readChar( record, 2 ) == '\x00' );
+	assert( readChar( record, 3 ) == '\x1c' ); // record length
+	assert( readChar( record, 4 ) == '\x07' ); // record count
+	assert( readChar( record, 5 ) == '\x00' );
+	assert( readChar( record, 6 ) == '\x00' );
 	for( int i=7; i < 23; i++ ) {
 		//just a string "issue name"
 	}
-	Q_ASSERT( record[23] == '\0' );
-	Q_ASSERT( record[24] == '\0' );
+	assert( record[23] == '\0' );
+	assert( record[24] == '\0' );
 	for( int i=25; i < 29; i++ ) {
 		//just a date
 	}
 	for( int i=29; i < 33; i++ ) {
 		//just a date
 	}
-	Q_ASSERT( record[33] == 'D' ); // time frame
+	assert( record[33] == 'D' ); // time frame
 	for( int i=34; i < 36; i++ ) {
 		//just a intraday time frame
 	}
 	for( int i=36; i < 52; i++ ) {
 		//just a string "symbol", space padded?
 	}
-	Q_ASSERT( readChar( record, 52 ) == '\0' );
+	assert( readChar( record, 52 ) == '\0' );
 	
 	
 	return true;
@@ -234,7 +234,7 @@ int MasterFile::fileNumber( int r ) const
 	const char *record = buf + (record_length * r);
 	int fileNumber = readUnsignedChar( record, 0);
 	
-	Q_ASSERT( fileNumber > 0 && fileNumber <= 255 );
+	assert( fileNumber > 0 && fileNumber <= 255 );
 	return fileNumber;
 }
 
@@ -269,17 +269,17 @@ bool EMasterFile::check() const
 
 bool EMasterFile::checkHeader() const
 {
-	Q_ASSERT( size % record_length == 0 );
-	Q_ASSERT( countRecords() == (size / record_length - 1) );
+	assert( size % record_length == 0 );
+	assert( countRecords() == (size / record_length - 1) );
 	
 	printHeader();
 	
-	Q_ASSERT( readUnsignedChar(buf, 0) == countRecords() );
-	Q_ASSERT( readChar(buf, 1) == '\x00' );
-	Q_ASSERT( readUnsignedChar(buf, 2) == countRecords() );
-	Q_ASSERT( readChar(buf, 3) == '\x00' );
+	assert( readUnsignedChar(buf, 0) == countRecords() );
+	assert( readChar(buf, 1) == '\x00' );
+	assert( readUnsignedChar(buf, 2) == countRecords() );
+	assert( readChar(buf, 3) == '\x00' );
 	for( int i=4; i<49; i++ ) {
-		Q_ASSERT( readChar(buf, i) == '\x00' );
+		assert( readChar(buf, i) == '\x00' );
 	}
 	for( int i=49; i<52; i++ ) {
 		// unknown
@@ -313,7 +313,7 @@ bool EMasterFile::checkRecords() const
 
 bool EMasterFile::checkRecord( unsigned char r ) const
 {
-	Q_ASSERT( r > 0 );
+	assert( r > 0 );
 	const char *record = buf + (record_length * r);
 	printRecord( record );
 	
@@ -341,38 +341,38 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	// char 139 - 191 long name?
 	char b_191 = readChar( record, 191); // last byte always zero
 	
-// 	Q_ASSERT( b_0 == '\x36' || b_0 == '\x00' );
-// 	Q_ASSERT( b_1 == b_0 );
-	Q_ASSERT( b_2 > 0 && b_2 <= countRecords() );
+// 	assert( b_0 == '\x36' || b_0 == '\x00' );
+// 	assert( b_1 == b_0 );
+	assert( b_2 > 0 && b_2 <= countRecords() );
 	for( int i = 3; i<=5; i++ ) {
-		Q_ASSERT( readChar( record, i ) == '\x00' );
+		assert( readChar( record, i ) == '\x00' );
 	}
-	Q_ASSERT( b_6 == '\x07' );
-	Q_ASSERT( b_7 == '\x7f' );
-	Q_ASSERT( readChar( record, 8) == '\x00' );
-	Q_ASSERT( readChar( record, 9) == '\x20' );
-	Q_ASSERT( readChar( record, 10) == '\x00' );
+	assert( b_6 == '\x07' );
+	assert( b_7 == '\x7f' );
+	assert( readChar( record, 8) == '\x00' );
+	assert( readChar( record, 9) == '\x20' );
+	assert( readChar( record, 10) == '\x00' );
 	for( int i = 27; i<=31; i++ ) {
-		Q_ASSERT( readChar( record, i ) == '\x00' );
+		assert( readChar( record, i ) == '\x00' );
 	}
 	for( int i = 48; i<=59; i++ ) {
-		Q_ASSERT( readChar( record, i ) == '\x00' );
+		assert( readChar( record, i ) == '\x00' );
 	}
-	Q_ASSERT( b_60 == 'D' );
+	assert( b_60 == 'D' );
 	for( int i = 61; i<=63; i++ ) {
-		Q_ASSERT( readChar( record, i ) == '\x00' );
+		assert( readChar( record, i ) == '\x00' );
 	}
 	for( int i = 68; i<=71; i++ ) {
-		Q_ASSERT( readChar( record, i ) == '\x00' );
+		assert( readChar( record, i ) == '\x00' );
 	}
 	for( int i = 76; i<=125; i++ ) {
 		// some where here are start/end times
-		Q_ASSERT( readChar( record, i ) == '\x00' );
+		assert( readChar( record, i ) == '\x00' );
 	}
 	for( int i = 130; i<=138; i++ ) {
-		Q_ASSERT( readChar( record, i ) == '\x00' );
+		assert( readChar( record, i ) == '\x00' );
 	}
-	Q_ASSERT( b_191 == '\x00' );
+	assert( b_191 == '\x00' );
 	
 	return true;
 }
@@ -410,7 +410,7 @@ int EMasterFile::fileNumber( int r ) const
 {
 	const char *record = buf + (record_length * r);
 	int fileNumber = readUnsignedChar( record, 2);
-	Q_ASSERT( fileNumber > 0 && fileNumber <= 255 );
+	assert( fileNumber > 0 && fileNumber <= 255 );
 	return fileNumber;
 	
 }
@@ -446,27 +446,27 @@ bool XMasterFile::check() const
 
 bool XMasterFile::checkHeader() const
 {
-	Q_ASSERT( size % record_length == 0 );
-	Q_ASSERT( countRecords() == (size / record_length - 1) );
+	assert( size % record_length == 0 );
+	assert( countRecords() == (size / record_length - 1) );
 	
 	printHeader();
 	
-	Q_ASSERT( readChar(buf, 0) == '\x5d' );
-	Q_ASSERT( readChar(buf, 1) == '\xFE' );
-	Q_ASSERT( readChar(buf, 2) == 'X' );
-	Q_ASSERT( readChar(buf, 3) == 'M' );
+	assert( readChar(buf, 0) == '\x5d' );
+	assert( readChar(buf, 1) == '\xFE' );
+	assert( readChar(buf, 2) == 'X' );
+	assert( readChar(buf, 3) == 'M' );
 	// char 4 - 9 unknown
-	Q_ASSERT( readUnsignedShort(buf, 10) ==  countRecords() );
-	Q_ASSERT( readChar( buf, 12 ) == '\x00' );
-	Q_ASSERT( readChar( buf, 13 ) == '\x00' );
-	Q_ASSERT( readUnsignedShort(buf, 14) ==  countRecords() );
-	Q_ASSERT( readChar( buf, 16 ) == '\x00' );
-	Q_ASSERT( readChar( buf, 17 ) == '\x00' );
+	assert( readUnsignedShort(buf, 10) ==  countRecords() );
+	assert( readChar( buf, 12 ) == '\x00' );
+	assert( readChar( buf, 13 ) == '\x00' );
+	assert( readUnsignedShort(buf, 14) ==  countRecords() );
+	assert( readChar( buf, 16 ) == '\x00' );
+	assert( readChar( buf, 17 ) == '\x00' );
 	
 	// last used + 1 !?
-	Q_ASSERT( readUnsignedShort(buf, 18) > countRecords() );
-	Q_ASSERT( readChar( buf, 20 ) == '\x00' );
-	Q_ASSERT( readChar( buf, 21 ) == '\x00' );
+	assert( readUnsignedShort(buf, 18) > countRecords() );
+	assert( readChar( buf, 20 ) == '\x00' );
+	assert( readChar( buf, 21 ) == '\x00' );
 	
 	// char 22 -191 unknown
 	
@@ -499,7 +499,7 @@ bool XMasterFile::checkRecords() const
 
 bool XMasterFile::checkRecord( int r ) const
 {
-	Q_ASSERT( r > 0 );
+	assert( r > 0 );
 	const char *record = buf + (record_length * r);
 	printRecord( record );
 	
@@ -527,30 +527,30 @@ bool XMasterFile::checkRecord( int r ) const
 	// char 120 - 149 always '\x00'
 	
 	
-	Q_ASSERT( readChar( record, 0) == '\x01' );
-	Q_ASSERT( readChar( record, 15) == '\x00' );
-	Q_ASSERT( readChar( record, 61) == '\x00' );
-	Q_ASSERT( readChar( record, 62) == 'D' );
-	Q_ASSERT( readChar( record, 63) == '\x00' );
-	Q_ASSERT( readChar( record, 64) == '\x00' );
-	Q_ASSERT( readChar( record, 67) == '\x00' );
-	Q_ASSERT( readChar( record, 68) == '\x00' );
-	Q_ASSERT( readChar( record, 69) == '\x00' );
-	Q_ASSERT( readChar( record, 70) == '\x7f' || readChar( record, 70) == '\x3f' );
+	assert( readChar( record, 0) == '\x01' );
+	assert( readChar( record, 15) == '\x00' );
+	assert( readChar( record, 61) == '\x00' );
+	assert( readChar( record, 62) == 'D' );
+	assert( readChar( record, 63) == '\x00' );
+	assert( readChar( record, 64) == '\x00' );
+	assert( readChar( record, 67) == '\x00' );
+	assert( readChar( record, 68) == '\x00' );
+	assert( readChar( record, 69) == '\x00' );
+	assert( readChar( record, 70) == '\x7f' || readChar( record, 70) == '\x3f' );
 	for( int i = 71; i<=79; i++ ) {
-		Q_ASSERT( readChar( record, i ) == '\x00' );
+		assert( readChar( record, i ) == '\x00' );
 	}
-	Q_ASSERT( readChar( record, 70) == '\x7f' || readChar( record, 70) == '\x3f' );
+	assert( readChar( record, 70) == '\x7f' || readChar( record, 70) == '\x3f' );
 	for( int i = 87; i<=103; i++ ) {
-		Q_ASSERT( readChar( record, i ) == '\x00' );
+		assert( readChar( record, i ) == '\x00' );
 	}
 	for( int i = 112; i<=115; i++ ) {
-		Q_ASSERT( readChar( record, i ) == '\x00' );
+		assert( readChar( record, i ) == '\x00' );
 	}
 	for( int i = 120; i<=149; i++ ) {
-		Q_ASSERT( readChar( record, i ) == '\x00' );
+		assert( readChar( record, i ) == '\x00' );
 	}
-// 	Q_ASSERT( b_46 == '\x7f' );
+// 	assert( b_46 == '\x7f' );
 	
 	return true;
 }
@@ -584,7 +584,7 @@ int XMasterFile::fileNumber( int r ) const
 	const char *record = buf + (record_length * r);
 	int fileNumber = readUnsignedShort( record, 65 );
 	
-	Q_ASSERT( fileNumber > 255 );
+	assert( fileNumber > 255 );
 	return fileNumber;
 }
 
@@ -617,10 +617,10 @@ FDat::FDat( const char *_buf, int _size, int l ) :
 
 bool FDat::checkHeader() const
 {
-	Q_ASSERT( size % record_length == 0 );
-	Q_ASSERT( countRecords() == (size / record_length) - 1 );
+	assert( size % record_length == 0 );
+	assert( countRecords() == (size / record_length) - 1 );
 	
-// 	Q_ASSERT( readChar(buf, 0) == '\x5d' );
+// 	assert( readChar(buf, 0) == '\x5d' );
 	
 	return true;
 }
