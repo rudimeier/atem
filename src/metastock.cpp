@@ -748,7 +748,7 @@ class FDat
 		static bool checkRecord( const char* buf, int record  );
 		
 		bool checkHeader() const;
-		void print() const;
+		void print( const char* header ) const;
 		inline unsigned short countRecords() const;
 		
 	private:
@@ -781,10 +781,8 @@ bool FDat::checkHeader() const
 }
 
 
-void FDat::print() const
+void FDat::print( const char* header ) const
 {
-	const char* header = "symbol";
-	
 	const char *record = buf + record_length;
 	const char *end = buf + size;
 	char buf[512];
@@ -1078,7 +1076,7 @@ void Metastock::dumpData( int n, int l ) const
 		tmp, datfile.countRecords(), l );
 	
 	datfile.checkHeader();
-	datfile.print();
+	datfile.print( tmp );
 	
 	delete fdat;
 
