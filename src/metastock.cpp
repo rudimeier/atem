@@ -783,12 +783,21 @@ bool FDat::checkHeader() const
 
 void FDat::print() const
 {
+	const char* header = "symbol";
+	
 	const char *record = buf + record_length;
 	const char *end = buf + size;
 	char buf[512];
+	char *buf_p = buf;
+	
+	int h_size = strlen( header );
+	memcpy( buf, header, h_size );
+	buf_p += h_size;
+	*buf_p++ = '\t';
+	
 	
 	while( record < end ) {
-		record_to_string( record, buf );
+		record_to_string( record, buf_p );
 		record += record_length;
 		
 		fputs( buf, stdout );
