@@ -9,5 +9,6 @@
 extern int ltoa( long n, char *s );
 
 
+extern int ftoa(float f, char *s);
 
 #endif

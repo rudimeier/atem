@@ -152,30 +152,6 @@ L1:
 
 
 
-int ftoa(float f, char *s)
-{
-	char *buf = s;
-	if( f < 0 ) {
-		f = -f;
-		*buf++ = '-';
-	}
-	
-	float a;
-	float b = modff(f, &a );
-	
-	int b_ = (b * 1000000);
-	if( b_ % 10 >= 5 ) {
-		b_ = b_ / 10 + 1;
-	} else {
-		b_ /= 10;
-	}
-	buf += ltoa(a, buf);
-	int d = ltoa( 100000 + b_, buf);
-	*buf = '.';
-	return buf + d - s;
-}
-
-
 char readChar( const char *c, int offset )
 {
 	return (char)(c[offset]);
