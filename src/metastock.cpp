@@ -747,13 +747,11 @@ class FDat
 		static bool checkHeader( const char* buf );
 		static bool checkRecord( const char* buf, int record  );
 		
-		bool check() const;
+		bool checkHeader() const;
+		void print() const;
 		inline unsigned short countRecords() const;
 		
 	private:
-		bool checkHeader() const;
-		bool checkRecords() const;
-		bool checkRecord( int r ) const;
 		void printRecord( const char *record ) const;
 		
 		
@@ -772,14 +770,6 @@ FDat::FDat( const char *_buf, int _size, int l ) :
 }
 
 
-bool FDat::check() const
-{
-	checkHeader();
-	checkRecords();
-	return true;
-}
-
-
 bool FDat::checkHeader() const
 {
 	Q_ASSERT( size % record_length == 0 );
@@ -791,27 +781,15 @@ bool FDat::checkHeader() const
 }
 
 
-bool FDat::checkRecords() const
+void FDat::print() const
 {
-	for( int i = 1; i <= countRecords(); i++ ) {
-		bool ok = checkRecord( i );
-		if( !ok ) {
-			return false;
-		}
+	const char *record = buf + record_length;
+	const char *end = buf + size;
+	
+	while( record < end ) {
+		printRecord( record );
+		record += record_length;
 	}
-	return true;
-}
-
-
-bool FDat::checkRecord( int r ) const
-{
-	Q_ASSERT( r > 0 );
-	const char *record = buf + (record_length * r);
-	printRecord( record );
-	
-
-	
-	return true;
 }
 
 
@@ -1083,7 +1061,10 @@ void Metastock::dumpData( int n, int l ) const
 	FDat datfile( ba_fdat.constData(), ba_fdat.size(), l );
 	fprintf( stdout, "%s: %d x %d bytes\n",
 		tmp, datfile.countRecords(), l );
-	datfile.check();
+	
+	datfile.checkHeader();
+	datfile.print();
+	
 	delete fdat;
 
 }
