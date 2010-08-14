@@ -146,6 +146,7 @@ ___printf_fp (FILE *fp,
 	assert( ! info->group );
 	assert( ! info->i18n );
 	assert( ! info->alt );
+	assert( info->spec > 60 /*lower case*/ );
 
   /* The floating-point value to output.  */
   union
@@ -257,26 +258,12 @@ ___printf_fp (FILE *fp,
 	{
 	  union ieee854_long_double u = { .d = fpnum.ldbl };
 	  is_neg = u.ieee.negative != 0;
-	  if (isupper (info->spec))
-	    {
-	      special = "NAN";
-	    }
-	    else
-	      {
-		special = "nan";
-	      }
+	  special = "nan";
 	}
       else if (__isinfl (fpnum.ldbl))
 	{
 	  is_neg = fpnum.ldbl < 0;
-	  if (isupper (info->spec))
-	    {
-	      special = "INF";
-	    }
-	  else
-	    {
-	      special = "inf";
-	    }
+	  special = "inf";
 	}
       else
 	{
@@ -298,26 +285,12 @@ ___printf_fp (FILE *fp,
 	{
 	  union ieee754_double u = { .d = fpnum.dbl };
 	  is_neg = u.ieee.negative != 0;
-	  if (isupper (info->spec))
-	    {
-	      special = "NAN";
-	    }
-	  else
-	    {
-	      special = "nan";
-	    }
+	  special = "nan";
 	}
       else if (__isinf (fpnum.dbl))
 	{
 	  is_neg = fpnum.dbl < 0;
-	  if (isupper (info->spec))
-	    {
-	      special = "INF";
-	    }
-	  else
-	    {
-	      special = "inf";
-	    }
+	  special = "inf";
 	}
       else
 	{
@@ -729,9 +702,8 @@ ___printf_fp (FILE *fp,
     int fracdig_max;
     int dig_max;
     int significant;
-    char spec = _tolower (info->spec);
 
-    if (spec == 'e')
+    if (info->spec == 'e')
       {
 	type = info->spec;
 	intdig_max = 1;
@@ -741,7 +713,7 @@ ___printf_fp (FILE *fp,
 	dig_max = INT_MAX;		/* Unlimited.  */
 	significant = 1;		/* Does not matter here.  */
       }
-    else if (spec == 'f')
+    else if (info->spec == 'f')
       {
 	type = 'f';
 	fracdig_min = fracdig_max = info->prec < 0 ? 6 : info->prec;
@@ -765,10 +737,7 @@ ___printf_fp (FILE *fp,
 	if ((expsign == 0 && exponent >= dig_max)
 	    || (expsign != 0 && exponent > 4))
 	  {
-	    if ('g' - 'G' == 'e' - 'E')
-	      type = 'E' + (info->spec - 'G');
-	    else
-	      type = isupper (info->spec) ? 'E' : 'e';
+	    type = 'e';
 	    fracdig_max = dig_max - 1;
 	    intdig_max = 1;
 	    chars_needed = 1 + 1 + (size_t) fracdig_max + 1 + 1 + 4;
@@ -946,7 +915,7 @@ ___printf_fp (FILE *fp,
 		    fracdig_max = intdig_max - intdig_no;
 		    ++exponent;
 		    /* Now we must print the exponent.	*/
-		    type = isupper (info->spec) ? 'E' : 'e';
+		    type = 'e';
 		  }
 		else
 		  {
@@ -984,7 +953,7 @@ ___printf_fp (FILE *fp,
     /* Write the exponent if it is needed.  */
     if (type != 'f')
       {
-	if (__builtin_expect (expsign != 0 && exponent == 4 && spec == 'g', 0))
+	if (__builtin_expect (expsign != 0 && exponent == 4 && info->spec == 'g', 0))
 	  {
 	    /* This is another special case.  The exponent of the number is
 	       really smaller than -4, which requires the 'e'/'E' format.
