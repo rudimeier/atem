@@ -74,7 +74,7 @@
       ++done;								      \
     } while (0)
 
-#define PRINT(ptr, wptr, len)						      \
+#define PRINT(ptr, len)						      \
   do									      \
     {									      \
       register size_t outlen = (len);					      \
@@ -163,7 +163,6 @@ ___printf_fp (FILE *fp,
 
   /* "NaN" or "Inf" for the special cases.  */
   const char *special = NULL;
-  const wchar_t *wspecial = NULL;
 
   /* We need just a few limbs for the input before shifting to the right
      position.	*/
@@ -261,12 +260,10 @@ ___printf_fp (FILE *fp,
 	  if (isupper (info->spec))
 	    {
 	      special = "NAN";
-	      wspecial = L"NAN";
 	    }
 	    else
 	      {
 		special = "nan";
-		wspecial = L"nan";
 	      }
 	}
       else if (__isinfl (fpnum.ldbl))
@@ -275,12 +272,10 @@ ___printf_fp (FILE *fp,
 	  if (isupper (info->spec))
 	    {
 	      special = "INF";
-	      wspecial = L"INF";
 	    }
 	  else
 	    {
 	      special = "inf";
-	      wspecial = L"inf";
 	    }
 	}
       else
@@ -306,12 +301,10 @@ ___printf_fp (FILE *fp,
 	  if (isupper (info->spec))
 	    {
 	      special = "NAN";
-	      wspecial = L"NAN";
 	    }
 	  else
 	    {
 	      special = "nan";
-	      wspecial = L"nan";
 	    }
 	}
       else if (__isinf (fpnum.dbl))
@@ -320,12 +313,10 @@ ___printf_fp (FILE *fp,
 	  if (isupper (info->spec))
 	    {
 	      special = "INF";
-	      wspecial = L"INF";
 	    }
 	  else
 	    {
 	      special = "inf";
-	      wspecial = L"inf";
 	    }
 	}
       else
@@ -356,7 +347,7 @@ ___printf_fp (FILE *fp,
       else if (info->space)
 	outchar (' ');
 
-      PRINT (special, wspecial, 3);
+      PRINT (special, 3);
 
       if (info->left && width > 0)
 	PADN (' ', width);
@@ -1096,7 +1087,7 @@ ___printf_fp (FILE *fp,
       tmpptr = buffer;
 
 
-      PRINT (tmpptr, wstartp, cp - tmpptr);
+      PRINT (tmpptr, cp - tmpptr);
 
       /* Free the memory if necessary.  */
       if (__builtin_expect (buffer_malloced, 0))
