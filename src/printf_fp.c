@@ -58,12 +58,11 @@
 /* This defines make it possible to use the same code for GNU C library and
    the GNU I/O library.	 */
 #define PUT(f, s, n) _IO_sputn (f, s, n)
-#define PAD(f, c, n) (wide ? _IO_wpadn (f, c, n) : INTUSE(_IO_padn) (f, c, n))
+#define PAD(f, c, n) (INTUSE(_IO_padn) (f, c, n))
 /* We use this file GNU C library and GNU I/O library.	So make
    names equal.	 */
 #undef putc
-#define putc(c, f) (wide \
-		    ? (int)_IO_putwc_unlocked (c, f) : _IO_putc_unlocked (c, f))
+#define putc(c, f) ( _IO_putc_unlocked (c, f))
 #define size_t     _IO_size_t
 #define FILE	     _IO_FILE
 
@@ -88,7 +87,7 @@
       register size_t outlen = (len);					      \
       if (len > 20)							      \
 	{								      \
-	  if (PUT (fp, wide ? (const char *) wptr : ptr, outlen) != outlen)   \
+	  if (PUT (fp, ptr, outlen) != outlen)   \
 	    {								      \
 	      if (buffer_malloced)					      \
 		free (wbuffer);						      \
@@ -99,10 +98,6 @@
 	}								      \
       else								      \
 	{								      \
-	  if (wide)							      \
-	    while (outlen-- > 0)					      \
-	      outchar (*wptr++);					      \
-	  else								      \
 	    while (outlen-- > 0)					      \
 	      outchar (*ptr++);						      \
 	}								      \
@@ -157,6 +152,9 @@ ___printf_fp (FILE *fp,
 	      const struct printf_info *info,
 	      const void *const *args)
 {
+	assert( ! info->wide );
+
+
   /* The floating-point value to output.  */
   union
     {
@@ -210,9 +208,6 @@ ___printf_fp (FILE *fp,
 
   /* General helper (carry limb).  */
   mp_limb_t cy;
-
-  /* Nonzero if this is output on a wide character stream.  */
-  int wide = info->wide;
 
   /* Buffer in which we produce the output.  */
   wchar_t *wbuffer = NULL;
@@ -295,18 +290,7 @@ ___printf_fp (FILE *fp,
 	grouping = NULL;
       else
 	{
-	  /* Figure out the thousands separator character.  */
-	  if (wide)
-	    {
-	      if (info->extra == 0)
-		thousands_sepwc =
-		  _NL_CURRENT_WORD (LC_NUMERIC, _NL_NUMERIC_THOUSANDS_SEP_WC);
-	      else
-		thousands_sepwc =
-		  _NL_CURRENT_WORD (LC_MONETARY,
-				    _NL_MONETARY_THOUSANDS_SEP_WC);
-	    }
-	  else
+
 	    {
 	      if (info->extra == 0)
 		thousands_sep = _NL_CURRENT (LC_NUMERIC, THOUSANDS_SEP);
@@ -314,8 +298,7 @@ ___printf_fp (FILE *fp,
 		thousands_sep = _NL_CURRENT (LC_MONETARY, MON_THOUSANDS_SEP);
 	    }
 
-	  if ((wide && thousands_sepwc == L'\0')
-	      || (! wide && *thousands_sep == '\0'))
+	  if ( *thousands_sep == '\0' )
 	    grouping = NULL;
 	  else if (thousands_sepwc == L'\0')
 	    /* If we are printing multibyte characters and there is a
@@ -1163,7 +1146,6 @@ ___printf_fp (FILE *fp,
       char *cp = NULL;
       char *tmpptr;
 
-      if (! wide)
 	{
 	  /* Create the single byte string.  */
 	  size_t decimal_len;
@@ -1227,7 +1209,7 @@ ___printf_fp (FILE *fp,
 #endif
         }
 
-      PRINT (tmpptr, wstartp, wide ? wcp - wstartp : cp - tmpptr);
+      PRINT (tmpptr, wstartp, cp - tmpptr);
 
       /* Free the memory if necessary.  */
       if (__builtin_expect (buffer_malloced, 0))
