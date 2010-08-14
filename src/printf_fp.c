@@ -153,7 +153,7 @@ ___printf_fp (FILE *fp,
 	      const void *const *args)
 {
 	assert( ! info->wide );
-
+	assert( ! info->extra );
 
   /* The floating-point value to output.  */
   union
@@ -259,21 +259,9 @@ ___printf_fp (FILE *fp,
 
 
   /* Figure out the decimal point character.  */
-  if (info->extra == 0)
     {
       decimal = _NL_CURRENT (LC_NUMERIC, DECIMAL_POINT);
       decimalwc = _NL_CURRENT_WORD (LC_NUMERIC, _NL_NUMERIC_DECIMAL_POINT_WC);
-    }
-  else
-    {
-      decimal = _NL_CURRENT (LC_MONETARY, MON_DECIMAL_POINT);
-      if (*decimal == '\0')
-	decimal = _NL_CURRENT (LC_NUMERIC, DECIMAL_POINT);
-      decimalwc = _NL_CURRENT_WORD (LC_MONETARY,
-				    _NL_MONETARY_DECIMAL_POINT_WC);
-      if (decimalwc == L'\0')
-	decimalwc = _NL_CURRENT_WORD (LC_NUMERIC,
-				      _NL_NUMERIC_DECIMAL_POINT_WC);
     }
   /* The decimal point character must not be zero.  */
   assert (*decimal != '\0');
@@ -281,10 +269,7 @@ ___printf_fp (FILE *fp,
 
   if (info->group)
     {
-      if (info->extra == 0)
 	grouping = _NL_CURRENT (LC_NUMERIC, GROUPING);
-      else
-	grouping = _NL_CURRENT (LC_MONETARY, MON_GROUPING);
 
       if (*grouping <= 0 || *grouping == CHAR_MAX)
 	grouping = NULL;
@@ -292,10 +277,7 @@ ___printf_fp (FILE *fp,
 	{
 
 	    {
-	      if (info->extra == 0)
 		thousands_sep = _NL_CURRENT (LC_NUMERIC, THOUSANDS_SEP);
-	      else
-		thousands_sep = _NL_CURRENT (LC_MONETARY, MON_THOUSANDS_SEP);
 	    }
 
 	  if ( *thousands_sep == '\0' )
