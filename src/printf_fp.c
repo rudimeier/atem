@@ -43,7 +43,7 @@
 
 
 
-struct printf_info
+struct rudi_printf_info
 {
   int prec;			/* Precision.  */
   int width;			/* Width.  */
@@ -152,15 +152,13 @@ extern mp_size_t __mpn_extract_double (mp_ptr res_ptr, mp_size_t size,
 extern mp_size_t __mpn_extract_long_double (mp_ptr res_ptr, mp_size_t size,
 					    int *expt, int *is_neg,
 					    long double value);
-extern unsigned int __guess_grouping (unsigned int intdig_max,
-				      const char *grouping);
 
 
 
 
 int
-___printf_fp (FILE *fp,
-	      const struct printf_info *info,
+rudi_printf_fp (FILE *fp,
+	      const struct rudi_printf_info *info,
 	      const void *const *args)
 {
 	assert( ! info->wide );
@@ -1039,17 +1037,5 @@ ___printf_fp (FILE *fp,
   }
   return done;
 }
-ldbl_hidden_def (___printf_fp, __printf_fp)
-ldbl_strong_alias (___printf_fp, __printf_fp)
-
-/* Return the number of extra grouping characters that will be inserted
-   into a number with INTDIG_MAX integer digits.  */
 
-unsigned int
-__guess_grouping (unsigned int intdig_max, const char *grouping)
-{
-    //NOTE implementation removed as "No grouping should be done."
-    // can'r remove this function completely because needed by strfmon_l.c
-    return 0;
-}
 
