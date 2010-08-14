@@ -161,8 +161,7 @@ ___printf_fp (FILE *fp,
   /* Locale-dependent representation of decimal point.	*/
 
   /* Figure out the decimal point character.  */
-  static const char _DECIMAL_ = '.';
-  const char *decimal = &_DECIMAL_;
+  const char decimal = '.';
   wchar_t decimalwc = L'.';
 
   /* "NaN" or "Inf" for the special cases.  */
@@ -1098,10 +1097,9 @@ ___printf_fp (FILE *fp,
 	     be coming from the ASCII range we can esily convert the
 	     string without mapping tables.  */
 	  for (cp = buffer, copywc = wstartp; copywc < wcp; ++copywc)
+	    assert( copywc != 0 ); // TODO is that always true since thousands_sepwc was removed?
 	    if (*copywc == decimalwc)
-	      cp = (char *) __mempcpy (cp, decimal, 1/*decimal_len*/);
-	    else if (*copywc == 0 ) // TODO always 0 since thousands_sepwc was removed
-	      cp = (char *) __mempcpy (cp, NULL, 0); // TODO
+	      *cp++ = decimal;
 	    else
 	      *cp++ = (char) *copywc;
 	}
