@@ -222,7 +222,7 @@ ___printf_fp (FILE *fp,
 		  /* We're not prepared for an mpn variable with zero
 		     limbs.  */
 		  fracsize = 1;
-		  return L'0' + hi;
+		  return '0' + hi;
 		}
 	    }
 
@@ -231,7 +231,7 @@ ___printf_fp (FILE *fp,
 	    frac[fracsize++] = _cy;
 	}
 
-      return L'0' + hi;
+      return '0' + hi;
     }
 
 
@@ -782,7 +782,7 @@ ___printf_fp (FILE *fp,
       {
 	/* |fp| < 1.0 and the selected type is 'f', so put "0."
 	   in the buffer.  */
-	*wcp++ = L'0';
+	*wcp++ = '0';
 	--exponent;
 	*wcp++ = decimalwc;
       }
@@ -795,7 +795,7 @@ ___printf_fp (FILE *fp,
       {
 	++fracdig_no;
 	*wcp = hack_digit ();
-	if (*wcp++ != L'0')
+	if (*wcp++ != '0')
 	  significant = 1;
 	else if (significant == 0)
 	  {
@@ -807,11 +807,11 @@ ___printf_fp (FILE *fp,
 
     /* Do rounding.  */
     digit = hack_digit ();
-    if (digit > L'4')
+    if (digit > '4')
       {
 	char *wtp = wcp;
 
-	if (digit == L'5'
+	if (digit == '5'
 	    && ((*(wcp - 1) != decimalwc && (*(wcp - 1) & 1) == 0)
 		|| ((*(wcp - 1) == decimalwc && (*(wcp - 2) & 1) == 0))))
 	  {
@@ -839,9 +839,9 @@ ___printf_fp (FILE *fp,
 	    /* Process fractional digits.  Terminate if not rounded or
 	       radix character is reached.  */
 	    int removed = 0;
-	    while (*--wtp != decimalwc && *wtp == L'9')
+	    while (*--wtp != decimalwc && *wtp == '9')
 	      {
-		*wtp = L'0';
+		*wtp = '0';
 		++removed;
 	      }
 	    if (removed == fracdig_min && added_zeros > 0)
@@ -857,8 +857,8 @@ ___printf_fp (FILE *fp,
 	    if (*(wtp - 1) == decimalwc)
 	      --wtp;
 
-	    while (--wtp >= wstartp && *wtp == L'9')
-	      *wtp = L'0';
+	    while (--wtp >= wstartp && *wtp == '9')
+	      *wtp = '0';
 
 	    if (wtp >= wstartp)
 	      /* Round up.  */
@@ -883,12 +883,12 @@ ___printf_fp (FILE *fp,
 		       really in the range for %f output but after rounding
 		       the number of digits is too big.	 */
 		    *--wstartp = decimalwc;
-		    *--wstartp = L'1';
+		    *--wstartp = '1';
 
 		    if (fracdig_no > 0)
 		      {
 			/* Overwrite the old radix character.  */
-			wstartp[intdig_no + 2] = L'0';
+			wstartp[intdig_no + 2] = '0';
 			++fracdig_no;
 		      }
 
@@ -903,7 +903,7 @@ ___printf_fp (FILE *fp,
 		  {
 		    /* We can simply add another another digit before the
 		       radix.  */
-		    *--wstartp = L'1';
+		    *--wstartp = '1';
 		    ++intdig_no;
 		  }
 
@@ -921,7 +921,7 @@ ___printf_fp (FILE *fp,
 
   do_expo:
     /* Now remove unnecessary '0' at the end of the string.  */
-    while (fracdig_no > fracdig_min + added_zeros && *(wcp - 1) == L'0')
+    while (fracdig_no > fracdig_min + added_zeros && *(wcp - 1) == '0')
       {
 	--wcp;
 	--fracdig_no;
@@ -955,7 +955,7 @@ ___printf_fp (FILE *fp,
 	else
 	  {
 	    *wcp++ = (char) type;
-	    *wcp++ = expsign ? L'-' : L'+';
+	    *wcp++ = expsign ? '-' : '+';
 
 	    /* Find the magnitude of the exponent.	*/
 	    expscale = 10;
@@ -964,16 +964,16 @@ ___printf_fp (FILE *fp,
 
 	    if (exponent < 10)
 	      /* Exponent always has at least two digits.  */
-	      *wcp++ = L'0';
+	      *wcp++ = '0';
 	    else
 	      do
 		{
 		  expscale /= 10;
-		  *wcp++ = L'0' + (exponent / expscale);
+		  *wcp++ = '0' + (exponent / expscale);
 		  exponent %= expscale;
 		}
 	      while (expscale > 10);
-	    *wcp++ = L'0' + exponent;
+	    *wcp++ = '0' + exponent;
 	  }
       }
 
