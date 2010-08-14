@@ -134,10 +134,6 @@ extern unsigned int __guess_grouping (unsigned int intdig_max,
 				      const char *grouping);
 
 
-static wchar_t *group_number (wchar_t *buf, wchar_t *bufend,
-			      unsigned int intdig_no, const char *grouping,
-			      wchar_t thousands_sep, int ngroups)
-     internal_function;
 
 
 int
@@ -1133,21 +1129,7 @@ unsigned int
 __guess_grouping (unsigned int intdig_max, const char *grouping)
 {
     //NOTE implementation removed as "No grouping should be done."
-    // can'r remove this function completely because others need it too
+    // can'r remove this function completely because needed by strfmon_l.c
     return 0;
 }
 
-/* Group the INTDIG_NO integer digits of the number in [BUF,BUFEND).
-   There is guaranteed enough space past BUFEND to extend it.
-   Return the new end of buffer.  */
-
-static wchar_t *
-internal_function
-group_number (wchar_t *buf, wchar_t *bufend, unsigned int intdig_no,
-	      const char *grouping, wchar_t thousands_sep, int ngroups)
-{
-    //NOTE implementation removed as we would have ngroups == 0
-    // can'r remove this function completely because others need it too
-    return bufend;
-
-}
