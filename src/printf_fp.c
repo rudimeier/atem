@@ -58,7 +58,7 @@ struct printf_info
   unsigned int space:1;		/* Space flag.  */
   unsigned int left:1;		/* - flag.  */
   unsigned int showsign:1;	/* + flag.  */
-  unsigned int group:1;		/* ' flag.  */
+//   unsigned int group:1;		/* ' flag.  */
   unsigned int extra:1;		/* For special use.  */
   unsigned int is_char:1;	/* hh flag.  */
   unsigned int wide:1;		/* Nonzero for wide character streams.  */
@@ -171,14 +171,7 @@ extern mp_size_t __mpn_extract_double (mp_ptr res_ptr, mp_size_t size,
 extern mp_size_t __mpn_extract_long_double (mp_ptr res_ptr, mp_size_t size,
 					    int *expt, int *is_neg,
 					    long double value);
-extern unsigned int __guess_grouping (unsigned int intdig_max,
-				      const char *grouping);
 
-
-static wchar_t *group_number (wchar_t *buf, wchar_t *bufend,
-			      unsigned int intdig_no, const char *grouping,
-			      wchar_t thousands_sep, int ngroups)
-     internal_function;
 
 
 int
@@ -201,7 +194,6 @@ ___printf_fp (FILE *fp,
   /* Locale-dependent thousands separator and grouping specification.  */
   const char *thousands_sep = NULL;
   wchar_t thousands_sepwc = 0;
-  const char *grouping;
 
   /* "NaN" or "Inf" for the special cases.  */
   const char *special = NULL;
@@ -313,49 +305,6 @@ ___printf_fp (FILE *fp,
   assert (*decimal != '\0');
   assert (decimalwc != L'\0');
 
-  if (info->group)
-    {
-      if (info->extra == 0)
-	grouping = _NL_CURRENT (LC_NUMERIC, GROUPING);
-      else
-	grouping = _NL_CURRENT (LC_MONETARY, MON_GROUPING);
-
-      if (*grouping <= 0 || *grouping == CHAR_MAX)
-	grouping = NULL;
-      else
-	{
-	  /* Figure out the thousands separator character.  */
-	  if (wide)
-	    {
-	      if (info->extra == 0)
-		thousands_sepwc =
-		  _NL_CURRENT_WORD (LC_NUMERIC, _NL_NUMERIC_THOUSANDS_SEP_WC);
-	      else
-		thousands_sepwc =
-		  _NL_CURRENT_WORD (LC_MONETARY,
-				    _NL_MONETARY_THOUSANDS_SEP_WC);
-	    }
-	  else
-	    {
-	      if (info->extra == 0)
-		thousands_sep = _NL_CURRENT (LC_NUMERIC, THOUSANDS_SEP);
-	      else
-		thousands_sep = _NL_CURRENT (LC_MONETARY, MON_THOUSANDS_SEP);
-	    }
-
-	  if ((wide && thousands_sepwc == L'\0')
-	      || (! wide && *thousands_sep == '\0'))
-	    grouping = NULL;
-	  else if (thousands_sepwc == L'\0')
-	    /* If we are printing multibyte characters and there is a
-	       multibyte representation for the thousands separator,
-	       we must ensure the wide character thousands separator
-	       is available, even if it is fake.  */
-	    thousands_sepwc = 0xfffffffe;
-	}
-    }
-  else
-    grouping = NULL;
 
   /* Fetch the argument value.	*/
   if (info->is_long_double && sizeof (long double) > sizeof (double))
@@ -844,7 +793,6 @@ ___printf_fp (FILE *fp,
     int fracdig_max;
     int dig_max;
     int significant;
-    int ngroups = 0;
     char spec = _tolower (info->spec);
 
     if (spec == 'e')
@@ -903,14 +851,6 @@ ___printf_fp (FILE *fp,
 	  }
 	fracdig_min = info->alt ? fracdig_max : 0;
 	significant = 0;		/* We count significant digits.	 */
-      }
-
-    if (grouping)
-      {
-	/* Guess the number of groups we will make, and thus how
-	   many spaces we need for separator characters.  */
-	ngroups = __guess_grouping (intdig_max, grouping);
-	chars_needed += ngroups;
       }
 
     /* Allocate buffer for output.  We need two more because while rounding
@@ -1113,11 +1053,6 @@ ___printf_fp (FILE *fp,
     if (fracdig_no == 0 && !info->alt && *(wcp - 1) == decimalwc)
       --wcp;
 
-    if (grouping)
-      /* Add in separator characters, overwriting the same buffer.  */
-      wcp = group_number (wstartp, wcp, intdig_no, grouping, thousands_sepwc,
-			  ngroups);
-
     /* Write the exponent if it is needed.  */
     if (type != 'f')
       {
@@ -1205,8 +1140,8 @@ ___printf_fp (FILE *fp,
 	  else
 	    thousands_sep_len = strlen (thousands_sep);
 
-	  size_t nbuffer = (2 + chars_needed * factor + decimal_len
-			    + ngroups * thousands_sep_len);
+	  size_t nbuffer = (2 + chars_needed * factor + decimal_len);
+
 	  if (__builtin_expect (buffer_malloced, 0))
 	    {
 	      buffer = (char *) malloc (nbuffer);
@@ -1263,79 +1198,6 @@ ___printf_fp (FILE *fp,
 ldbl_hidden_def (___printf_fp, __printf_fp)
 ldbl_strong_alias (___printf_fp, __printf_fp)
 
-/* Return the number of extra grouping characters that will be inserted
-   into a number with INTDIG_MAX integer digits.  */
 
-unsigned int
-__guess_grouping (unsigned int intdig_max, const char *grouping)
-{
-  unsigned int groups;
 
-  /* We treat all negative values like CHAR_MAX.  */
 
-  if (*grouping == CHAR_MAX || *grouping <= 0)
-    /* No grouping should be done.  */
-    return 0;
-
-  groups = 0;
-  while (intdig_max > (unsigned int) *grouping)
-    {
-      ++groups;
-      intdig_max -= *grouping++;
-
-      if (*grouping == CHAR_MAX || *grouping < 0)
-	/* No more grouping should be done.  */
-	break;
-      else if (*grouping == 0)
-	{
-	  /* Same grouping repeats.  */
-	  groups += (intdig_max - 1) / grouping[-1];
-	  break;
-	}
-    }
-
-  return groups;
-}
-
-/* Group the INTDIG_NO integer digits of the number in [BUF,BUFEND).
-   There is guaranteed enough space past BUFEND to extend it.
-   Return the new end of buffer.  */
-
-static wchar_t *
-internal_function
-group_number (wchar_t *buf, wchar_t *bufend, unsigned int intdig_no,
-	      const char *grouping, wchar_t thousands_sep, int ngroups)
-{
-  wchar_t *p;
-
-  if (ngroups == 0)
-    return bufend;
-
-  /* Move the fractional part down.  */
-  __wmemmove (buf + intdig_no + ngroups, buf + intdig_no,
-	      bufend - (buf + intdig_no));
-
-  p = buf + intdig_no + ngroups - 1;
-  do
-    {
-      unsigned int len = *grouping++;
-      do
-	*p-- = buf[--intdig_no];
-      while (--len > 0);
-      *p-- = thousands_sep;
-
-      if (*grouping == CHAR_MAX || *grouping < 0)
-	/* No more grouping should be done.  */
-	break;
-      else if (*grouping == 0)
-	/* Same grouping repeats.  */
-	--grouping;
-    } while (intdig_no > (unsigned int) *grouping);
-
-  /* Copy the remaining ungrouped digits.  */
-  do
-    *p-- = buf[--intdig_no];
-  while (p > buf);
-
-  return bufend + ngroups;
-}
