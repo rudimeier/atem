@@ -35,46 +35,11 @@
 #include <locale/localeinfo.h>
 #include <limits.h>
 #include <math.h>
+#include <printf.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <wchar.h>
-
-
-
-///////////////////////
-
-
-
-struct printf_info
-{
-  int prec;			/* Precision.  */
-  int width;			/* Width.  */
-  wchar_t spec;			/* Format letter.  */
-  unsigned int is_long_double:1;/* L flag.  */
-  unsigned int is_short:1;	/* h flag.  */
-  unsigned int is_long:1;	/* l flag.  */
-  unsigned int alt:1;		/* # flag.  */
-  unsigned int space:1;		/* Space flag.  */
-  unsigned int left:1;		/* - flag.  */
-  unsigned int showsign:1;	/* + flag.  */
-  unsigned int group:1;		/* ' flag.  */
-  unsigned int extra:1;		/* For special use.  */
-  unsigned int is_char:1;	/* hh flag.  */
-  unsigned int wide:1;		/* Nonzero for wide character streams.  */
-  unsigned int i18n:1;		/* I flag.  */
-  unsigned int __pad:4;		/* Unused so far.  */
-  unsigned short int user;	/* Bits for user-installed modifiers.  */
-  wchar_t pad;			/* Padding character.  */
-};
-
-
-
-
-
-///////////////////////
-
-
 
 #ifdef COMPILE_WPRINTF
 # define CHAR_T        wchar_t
