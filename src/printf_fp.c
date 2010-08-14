@@ -64,8 +64,6 @@
       register const int outc = (ch);					      \
       if (putc (outc, fp) == EOF)					      \
 	{								      \
-	  if (buffer_malloced)						      \
-	    free (wbuffer);						      \
 	  return -1;							      \
 	}								      \
       ++done;								      \
@@ -79,8 +77,6 @@
 	{								      \
 	  if (PUT (fp, ptr, outlen) != outlen)   \
 	    {								      \
-	      if (buffer_malloced)					      \
-		free (wbuffer);						      \
 	      return -1;						      \
 	    }								      \
 	  ptr += outlen;						      \
@@ -98,8 +94,6 @@
     {									      \
       if (PAD (fp, ch, len) != len)					      \
 	{								      \
-	  if (buffer_malloced)						      \
-	    free (wbuffer);						      \
 	  return -1;							      \
 	}								      \
       done += len;							      \
@@ -196,8 +190,6 @@ ___printf_fp (FILE *fp,
 
   /* Buffer in which we produce the output.  */
   char *wbuffer = NULL;
-  /* Flag whether wbuffer is malloc'ed or not.  */
-  int buffer_malloced = 0;
 
   auto char hack_digit (void);
 
@@ -766,16 +758,10 @@ ___printf_fp (FILE *fp,
 	return -1;
       }
     size_t wbuffer_to_alloc = (2 + chars_needed) * sizeof (char);
-    buffer_malloced = ! __libc_use_alloca (wbuffer_to_alloc);
-    if (__builtin_expect (buffer_malloced, 0))
-      {
-	wbuffer = (char *) malloc (wbuffer_to_alloc);
-	if (wbuffer == NULL)
-	  /* Signal an error to the caller.  */
-	  return -1;
-      }
-    else
-      wbuffer = (char *) alloca (wbuffer_to_alloc);
+
+    assert( __libc_use_alloca (wbuffer_to_alloc) );
+    wbuffer = (char *) alloca (wbuffer_to_alloc);
+
     wcp = wstartp = wbuffer + 2;	/* Let room for rounding.  */
 
     /* Do the real work: put digits in allocated buffer.  */
@@ -1015,11 +1001,6 @@ ___printf_fp (FILE *fp,
 
       PRINT (wstartp, wcp - wstartp);
 
-      /* Free the memory if necessary.  */
-      if (__builtin_expect (buffer_malloced, 0))
-	{
-	  free (wbuffer);
-	}
     }
 
     if (info->left && width > 0)
