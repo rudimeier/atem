@@ -145,6 +145,7 @@ ___printf_fp (FILE *fp,
 	assert( ! info->extra );
 	assert( ! info->group );
 	assert( ! info->i18n );
+	assert( ! info->alt );
 
   /* The floating-point value to output.  */
   union
@@ -793,7 +794,7 @@ ___printf_fp (FILE *fp,
 	       exponent, which is 4.  */
 	    chars_needed = (size_t) dig_max + 1 + 4;
 	  }
-	fracdig_min = info->alt ? fracdig_max : 0;
+	fracdig_min = 0;
 	significant = 0;		/* We count significant digits.	 */
       }
 
@@ -831,8 +832,7 @@ ___printf_fp (FILE *fp,
 	    *wcp++ = hack_digit ();
 	  }
 	significant = 1;
-	if (info->alt
-	    || fracdig_min > 0
+	if ( fracdig_min > 0
 	    || (fracdig_max > 0 && (fracsize > 1 || frac[0] != 0)))
 	  *wcp++ = decimalwc;
       }
@@ -907,14 +907,6 @@ ___printf_fp (FILE *fp,
 	    if (*wtp != decimalwc)
 	      /* Round up.  */
 	      (*wtp)++;
-	    else if (__builtin_expect (spec == 'g' && type == 'f' && info->alt
-				       && wtp == wstartp + 1
-				       && wstartp[0] == L'0',
-				       0))
-	      /* This is a special case: the rounded number is 1.0,
-		 the format is 'g' or 'G', and the alternative format
-		 is selected.  This means the result must be "1.".  */
-	      --added_zeros;
 	  }
 
 	if (fracdig_no == 0 || *wtp == decimalwc)
@@ -951,7 +943,7 @@ ___printf_fp (FILE *fp,
 		    *--wstartp = decimalwc;
 		    *--wstartp = L'1';
 
-		    if (info->alt || fracdig_no > 0)
+		    if (fracdig_no > 0)
 		      {
 			/* Overwrite the old radix character.  */
 			wstartp[intdig_no + 2] = L'0';
@@ -994,7 +986,7 @@ ___printf_fp (FILE *fp,
       }
     /* If we eliminate all fractional digits we perhaps also can remove
        the radix character.  */
-    if (fracdig_no == 0 && !info->alt && *(wcp - 1) == decimalwc)
+    if (fracdig_no == 0 && *(wcp - 1) == decimalwc)
       --wcp;
 
 
