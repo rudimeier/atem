@@ -1131,36 +1131,9 @@ ldbl_strong_alias (___printf_fp, __printf_fp)
 unsigned int
 __guess_grouping (unsigned int intdig_max, const char *grouping)
 {
-  unsigned int groups;
-
-  /* We treat all negative values like CHAR_MAX.  */
-
-  if (*grouping == CHAR_MAX || *grouping <= 0)
-    /* No grouping should be done.  */
+    //NOTE implementation removed as "No grouping should be done."
+    // can'r remove this function completely because others need it too
     return 0;
-
-  groups = 0;
-  while (intdig_max > (unsigned int) *grouping)
-    {
-      ++groups;
-      intdig_max -= *grouping++;
-
-      if (*grouping == CHAR_MAX
-#if CHAR_MIN < 0
-	  || *grouping < 0
-#endif
-	  )
-	/* No more grouping should be done.  */
-	break;
-      else if (*grouping == 0)
-	{
-	  /* Same grouping repeats.  */
-	  groups += (intdig_max - 1) / grouping[-1];
-	  break;
-	}
-    }
-
-  return groups;
 }
 
 /* Group the INTDIG_NO integer digits of the number in [BUF,BUFEND).
@@ -1172,40 +1145,8 @@ internal_function
 group_number (wchar_t *buf, wchar_t *bufend, unsigned int intdig_no,
 	      const char *grouping, wchar_t thousands_sep, int ngroups)
 {
-  wchar_t *p;
-
-  if (ngroups == 0)
+    //NOTE implementation removed as we would have ngroups == 0
+    // can'r remove this function completely because others need it too
     return bufend;
 
-  /* Move the fractional part down.  */
-  __wmemmove (buf + intdig_no + ngroups, buf + intdig_no,
-	      bufend - (buf + intdig_no));
-
-  p = buf + intdig_no + ngroups - 1;
-  do
-    {
-      unsigned int len = *grouping++;
-      do
-	*p-- = buf[--intdig_no];
-      while (--len > 0);
-      *p-- = thousands_sep;
-
-      if (*grouping == CHAR_MAX
-#if CHAR_MIN < 0
-	  || *grouping < 0
-#endif
-	  )
-	/* No more grouping should be done.  */
-	break;
-      else if (*grouping == 0)
-	/* Same grouping repeats.  */
-	--grouping;
-    } while (intdig_no > (unsigned int) *grouping);
-
-  /* Copy the remaining ungrouped digits.  */
-  do
-    *p-- = buf[--intdig_no];
-  while (p > buf);
-
-  return bufend + ngroups;
 }
