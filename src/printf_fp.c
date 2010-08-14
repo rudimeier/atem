@@ -154,6 +154,7 @@ ___printf_fp (FILE *fp,
 {
 	assert( ! info->wide );
 	assert( ! info->extra );
+	assert( ! info->group );
 
   /* The floating-point value to output.  */
   union
@@ -170,7 +171,7 @@ ___printf_fp (FILE *fp,
   /* Locale-dependent thousands separator and grouping specification.  */
   const char *thousands_sep = NULL;
   wchar_t thousands_sepwc = 0;
-  const char *grouping;
+  const char *grouping = NULL;
 
   /* "NaN" or "Inf" for the special cases.  */
   const char *special = NULL;
@@ -266,32 +267,6 @@ ___printf_fp (FILE *fp,
   /* The decimal point character must not be zero.  */
   assert (*decimal != '\0');
   assert (decimalwc != L'\0');
-
-  if (info->group)
-    {
-	grouping = _NL_CURRENT (LC_NUMERIC, GROUPING);
-
-      if (*grouping <= 0 || *grouping == CHAR_MAX)
-	grouping = NULL;
-      else
-	{
-
-	    {
-		thousands_sep = _NL_CURRENT (LC_NUMERIC, THOUSANDS_SEP);
-	    }
-
-	  if ( *thousands_sep == '\0' )
-	    grouping = NULL;
-	  else if (thousands_sepwc == L'\0')
-	    /* If we are printing multibyte characters and there is a
-	       multibyte representation for the thousands separator,
-	       we must ensure the wide character thousands separator
-	       is available, even if it is fake.  */
-	    thousands_sepwc = 0xfffffffe;
-	}
-    }
-  else
-    grouping = NULL;
 
   /* Fetch the argument value.	*/
 #ifndef __NO_LONG_DOUBLE_MATH
@@ -784,7 +759,6 @@ ___printf_fp (FILE *fp,
     int fracdig_max;
     int dig_max;
     int significant;
-    int ngroups = 0;
     char spec = _tolower (info->spec);
 
     if (spec == 'e')
@@ -843,14 +817,6 @@ ___printf_fp (FILE *fp,
 	  }
 	fracdig_min = info->alt ? fracdig_max : 0;
 	significant = 0;		/* We count significant digits.	 */
-      }
-
-    if (grouping)
-      {
-	/* Guess the number of groups we will make, and thus how
-	   many spaces we need for separator characters.  */
-	ngroups = __guess_grouping (intdig_max, grouping);
-	chars_needed += ngroups;
       }
 
     /* Allocate buffer for output.  We need two more because while rounding
@@ -1053,10 +1019,6 @@ ___printf_fp (FILE *fp,
     if (fracdig_no == 0 && !info->alt && *(wcp - 1) == decimalwc)
       --wcp;
 
-    if (grouping)
-      /* Add in separator characters, overwriting the same buffer.  */
-      wcp = group_number (wstartp, wcp, intdig_no, grouping, thousands_sepwc,
-			  ngroups);
 
     /* Write the exponent if it is needed.  */
     if (type != 'f')
@@ -1144,8 +1106,8 @@ ___printf_fp (FILE *fp,
 	  else
 	    thousands_sep_len = strlen (thousands_sep);
 
-	  size_t nbuffer = (2 + chars_needed * factor + decimal_len
-			    + ngroups * thousands_sep_len);
+	  size_t nbuffer = (2 + chars_needed * factor + decimal_len);
+
 	  if (__builtin_expect (buffer_malloced, 0))
 	    {
 	      buffer = (char *) malloc (nbuffer);
