@@ -159,13 +159,11 @@ ___printf_fp (FILE *fp,
   fpnum;
 
   /* Locale-dependent representation of decimal point.	*/
-  const char *decimal;
-  wchar_t decimalwc;
 
-  /* Locale-dependent thousands separator and grouping specification.  */
-  const char *thousands_sep = NULL;
-  wchar_t thousands_sepwc = 0;
-  const char *grouping = NULL;
+  /* Figure out the decimal point character.  */
+  static const char _DECIMAL_ = '.';
+  const char *decimal = &_DECIMAL_;
+  wchar_t decimalwc = L'.';
 
   /* "NaN" or "Inf" for the special cases.  */
   const char *special = NULL;
@@ -252,15 +250,6 @@ ___printf_fp (FILE *fp,
       return L'0' + hi;
     }
 
-
-  /* Figure out the decimal point character.  */
-    {
-      decimal = _NL_CURRENT (LC_NUMERIC, DECIMAL_POINT);
-      decimalwc = _NL_CURRENT_WORD (LC_NUMERIC, _NL_NUMERIC_DECIMAL_POINT_WC);
-    }
-  /* The decimal point character must not be zero.  */
-  assert (*decimal != '\0');
-  assert (decimalwc != L'\0');
 
   /* Fetch the argument value.	*/
 #ifndef __NO_LONG_DOUBLE_MATH
@@ -1086,18 +1075,9 @@ ___printf_fp (FILE *fp,
 
 	{
 	  /* Create the single byte string.  */
-	  size_t decimal_len;
-	  size_t thousands_sep_len;
 	  wchar_t *copywc;
 
-	  decimal_len = strlen (decimal);
-
-	  if (thousands_sep == NULL)
-	    thousands_sep_len = 0;
-	  else
-	    thousands_sep_len = strlen (thousands_sep);
-
-	  size_t nbuffer = (2 + chars_needed + decimal_len);
+	  size_t nbuffer = (2 + chars_needed + 1/*decimal_len*/);
 
 	  if (__builtin_expect (buffer_malloced, 0))
 	    {
@@ -1119,14 +1099,16 @@ ___printf_fp (FILE *fp,
 	     string without mapping tables.  */
 	  for (cp = buffer, copywc = wstartp; copywc < wcp; ++copywc)
 	    if (*copywc == decimalwc)
-	      cp = (char *) __mempcpy (cp, decimal, decimal_len);
-	    else if (*copywc == thousands_sepwc)
-	      cp = (char *) __mempcpy (cp, thousands_sep, thousands_sep_len);
+	      cp = (char *) __mempcpy (cp, decimal, 1/*decimal_len*/);
+	    else if (*copywc == 0 ) // TODO always 0 since thousands_sepwc was removed
+	      cp = (char *) __mempcpy (cp, NULL, 0); // TODO
 	    else
 	      *cp++ = (char) *copywc;
 	}
 
       tmpptr = buffer;
+
+
       PRINT (tmpptr, wstartp, cp - tmpptr);
 
       /* Free the memory if necessary.  */
