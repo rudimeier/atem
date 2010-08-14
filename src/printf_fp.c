@@ -52,6 +52,7 @@
 #ifndef NDEBUG
 # define NDEBUG			/* Undefine this for debugging assertions.  */
 #endif
+#undef NDEBUG
 #include <assert.h>
 
 /* This defines make it possible to use the same code for GNU C library and
