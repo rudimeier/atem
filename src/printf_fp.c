@@ -156,7 +156,6 @@ ___printf_fp (FILE *fp,
   /* Locale-dependent representation of decimal point.	*/
 
   /* Figure out the decimal point character.  */
-  const char decimal = '.';
   char decimalwc = '.';
 
   /* "NaN" or "Inf" for the special cases.  */
@@ -1012,53 +1011,13 @@ ___printf_fp (FILE *fp,
       PADN ('0', width);
 
     {
-      char *buffer = NULL;
-      char *buffer_end = NULL;
-      char *cp = NULL;
-      char *tmpptr;
-
-	{
-	  /* Create the single byte string.  */
-	  char *copywc;
-
-	  size_t nbuffer = (2 + chars_needed + 1/*decimal_len*/);
-
-	  if (__builtin_expect (buffer_malloced, 0))
-	    {
-	      buffer = (char *) malloc (nbuffer);
-	      if (buffer == NULL)
-		{
-		  /* Signal an error to the caller.  */
-		  free (wbuffer);
-		  return -1;
-		}
-	    }
-	  else
-	    buffer = (char *) alloca (nbuffer);
-	  buffer_end = buffer + nbuffer;
-
-	  /* Now copy the wide character string.  Since the character
-	     (except for the decimal point and thousands separator) must
-	     be coming from the ASCII range we can esily convert the
-	     string without mapping tables.  */
-	  for (cp = buffer, copywc = wstartp; copywc < wcp; ++copywc) {
-	    	assert( copywc != 0 ); // TODO is that always true since thousands_sepwc was removed?
-	    	if (*copywc == decimalwc)
-	    	  *cp++ = decimal;
-	    	else
-	    	  *cp++ = (char) *copywc;
-		}
-	}
-
-      tmpptr = buffer;
 
 
-      PRINT (tmpptr, cp - tmpptr);
+      PRINT (wstartp, wcp - wstartp);
 
       /* Free the memory if necessary.  */
       if (__builtin_expect (buffer_malloced, 0))
 	{
-	  free (buffer);
 	  free (wbuffer);
 	}
     }
