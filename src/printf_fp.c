@@ -155,6 +155,7 @@ ___printf_fp (FILE *fp,
 	assert( ! info->wide );
 	assert( ! info->extra );
 	assert( ! info->group );
+	assert( ! info->i18n );
 
   /* The floating-point value to output.  */
   union
@@ -1095,9 +1096,6 @@ ___printf_fp (FILE *fp,
 	  size_t decimal_len;
 	  size_t thousands_sep_len;
 	  wchar_t *copywc;
-	  size_t factor = (info->i18n
-			   ? _NL_CURRENT_WORD (LC_CTYPE, _NL_CTYPE_MB_CUR_MAX)
-			   : 1);
 
 	  decimal_len = strlen (decimal);
 
@@ -1106,7 +1104,7 @@ ___printf_fp (FILE *fp,
 	  else
 	    thousands_sep_len = strlen (thousands_sep);
 
-	  size_t nbuffer = (2 + chars_needed * factor + decimal_len);
+	  size_t nbuffer = (2 + chars_needed + decimal_len);
 
 	  if (__builtin_expect (buffer_malloced, 0))
 	    {
@@ -1136,7 +1134,7 @@ ___printf_fp (FILE *fp,
 	}
 
       tmpptr = buffer;
-      if (__builtin_expect (info->i18n, 0))
+      if (__builtin_expect (0, 0)) //TODO 1st arg is always 0 since i18 removed
         {
 #ifdef COMPILE_WPRINTF
 	  wstartp = _i18n_number_rewrite (wstartp, wcp,
