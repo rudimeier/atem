@@ -37,7 +37,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <wchar.h>
 
 
 #ifndef NDEBUG
@@ -158,7 +157,7 @@ ___printf_fp (FILE *fp,
 
   /* Figure out the decimal point character.  */
   const char decimal = '.';
-  wchar_t decimalwc = L'.';
+  char decimalwc = '.';
 
   /* "NaN" or "Inf" for the special cases.  */
   const char *special = NULL;
@@ -185,7 +184,7 @@ ___printf_fp (FILE *fp,
   MPN_VAR(tmp);
 
   /* Digit which is result of last hack_digit() call.  */
-  wchar_t digit;
+  char digit;
 
   /* The type of output format that will be used: 'e'/'E' or 'f'.  */
   int type;
@@ -197,13 +196,13 @@ ___printf_fp (FILE *fp,
   mp_limb_t cy;
 
   /* Buffer in which we produce the output.  */
-  wchar_t *wbuffer = NULL;
+  char *wbuffer = NULL;
   /* Flag whether wbuffer is malloc'ed or not.  */
   int buffer_malloced = 0;
 
-  auto wchar_t hack_digit (void);
+  auto char hack_digit (void);
 
-  wchar_t hack_digit (void)
+  char hack_digit (void)
     {
       mp_limb_t hi;
 
@@ -692,7 +691,7 @@ ___printf_fp (FILE *fp,
 
   {
     int width = info->width;
-    wchar_t *wstartp, *wcp;
+    char *wstartp, *wcp;
     size_t chars_needed;
     int expscale;
     int intdig_max, intdig_no = 0;
@@ -760,24 +759,24 @@ ___printf_fp (FILE *fp,
        it is possible that we need two more characters in front of all the
        other output.  If the amount of memory we have to allocate is too
        large use `malloc' instead of `alloca'.  */
-    if (__builtin_expect (chars_needed >= (size_t) -1 / sizeof (wchar_t) - 2
+    if (__builtin_expect (chars_needed >= (size_t) -1 / sizeof (char) - 2
 			  || chars_needed < fracdig_max, 0))
       {
 	/* Some overflow occurred.  */
 	__set_errno (ERANGE);
 	return -1;
       }
-    size_t wbuffer_to_alloc = (2 + chars_needed) * sizeof (wchar_t);
+    size_t wbuffer_to_alloc = (2 + chars_needed) * sizeof (char);
     buffer_malloced = ! __libc_use_alloca (wbuffer_to_alloc);
     if (__builtin_expect (buffer_malloced, 0))
       {
-	wbuffer = (wchar_t *) malloc (wbuffer_to_alloc);
+	wbuffer = (char *) malloc (wbuffer_to_alloc);
 	if (wbuffer == NULL)
 	  /* Signal an error to the caller.  */
 	  return -1;
       }
     else
-      wbuffer = (wchar_t *) alloca (wbuffer_to_alloc);
+      wbuffer = (char *) alloca (wbuffer_to_alloc);
     wcp = wstartp = wbuffer + 2;	/* Let room for rounding.  */
 
     /* Do the real work: put digits in allocated buffer.  */
@@ -825,7 +824,7 @@ ___printf_fp (FILE *fp,
     digit = hack_digit ();
     if (digit > L'4')
       {
-	wchar_t *wtp = wcp;
+	char *wtp = wcp;
 
 	if (digit == L'5'
 	    && ((*(wcp - 1) != decimalwc && (*(wcp - 1) & 1) == 0)
@@ -957,12 +956,12 @@ ___printf_fp (FILE *fp,
 	       really smaller than -4, which requires the 'e'/'E' format.
 	       But after rounding the number has an exponent of -4.  */
 	    assert (wcp >= wstartp + 1);
-	    assert (wstartp[0] == L'1');
-	    __wmemcpy (wstartp, L"0.0001", 6);
+	    assert (wstartp[0] == '1');
+	    memcpy (wstartp, "0.0001", 6);
 	    wstartp[1] = decimalwc;
 	    if (wcp >= wstartp + 2)
 	      {
-		wmemset (wstartp + 6, L'0', wcp - (wstartp + 2));
+		memset (wstartp + 6, '0', wcp - (wstartp + 2));
 		wcp += 4;
 	      }
 	    else
@@ -970,7 +969,7 @@ ___printf_fp (FILE *fp,
 	  }
 	else
 	  {
-	    *wcp++ = (wchar_t) type;
+	    *wcp++ = (char) type;
 	    *wcp++ = expsign ? L'-' : L'+';
 
 	    /* Find the magnitude of the exponent.	*/
@@ -1020,7 +1019,7 @@ ___printf_fp (FILE *fp,
 
 	{
 	  /* Create the single byte string.  */
-	  wchar_t *copywc;
+	  char *copywc;
 
 	  size_t nbuffer = (2 + chars_needed + 1/*decimal_len*/);
 
