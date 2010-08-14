@@ -24,7 +24,6 @@
 
 #include <libioP.h>
 #include <alloca.h>
-#include <ctype.h>
 #include <float.h>
 #include <gmp-mparam.h>
 #include <gmp.h>
@@ -32,7 +31,6 @@
 #include <stdlib/gmp-impl.h>
 #include <stdlib/longlong.h>
 #include <stdlib/fpioconst.h>
-#include <locale/localeinfo.h>
 #include <limits.h>
 #include <math.h>
 #include <printf.h>
