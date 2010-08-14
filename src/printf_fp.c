@@ -1096,12 +1096,13 @@ ___printf_fp (FILE *fp,
 	     (except for the decimal point and thousands separator) must
 	     be coming from the ASCII range we can esily convert the
 	     string without mapping tables.  */
-	  for (cp = buffer, copywc = wstartp; copywc < wcp; ++copywc)
-	    assert( copywc != 0 ); // TODO is that always true since thousands_sepwc was removed?
-	    if (*copywc == decimalwc)
-	      *cp++ = decimal;
-	    else
-	      *cp++ = (char) *copywc;
+	  for (cp = buffer, copywc = wstartp; copywc < wcp; ++copywc) {
+	    	assert( copywc != 0 ); // TODO is that always true since thousands_sepwc was removed?
+	    	if (*copywc == decimalwc)
+	    	  *cp++ = decimal;
+	    	else
+	    	  *cp++ = (char) *copywc;
+		}
 	}
 
       tmpptr = buffer;
