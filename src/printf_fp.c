@@ -76,12 +76,7 @@ struct printf_info
 
 
 
-#ifdef COMPILE_WPRINTF
-# define CHAR_T        wchar_t
-#else
 # define CHAR_T        char
-#endif
-
 #include "_i18n_number.h"
 
 #ifndef NDEBUG
@@ -363,7 +358,6 @@ ___printf_fp (FILE *fp,
     grouping = NULL;
 
   /* Fetch the argument value.	*/
-#ifndef __NO_LONG_DOUBLE_MATH
   if (info->is_long_double && sizeof (long double) > sizeof (double))
     {
       fpnum.ldbl = *(const long double *) args[0];
@@ -409,7 +403,6 @@ ___printf_fp (FILE *fp,
 	}
     }
   else
-#endif	/* no long double */
     {
       fpnum.dbl = *(const double *) args[0];
 
@@ -535,7 +528,6 @@ ___printf_fp (FILE *fp,
 	    {
 	      if (scalesize == 0)
 		{
-#ifndef __NO_LONG_DOUBLE_MATH
 		  if (LDBL_MANT_DIG > _FPIO_CONST_OFFSET * BITS_PER_MP_LIMB
 		      && info->is_long_double)
 		    {
@@ -554,7 +546,6 @@ ___printf_fp (FILE *fp,
 		      exponent += _FPIO_CONST_SHIFT * BITS_PER_MP_LIMB;
 		    }
 		  else
-#endif
 		    {
 		      tmpsize = powers->arraysize;
 		      memcpy (tmp, &__tens[powers->arrayoff],
@@ -1246,19 +1237,12 @@ ___printf_fp (FILE *fp,
       tmpptr = buffer;
       if (__builtin_expect (info->i18n, 0))
         {
-#ifdef COMPILE_WPRINTF
-	  wstartp = _i18n_number_rewrite (wstartp, wcp,
-					  wbuffer + wbuffer_to_alloc);
-	  wcp = wbuffer + wbuffer_to_alloc;
-	  assert ((uintptr_t) wbuffer <= (uintptr_t) wstartp);
-	  assert ((uintptr_t) wstartp
-		  < (uintptr_t) wbuffer + wbuffer_to_alloc);
-#else
+
 	  tmpptr = _i18n_number_rewrite (tmpptr, cp, buffer_end);
 	  cp = buffer_end;
 	  assert ((uintptr_t) buffer <= (uintptr_t) tmpptr);
 	  assert ((uintptr_t) tmpptr < (uintptr_t) buffer_end);
-#endif
+
         }
 
       PRINT (tmpptr, wstartp, wide ? wcp - wstartp : cp - tmpptr);
@@ -1299,11 +1283,7 @@ __guess_grouping (unsigned int intdig_max, const char *grouping)
       ++groups;
       intdig_max -= *grouping++;
 
-      if (*grouping == CHAR_MAX
-#if CHAR_MIN < 0
-	  || *grouping < 0
-#endif
-	  )
+      if (*grouping == CHAR_MAX || *grouping < 0)
 	/* No more grouping should be done.  */
 	break;
       else if (*grouping == 0)
@@ -1344,11 +1324,7 @@ group_number (wchar_t *buf, wchar_t *bufend, unsigned int intdig_no,
       while (--len > 0);
       *p-- = thousands_sep;
 
-      if (*grouping == CHAR_MAX
-#if CHAR_MIN < 0
-	  || *grouping < 0
-#endif
-	  )
+      if (*grouping == CHAR_MAX || *grouping < 0)
 	/* No more grouping should be done.  */
 	break;
       else if (*grouping == 0)
