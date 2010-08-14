@@ -191,49 +191,47 @@ ___printf_fp (FILE *fp,
   /* Buffer in which we produce the output.  */
   char *wbuffer = NULL;
 
-// was nested function
-//   auto char hack_digit (void);
+  auto char hack_digit (void);
 
- #define hack_digit( _reTurn_, _goTo_) \
-    {\
-      mp_limb_t hi;\
-\
-      if (expsign != 0 && type == 'f' && exponent-- > 0)\
-	hi = 0;\
-      else if (scalesize == 0)\
-	{\
-	  hi = frac[fracsize - 1];\
-	  frac[fracsize - 1] = __mpn_mul_1 (frac, frac, fracsize - 1, 10);\
-	}\
-      else\
-	{\
-	  if (fracsize < scalesize)\
-	    hi = 0;\
-	  else\
-	    {\
-	      hi = mpn_divmod (tmp, frac, fracsize, scale, scalesize);\
-	      tmp[fracsize - scalesize] = hi;\
-	      hi = tmp[0];\
-\
-	      fracsize = scalesize;\
-	      while (fracsize != 0 && frac[fracsize - 1] == 0)\
-		--fracsize;\
-	      if (fracsize == 0)\
-		{\
-		  /* We're not prepared for an mpn variable with zero\
-		     limbs.  */\
-		  fracsize = 1;\
-		goto _goTo_;\
-		}\
-	    }\
-\
-	  mp_limb_t _cy = __mpn_mul_1 (frac, frac, fracsize, 10);\
-	  if (_cy != 0)\
-	    frac[fracsize++] = _cy;\
-	}\
-\
-_goTo_: \
-      _reTurn_ = '0' + hi;\
+  char hack_digit (void)
+    {
+      mp_limb_t hi;
+
+      if (expsign != 0 && type == 'f' && exponent-- > 0)
+	hi = 0;
+      else if (scalesize == 0)
+	{
+	  hi = frac[fracsize - 1];
+	  frac[fracsize - 1] = __mpn_mul_1 (frac, frac, fracsize - 1, 10);
+	}
+      else
+	{
+	  if (fracsize < scalesize)
+	    hi = 0;
+	  else
+	    {
+	      hi = mpn_divmod (tmp, frac, fracsize, scale, scalesize);
+	      tmp[fracsize - scalesize] = hi;
+	      hi = tmp[0];
+
+	      fracsize = scalesize;
+	      while (fracsize != 0 && frac[fracsize - 1] == 0)
+		--fracsize;
+	      if (fracsize == 0)
+		{
+		  /* We're not prepared for an mpn variable with zero
+		     limbs.  */
+		  fracsize = 1;
+		  return '0' + hi;
+		}
+	    }
+
+	  mp_limb_t _cy = __mpn_mul_1 (frac, frac, fracsize, 10);
+	  if (_cy != 0)
+	    frac[fracsize++] = _cy;
+	}
+
+      return '0' + hi;
     }
 
 
@@ -773,7 +771,7 @@ _goTo_: \
 	while (intdig_no < intdig_max)
 	  {
 	    ++intdig_no;
-	    hack_digit (*wcp++, blubba1 );
+	    *wcp++ = hack_digit ();
 	  }
 	significant = 1;
 	if ( fracdig_min > 0
@@ -796,7 +794,7 @@ _goTo_: \
 	   || (fracdig_no < fracdig_max && (fracsize > 1 || frac[0] != 0)))
       {
 	++fracdig_no;
-	hack_digit (*wcp, blubba2);
+	*wcp = hack_digit ();
 	if (*wcp++ != '0')
 	  significant = 1;
 	else if (significant == 0)
@@ -808,7 +806,7 @@ _goTo_: \
       }
 
     /* Do rounding.  */
-    hack_digit (digit, blubba3);
+    digit = hack_digit ();
     if (digit > '4')
       {
 	char *wtp = wcp;
