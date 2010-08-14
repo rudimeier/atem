@@ -41,13 +41,6 @@
 #include <stdlib.h>
 #include <wchar.h>
 
-#ifdef COMPILE_WPRINTF
-# define CHAR_T        wchar_t
-#else
-# define CHAR_T        char
-#endif
-
-#include "_i18n_number.h"
 
 #ifndef NDEBUG
 # define NDEBUG			/* Undefine this for debugging assertions.  */
@@ -1134,23 +1127,6 @@ ___printf_fp (FILE *fp,
 	}
 
       tmpptr = buffer;
-      if (__builtin_expect (0, 0)) //TODO 1st arg is always 0 since i18 removed
-        {
-#ifdef COMPILE_WPRINTF
-	  wstartp = _i18n_number_rewrite (wstartp, wcp,
-					  wbuffer + wbuffer_to_alloc);
-	  wcp = wbuffer + wbuffer_to_alloc;
-	  assert ((uintptr_t) wbuffer <= (uintptr_t) wstartp);
-	  assert ((uintptr_t) wstartp
-		  < (uintptr_t) wbuffer + wbuffer_to_alloc);
-#else
-	  tmpptr = _i18n_number_rewrite (tmpptr, cp, buffer_end);
-	  cp = buffer_end;
-	  assert ((uintptr_t) buffer <= (uintptr_t) tmpptr);
-	  assert ((uintptr_t) tmpptr < (uintptr_t) buffer_end);
-#endif
-        }
-
       PRINT (tmpptr, wstartp, cp - tmpptr);
 
       /* Free the memory if necessary.  */
