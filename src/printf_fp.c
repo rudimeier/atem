@@ -76,17 +76,8 @@ struct rudi_printf_info
 #undef NDEBUG
 #include <assert.h>
 
-/* This defines make it possible to use the same code for GNU C library and
-   the GNU I/O library.	 */
-#define PUT(f, s, n) _IO_sputn (f, s, n)
-#define PAD(f, c, n) (INTUSE(_IO_padn) (f, c, n))
-/* We use this file GNU C library and GNU I/O library.	So make
-   names equal.	 */
-#undef putc
-#define putc(c, f) ( _IO_putc_unlocked (c, f))
-#define size_t     _IO_size_t
-#define FILE	     _IO_FILE
-
+
+
 /* Macros for doing the actual output.  */
 
 #define outchar(ch)							      \
@@ -147,7 +138,6 @@ rudi_printf_fp ( char * ccc, const void *args );
 int
 rudi_printf_fp ( char * ccc, const void * args)
 {
-	FILE * fp;
 	struct rudi_printf_info _info;
   _info.prec = 6;			/* Precision.  */
   _info.width = 0;			/* Width.  */
