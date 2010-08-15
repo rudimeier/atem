@@ -23,3 +23,11 @@ core*dump
 *.kdevses
 *.tag
 *.pro.user
+
+
+# tmp
+Doxyfile
+cash
+contract
+data
+
