@@ -90,20 +90,28 @@ struct rudi_printf_info
 /* Macros for doing the actual output.  */
 
 #define outchar(ch)							      \
-	*ccc++ = ch
+	do {									      \
+		*ccc++ = ch;						      \
+		done++;								      \
+	} while(0)
+
 
 #define PRINT(ptr, len)						      \
-	memcpy(ccc, ptr, len)
+	do {									      \
+		memcpy(ccc, ptr, len);				      \
+		ccc += len;							      \
+		done += len;						      \
+	} while(0)
 
 
 #define PADN(ch, len)						      \
-	{										      \
+	do {									      \
 		char *end = ccc + len;				      \
 		while( ccc < end ) {				      \
 			*ccc++ = ch;					      \
 		}									      \
 		done += len;						      \
-	}
+	} while(0)
 
 
 
@@ -345,11 +353,12 @@ rudi_printf_fp ( char * ccc, const void * args)
       else if (info->space)
 	outchar (' ');
 
-      PRINT (special, 3 + 1 );
+      PRINT (special, 3 );
 
       if (info->left && width > 0)
 	PADN (' ', width);
 
+      *ccc = '\0';
       return done;
     }
 
@@ -1035,14 +1044,15 @@ rudi_printf_fp ( char * ccc, const void * args)
 
     {
 
-    *wcp = '\0';
-    PRINT (wstartp, wcp - wstartp  + 1 );
+    PRINT (wstartp, wcp - wstartp );
 
     }
 
     if (info->left && width > 0)
       PADN (info->pad, width);
   }
+
+  *ccc = '\0';
   return done;
 }
 
