@@ -156,15 +156,17 @@ extern mp_size_t __mpn_extract_long_double (mp_ptr res_ptr, mp_size_t size,
 
 
 
-int
-rudi_printf_fp (FILE *fp,
-	      const void *const *args)
-{
+extern int
+rudi_printf_fp ( char * ccc, const void *args );
 
+int
+rudi_printf_fp ( char * ccc, const void * args)
+{
+	FILE * fp;
 	struct rudi_printf_info _info;
-  _info.prec = 5;			/* Precision.  */
+  _info.prec = 6;			/* Precision.  */
   _info.width = 0;			/* Width.  */
-  _info.spec = 'f';			/* Format letter.  */
+  _info.spec = 'g';			/* Format letter.  */
   _info.is_long_double = 0;/* L flag.  */
   _info.is_short = 0;	/* h flag.  */
   _info.is_long = 0;	/* l flag.  */
@@ -297,7 +299,7 @@ rudi_printf_fp (FILE *fp,
 #ifndef __NO_LONG_DOUBLE_MATH
   if (info->is_long_double && sizeof (long double) > sizeof (double))
     {
-      fpnum.ldbl = *(const long double *) args[0];
+      fpnum.ldbl = *(const long double *) args;
 
       /* Check for special values: not a number or infinity.  */
       if (__isnanl (fpnum.ldbl))
@@ -324,7 +326,7 @@ rudi_printf_fp (FILE *fp,
   else
 #endif	/* no long double */
     {
-      fpnum.dbl = *(const double *) args[0];
+      fpnum.dbl = *(const double *) args;
 
       /* Check for special values: not a number or infinity.  */
       if (__isnan (fpnum.dbl))
@@ -812,12 +814,12 @@ rudi_printf_fp (FILE *fp,
 			  || chars_needed < fracdig_max, 0))
       {
 	/* Some overflow occurred.  */
-	__set_errno (ERANGE);
+// 	__set_errno (ERANGE);
 	return -1;
       }
     size_t wbuffer_to_alloc = (2 + chars_needed) * sizeof (char);
 
-    assert( __libc_use_alloca (wbuffer_to_alloc) );
+//     assert( __libc_use_alloca (wbuffer_to_alloc) );
     wbuffer = (char *) alloca (wbuffer_to_alloc);
 
     wcp = wstartp = wbuffer + 2;	/* Let room for rounding.  */
@@ -1055,9 +1057,9 @@ rudi_printf_fp (FILE *fp,
       PADN ('0', width);
 
     {
-
-
-      PRINT (wstartp, wcp - wstartp);
+	*wcp = '\0';
+	memcpy(ccc, wstartp, wcp - wstartp + 1);
+//       PRINT (wstartp, wcp - wstartp);
 
     }
 
