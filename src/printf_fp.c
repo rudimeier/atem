@@ -156,7 +156,7 @@ rudi_printf_fp ( char * ccc, const void * args)
   _info.i18n = 0;		/* I flag.  */
   _info.__pad = 0;		/* Unused so far.  */
   _info.user = 0;	/* Bits for user-installed modifiers.  */
-  _info.pad = '0';			/* Padding character.  */
+  _info.pad = ' ';			/* Padding character.  */
 
 	struct rudi_printf_info *info = &_info;
 
