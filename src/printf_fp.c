@@ -90,15 +90,7 @@ struct rudi_printf_info
 /* Macros for doing the actual output.  */
 
 #define outchar(ch)							      \
-  do									      \
-    {									      \
-      register const int outc = (ch);					      \
-      if (putc (outc, fp) == EOF)					      \
-	{								      \
-	  return -1;							      \
-	}								      \
-      ++done;								      \
-    } while (0)
+	*ccc++ = ch
 
 #define PRINT(ptr, len)						      \
 	memcpy(ccc, ptr, len)
