@@ -158,9 +158,38 @@ extern mp_size_t __mpn_extract_long_double (mp_ptr res_ptr, mp_size_t size,
 
 int
 rudi_printf_fp (FILE *fp,
-	      const struct rudi_printf_info *info,
 	      const void *const *args)
 {
+
+	struct rudi_printf_info _info;
+  _info.prec = 5;			/* Precision.  */
+  _info.width = 0;			/* Width.  */
+  _info.spec = 'f';			/* Format letter.  */
+  _info.is_long_double = 0;/* L flag.  */
+  _info.is_short = 0;	/* h flag.  */
+  _info.is_long = 0;	/* l flag.  */
+  _info.alt = 0;		/* # flag.  */
+  _info.space = 0;		/* Space flag.  */
+  _info.left = 0;		/* - flag.  */
+  _info.showsign = 0;	/* + flag.  */
+  _info.group = 0;		/* ' flag.  */
+  _info.extra = 0;		/* For special use.  */
+  _info.is_char = 0;	/* hh flag.  */
+  _info.wide = 0;		/* Nonzero for wide character streams.  */
+  _info.i18n = 0;		/* I flag.  */
+  _info.__pad = 0;		/* Unused so far.  */
+  _info.user = 0;	/* Bits for user-installed modifiers.  */
+  _info.pad = '0';			/* Padding character.  */
+
+	struct rudi_printf_info *info = &_info;
+
+
+
+
+
+
+
+
 	assert( ! info->wide );
 	assert( ! info->extra );
 	assert( ! info->group );
