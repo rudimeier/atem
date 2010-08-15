@@ -101,24 +101,8 @@ struct rudi_printf_info
     } while (0)
 
 #define PRINT(ptr, len)						      \
-  do									      \
-    {									      \
-      register size_t outlen = (len);					      \
-      if (len > 20)							      \
-	{								      \
-	  if (PUT (fp, ptr, outlen) != outlen)   \
-	    {								      \
-	      return -1;						      \
-	    }								      \
-	  ptr += outlen;						      \
-	  done += outlen;						      \
-	}								      \
-      else								      \
-	{								      \
-	    while (outlen-- > 0)					      \
-	      outchar (*ptr++);						      \
-	}								      \
-    } while (0)
+	memcpy(ccc, ptr, len)
+
 
 #define PADN(ch, len)							      \
   do									      \
@@ -368,7 +352,7 @@ rudi_printf_fp ( char * ccc, const void * args)
       else if (info->space)
 	outchar (' ');
 
-      PRINT (special, 3);
+      PRINT (special, 3 + 1 );
 
       if (info->left && width > 0)
 	PADN (' ', width);
@@ -1057,9 +1041,9 @@ rudi_printf_fp ( char * ccc, const void * args)
       PADN ('0', width);
 
     {
-	*wcp = '\0';
-	memcpy(ccc, wstartp, wcp - wstartp + 1);
-//       PRINT (wstartp, wcp - wstartp);
+
+    *wcp = '\0';
+    PRINT (wstartp, wcp - wstartp  + 1 );
 
     }
 
