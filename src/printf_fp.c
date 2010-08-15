@@ -96,16 +96,17 @@ struct rudi_printf_info
 	memcpy(ccc, ptr, len)
 
 
-#define PADN(ch, len)							      \
-  do									      \
-    {									      \
-      if (PAD (fp, ch, len) != len)					      \
-	{								      \
-	  return -1;							      \
-	}								      \
-      done += len;							      \
-    }									      \
-  while (0)
+#define PADN(ch, len)						      \
+	{										      \
+		char *end = ccc + len;				      \
+		while( ccc < end ) {				      \
+			*ccc++ = ch;					      \
+		}									      \
+		done += len;						      \
+	}
+
+
+
 
 /* We use the GNU MP library to handle large numbers.
 
