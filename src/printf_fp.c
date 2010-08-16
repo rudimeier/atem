@@ -22,7 +22,9 @@
 /* The gmp headers need some configuration frobs.  */
 #define HAVE_ALLOCA 1
 
-#include <libioP.h>
+// comes from ./glibc/include/libc-symbols.h
+#undef _LIBC
+
 #include <alloca.h>
 #include <float.h>
 #include <gmp-mparam.h>
