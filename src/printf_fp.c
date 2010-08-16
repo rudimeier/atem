@@ -22,13 +22,10 @@
 /* The gmp headers need some configuration frobs.  */
 #define HAVE_ALLOCA 1
 
-#define _LIBC_REENTRANT
-#define _IO_MTSAFE_IO
 
-#include "glibc/include/libc-symbols.h"
+/* this avoids including libc-symbols.h */
+#define attribute_hidden
 
-// comes from ./glibc/include/libc-symbols.h
-#undef _LIBC
 
 #include <alloca.h>
 #include <float.h>
