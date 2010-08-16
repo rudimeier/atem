@@ -12,4 +12,14 @@ extern int itoa( long n, char *s );
 
 extern int ftoa(float f, char *s);
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern int rudi_printf_fp( char *s, double f );
+
+#ifdef __cplusplus
+} /*extern "C"*/
+#endif
+
 #endif

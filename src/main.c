@@ -7,8 +7,6 @@
 
 
 
-extern int
-rudi_printf_fp ( char * ccc, void *args );
 
 
 int compare2()
@@ -25,7 +23,7 @@ int compare2()
 		f = +f;
 		
 // 		int l = ftoa( f, s1 );
-		rudi_printf_fp( s1, &f);
+		rudi_printf_fp( s1, f);
 // 		sprintf( s1, "%.5f", f );
 		sprintf( s2, "%.6g", f );
 		
@@ -77,6 +75,6 @@ int main(int argc, char *argv[])
 	return compare2();
 // 	double  f = 1121212212.12;
 // 	char ccc[512];
-// 	rudi_printf_fp( ccc, &f);
+// 	rudi_printf_fp( ccc, f);
 // 	fprintf( stdout, "HUHU %s \n", ccc );
 }
