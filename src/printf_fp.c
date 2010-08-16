@@ -50,26 +50,23 @@
 
 
 
+/**
+ * taken from <fprintf.h> and modified:
+ *    - removed flags: wide, extra, group, i18n, alt (treat them as unset)
+ *                     is_short, is_long, is_char, __pad, user (not needed)
+ *    - spec must be lowercase char
+ *    - spec and pad have type char instead of wchar_t
+ */
 struct rudi_printf_info
 {
   int prec;			/* Precision.  */
   int width;			/* Width.  */
-  wchar_t spec;			/* Format letter.  */
+  char spec;			/* Format letter.  */
   unsigned int is_long_double:1;/* L flag.  */
-  unsigned int is_short:1;	/* h flag.  */
-  unsigned int is_long:1;	/* l flag.  */
-  unsigned int alt:1;		/* # flag.  */
   unsigned int space:1;		/* Space flag.  */
   unsigned int left:1;		/* - flag.  */
   unsigned int showsign:1;	/* + flag.  */
-  unsigned int group:1;		/* ' flag.  */
-  unsigned int extra:1;		/* For special use.  */
-  unsigned int is_char:1;	/* hh flag.  */
-  unsigned int wide:1;		/* Nonzero for wide character streams.  */
-  unsigned int i18n:1;		/* I flag.  */
-  unsigned int __pad:4;		/* Unused so far.  */
-  unsigned short int user;	/* Bits for user-installed modifiers.  */
-  wchar_t pad;			/* Padding character.  */
+  char pad;			/* Padding character.  */
 };
 
 
@@ -147,19 +144,9 @@ rudi_printf_fp ( char *ccc, const double arg )
   _info.width = 0;			/* Width.  */
   _info.spec = 'g';			/* Format letter.  */
   _info.is_long_double = 0;/* L flag.  */
-  _info.is_short = 0;	/* h flag.  */
-  _info.is_long = 0;	/* l flag.  */
-  _info.alt = 0;		/* # flag.  */
   _info.space = 0;		/* Space flag.  */
   _info.left = 0;		/* - flag.  */
   _info.showsign = 0;	/* + flag.  */
-  _info.group = 0;		/* ' flag.  */
-  _info.extra = 0;		/* For special use.  */
-  _info.is_char = 0;	/* hh flag.  */
-  _info.wide = 0;		/* Nonzero for wide character streams.  */
-  _info.i18n = 0;		/* I flag.  */
-  _info.__pad = 0;		/* Unused so far.  */
-  _info.user = 0;	/* Bits for user-installed modifiers.  */
   _info.pad = ' ';			/* Padding character.  */
 
 	struct rudi_printf_info *info = &_info;
@@ -168,14 +155,6 @@ rudi_printf_fp ( char *ccc, const double arg )
 
 
 
-
-
-
-	assert( ! info->wide );
-	assert( ! info->extra );
-	assert( ! info->group );
-	assert( ! info->i18n );
-	assert( ! info->alt );
 	assert( info->spec > 60 /*lower case*/ );
 
   /* The floating-point value to output.  */
