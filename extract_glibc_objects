@@ -1,0 +1,12 @@
+#!/bin/bash
+
+
+if ! test -d src/glibc ;then
+	echo "cannot create directory 'src/glibc/objects'"
+	exit 1
+fi
+
+mkdir -p src/glibc/objects || exit 1
+cd src/glibc/objects || exit 1
+
+ar x  /usr/lib64/libc.a      fpioconst.o dbl2mpn.o divrem.o mul.o cmp.o mul_n.o lshift.o rshift.o mul_1.o submul_1.o add_n.o addmul_1.o sub_n.o
