@@ -46,17 +46,18 @@ fast_printing {
 
   # these objects are for printf_fp.c only!
   LIBS += \
-    glibc/objects/addmul_1.o \
-    glibc/objects/add_n.o \
-    glibc/objects/cmp.o \
     glibc/objects/dbl2mpn.o \
-    glibc/objects/divrem.o \
+    glibc/objects/ldbl2mpn.o \
     glibc/objects/fpioconst.o \
     glibc/objects/lshift.o \
+    glibc/objects/rshift.o \
     glibc/objects/mul_1.o \
     glibc/objects/mul_n.o \
     glibc/objects/mul.o \
-    glibc/objects/rshift.o \
+    glibc/objects/add_n.o \
+    glibc/objects/addmul_1.o \
+    glibc/objects/cmp.o \
+    glibc/objects/divrem.o \
     glibc/objects/submul_1.o \
     glibc/objects/sub_n.o
 } else {
