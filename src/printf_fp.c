@@ -123,8 +123,6 @@ struct rudi_printf_info
 #define MPN_GE(u,v) \
   (u##size > v##size || (u##size == v##size && __mpn_cmp (u, v, u##size) >= 0))
 
-extern int __isinfl_internal (long double) attribute_hidden;
-extern int __isnanl_internal (long double) attribute_hidden;
 
 #if ! defined COMPILE_FOR_LONG_DOUBLE
 extern mp_size_t __mpn_extract_double (mp_ptr res_ptr, mp_size_t size,
