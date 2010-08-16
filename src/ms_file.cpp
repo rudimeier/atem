@@ -656,17 +656,17 @@ int FDat::record_to_string( const char *record, char *s ) const
 	char *begin = s;
 	s += ltoa( floatToIntDate_YYY( readFloat( record, 0 )), s );
 	*s++ = '\t';
-	s += ftoa( readFloat( record, 4 ), s );
+	s += rudi_printf_fp( s, readFloat( record, 4 ) );
 	*s++ = '\t';
-	s += ftoa( readFloat( record, 8 ), s );
+	s += rudi_printf_fp( s, readFloat( record, 8 ) );
 	*s++ = '\t';
-	s += ftoa( readFloat( record, 12 ), s );
+	s += rudi_printf_fp( s, readFloat( record, 12 ) );
 	*s++ = '\t';
-	s += ftoa( readFloat( record, 16 ), s );
+	s += rudi_printf_fp( s, readFloat( record, 16 ) );
 	*s++ = '\t';
-	s += ftoa( readFloat( record, 20 ), s );
+	s += rudi_printf_fp( s, readFloat( record, 20 ) );
 	*s++ = '\t';
-	s += ftoa( record_length >= 28 ? readFloat( record, 24 ) : 0.0f, s );
+	s += rudi_printf_fp( s, record_length >= 28 ? readFloat( record, 24 ) : NAN );
 	*s++ = '\n';
 	*s = '\0';
 	
