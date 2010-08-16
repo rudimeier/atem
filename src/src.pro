@@ -47,8 +47,8 @@ TARGET = atem
 QMAKE_CXXFLAGS += -O3
 
 # these CFLAGS are for printf_fp.c only!
-QMAKE_CFLAGS += -O3 \
-        -std=gnu99 -fgnu89-inline -O2 -Wall -Winline -Wwrite-strings -fmerge-all-constants -g -Wstrict-prototypes \
+QMAKE_CFLAGS += -O2 \
+        -std=gnu99 -fgnu89-inline -Wall -Winline -Wwrite-strings -fmerge-all-constants -Wstrict-prototypes \
         -I./glibc/include                               \
         -I./glibc/sysdeps/generic                       \
         -I./glibc                                       \
