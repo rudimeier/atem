@@ -140,9 +140,9 @@ extern mp_size_t __mpn_extract_long_double (mp_ptr res_ptr, mp_size_t size,
 
 int
 #ifdef COMPILE_FOR_LONG_DOUBLE
-rudi_printf_fp_long ( char *ccc, const long double arg )
+rudi_printf_fp_long ( char *ccc, const long double fpnum_ldbl )
 #else
-rudi_printf_fp ( char *ccc, const double arg )
+rudi_printf_fp ( char *ccc, const double fpnum_dbl )
 #endif
 {
 	struct rudi_printf_info _info;
@@ -162,13 +162,6 @@ rudi_printf_fp ( char *ccc, const double arg )
 
 	assert( info->spec > 60 /*lower case*/ );
 
-  /* The floating-point value to output.  */
-  union
-    {
-      double dbl;
-      __long_double_t ldbl;
-    }
-  fpnum;
 
   /* Locale-dependent representation of decimal point.	*/
 
@@ -261,18 +254,16 @@ rudi_printf_fp ( char *ccc, const double arg )
   /* Fetch the argument value.	*/
 #ifdef COMPILE_FOR_LONG_DOUBLE
     {
-      fpnum.ldbl = arg; /*const long double*/ 
-
       /* Check for special values: not a number or infinity.  */
-      if (__isnanl (fpnum.ldbl))
+      if (__isnanl (fpnum_ldbl))
 	{
-	  union ieee854_long_double u = { .d = fpnum.ldbl };
+	  union ieee854_long_double u = { .d = fpnum_ldbl };
 	  is_neg = u.ieee.negative != 0;
 	  special = "nan";
 	}
-      else if (__isinfl (fpnum.ldbl))
+      else if (__isinfl (fpnum_ldbl))
 	{
-	  is_neg = fpnum.ldbl < 0;
+	  is_neg = fpnum_ldbl < 0;
 	  special = "inf";
 	}
       else
@@ -281,24 +272,22 @@ rudi_printf_fp ( char *ccc, const double arg )
 						(sizeof (fp_input) /
 						 sizeof (fp_input[0])),
 						&exponent, &is_neg,
-						fpnum.ldbl);
+						fpnum_ldbl);
 	  to_shift = 1 + fracsize * BITS_PER_MP_LIMB - LDBL_MANT_DIG;
 	}
     }
 #else	/* no long double */
     {
-      fpnum.dbl = arg; /*const double*/ 
-
       /* Check for special values: not a number or infinity.  */
-      if (__isnan (fpnum.dbl))
+      if (__isnan (fpnum_dbl))
 	{
-	  union ieee754_double u = { .d = fpnum.dbl };
+	  union ieee754_double u = { .d = fpnum_dbl };
 	  is_neg = u.ieee.negative != 0;
 	  special = "nan";
 	}
-      else if (__isinf (fpnum.dbl))
+      else if (__isinf (fpnum_dbl))
 	{
-	  is_neg = fpnum.dbl < 0;
+	  is_neg = fpnum_dbl < 0;
 	  special = "inf";
 	}
       else
@@ -306,7 +295,7 @@ rudi_printf_fp ( char *ccc, const double arg )
 	  fracsize = __mpn_extract_double (fp_input,
 					   (sizeof (fp_input)
 					    / sizeof (fp_input[0])),
-					   &exponent, &is_neg, fpnum.dbl);
+					   &exponent, &is_neg, fpnum_dbl);
 	  to_shift = 1 + fracsize * BITS_PER_MP_LIMB - DBL_MANT_DIG;
 	}
     }
