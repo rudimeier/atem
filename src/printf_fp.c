@@ -134,11 +134,8 @@ extern mp_size_t __mpn_extract_long_double (mp_ptr res_ptr, mp_size_t size,
 
 
 
-extern int
-rudi_printf_fp ( char * ccc, const void *args );
-
 int
-rudi_printf_fp ( char * ccc, const void * args)
+rudi_printf_fp ( char *ccc, const double arg )
 {
 	struct rudi_printf_info _info;
   _info.prec = 6;			/* Precision.  */
@@ -276,7 +273,8 @@ rudi_printf_fp ( char * ccc, const void * args)
 #ifndef __NO_LONG_DOUBLE_MATH
   if (info->is_long_double && sizeof (long double) > sizeof (double))
     {
-      fpnum.ldbl = *(const long double *) args;
+      assert(0); // actually arg is just a double
+      fpnum.ldbl = (const long double) arg;
 
       /* Check for special values: not a number or infinity.  */
       if (__isnanl (fpnum.ldbl))
@@ -303,7 +301,7 @@ rudi_printf_fp ( char * ccc, const void * args)
   else
 #endif	/* no long double */
     {
-      fpnum.dbl = *(const double *) args;
+      fpnum.dbl = (const double) arg;
 
       /* Check for special values: not a number or infinity.  */
       if (__isnan (fpnum.dbl))
