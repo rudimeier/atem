@@ -1,6 +1,7 @@
 # general excludes
 *~
 *.o
+*.o.dt
 *.cfg
 *.log
 Makefile
