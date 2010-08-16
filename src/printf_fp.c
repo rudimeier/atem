@@ -54,6 +54,7 @@
  * taken from <fprintf.h> and modified:
  *    - removed flags: wide, extra, group, i18n, alt (treat them as unset)
  *                     is_short, is_long, is_char, __pad, user (not needed)
+ *                     is_long_double (to be handled separately if needed)
  *    - spec must be lowercase char
  *    - spec and pad have type char instead of wchar_t
  */
@@ -62,7 +63,6 @@ struct rudi_printf_info
   int prec;			/* Precision.  */
   int width;			/* Width.  */
   char spec;			/* Format letter.  */
-  unsigned int is_long_double:1;/* L flag.  */
   unsigned int space:1;		/* Space flag.  */
   unsigned int left:1;		/* - flag.  */
   unsigned int showsign:1;	/* + flag.  */
@@ -126,24 +126,29 @@ struct rudi_printf_info
 extern int __isinfl_internal (long double) attribute_hidden;
 extern int __isnanl_internal (long double) attribute_hidden;
 
+#if ! defined COMPILE_FOR_LONG_DOUBLE
 extern mp_size_t __mpn_extract_double (mp_ptr res_ptr, mp_size_t size,
 				       int *expt, int *is_neg,
 				       double value);
+#else
 extern mp_size_t __mpn_extract_long_double (mp_ptr res_ptr, mp_size_t size,
 					    int *expt, int *is_neg,
 					    long double value);
-
+#endif
 
 
 
 int
+#ifdef COMPILE_FOR_LONG_DOUBLE
+rudi_printf_fp_long ( char *ccc, const long double arg )
+#else
 rudi_printf_fp ( char *ccc, const double arg )
+#endif
 {
 	struct rudi_printf_info _info;
   _info.prec = 6;			/* Precision.  */
   _info.width = 0;			/* Width.  */
   _info.spec = 'g';			/* Format letter.  */
-  _info.is_long_double = 0;/* L flag.  */
   _info.space = 0;		/* Space flag.  */
   _info.left = 0;		/* - flag.  */
   _info.showsign = 0;	/* + flag.  */
@@ -254,11 +259,9 @@ rudi_printf_fp ( char *ccc, const double arg )
 
 
   /* Fetch the argument value.	*/
-#ifndef __NO_LONG_DOUBLE_MATH
-  if (info->is_long_double && sizeof (long double) > sizeof (double))
+#ifdef COMPILE_FOR_LONG_DOUBLE
     {
-      assert(0); // actually arg is just a double
-      fpnum.ldbl = (const long double) arg;
+      fpnum.ldbl = arg; /*const long double*/ 
 
       /* Check for special values: not a number or infinity.  */
       if (__isnanl (fpnum.ldbl))
@@ -282,10 +285,9 @@ rudi_printf_fp ( char *ccc, const double arg )
 	  to_shift = 1 + fracsize * BITS_PER_MP_LIMB - LDBL_MANT_DIG;
 	}
     }
-  else
-#endif	/* no long double */
+#else	/* no long double */
     {
-      fpnum.dbl = (const double) arg;
+      fpnum.dbl = arg; /*const double*/ 
 
       /* Check for special values: not a number or infinity.  */
       if (__isnan (fpnum.dbl))
@@ -308,6 +310,7 @@ rudi_printf_fp ( char *ccc, const double arg )
 	  to_shift = 1 + fracsize * BITS_PER_MP_LIMB - DBL_MANT_DIG;
 	}
     }
+#endif
 
   if (special)
     {
@@ -392,9 +395,8 @@ rudi_printf_fp ( char *ccc, const double arg )
 	    {
 	      if (scalesize == 0)
 		{
-#ifndef __NO_LONG_DOUBLE_MATH
-		  if (LDBL_MANT_DIG > _FPIO_CONST_OFFSET * BITS_PER_MP_LIMB
-		      && info->is_long_double)
+#ifdef COMPILE_FOR_LONG_DOUBLE
+		  if (LDBL_MANT_DIG > _FPIO_CONST_OFFSET * BITS_PER_MP_LIMB)
 		    {
 #define _FPIO_CONST_SHIFT \
   (((LDBL_MANT_DIG + BITS_PER_MP_LIMB - 1) / BITS_PER_MP_LIMB) \
