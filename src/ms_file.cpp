@@ -5,7 +5,7 @@
 #include <string.h>
 #include <math.h> // NAN, really needed?
 
-#if ! defined USE_FPRINTF
+#if defined FAST_PRINTING
 	#include "util.h"
 #endif
 
@@ -652,7 +652,7 @@ int FDat::record_to_string( const char *record, char *s ) const
 {
 	int ret;
 	
-#if ! defined USE_FPRINTF
+#if defined FAST_PRINTING
 	char *begin = s;
 	s += ltoa( floatToIntDate_YYY( readFloat( record, 0 )), s );
 	*s++ = '\t';
