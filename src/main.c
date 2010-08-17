@@ -20,19 +20,16 @@ int compare2()
 		char s2[512];
 		
 		double f = *( (float*) (&i) );
-		f = +f;
 		
-// 		int l = ftoa( f, s1 );
-		rudi_printf_fp( s1, f);
-// 		sprintf( s1, "%.5f", f );
-		sprintf( s2, "%.6g", f );
+		sprintf( s1, "%.6g", f );
+		rudi_printf_fp( s2, f);
 		
 		if( strcmp(s1, s2/*, l - 1*/) ) {
-			fprintf( stdout, "error(%d): %.18g  %s != %s\n", (i - start), f, s1, s2 );
+			fprintf( stdout, "error(%d): %.18g  %s != %s\n", i, f, s1, s2 );
 // 			return 1;
 		}
 		if( (i % 10000000) == 0 ) {
-			fprintf( stdout, "%s, %s\n", s1, s2 );
+			fprintf( stdout, "#%d: %s, %s\n", i, s1, s2 );
 		}
 	}
 	return 0;
@@ -72,9 +69,10 @@ int compare2()
 
 int main(int argc, char *argv[])
 {
-	return compare2();
-// 	double  f = 1121212212.12;
-// 	char ccc[512];
-// 	rudi_printf_fp( ccc, f);
-// 	fprintf( stdout, "HUHU %s \n", ccc );
+// 	return compare2();
+	double  f = -NAN;
+	char ccc[512];
+	rudi_printf_fp( ccc, f);
+	fprintf( stdout, "MY  : %s \n", ccc );
+	fprintf( stdout, "ORIG: %.6f \n", f );
 }
