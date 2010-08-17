@@ -31,7 +31,9 @@
 #include <float.h>
 #include <gmp-mparam.h>
 #include <gmp.h>
-#include <ieee754.h>
+#ifdef PRINT_NAN_SIGN
+	#include <ieee754.h>
+#endif
 #include <stdlib/gmp-impl.h>
 #include <stdlib/longlong.h>
 #include <stdlib/fpioconst.h>
@@ -252,8 +254,12 @@ rudi_printf_fp ( char *ccc, const double fpnum_dbl )
       /* Check for special values: not a number or infinity.  */
       if (__isnanl (fpnum_ldbl))
 	{
+#ifdef PRINT_NAN_SIGN
 	  union ieee854_long_double u = { .d = fpnum_ldbl };
 	  is_neg = u.ieee.negative != 0;
+#else
+	  is_neg = 0;
+#endif
 	  special = "nan";
 	}
       else if (__isinfl (fpnum_ldbl))
@@ -276,8 +282,12 @@ rudi_printf_fp ( char *ccc, const double fpnum_dbl )
       /* Check for special values: not a number or infinity.  */
       if (__isnan (fpnum_dbl))
 	{
+#ifdef PRINT_NAN_SIGN
 	  union ieee754_double u = { .d = fpnum_dbl };
 	  is_neg = u.ieee.negative != 0;
+#else
+	  is_neg = 0;
+#endif
 	  special = "nan";
 	}
       else if (__isinf (fpnum_dbl))
