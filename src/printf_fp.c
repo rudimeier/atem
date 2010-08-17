@@ -65,6 +65,7 @@
 	} while(0)
 
 
+#ifdef FULL_FEAT_PRINTF
 #define PADN(ch, len)						      \
 	do {									      \
 		char *end = ccc + len;				      \
@@ -73,6 +74,7 @@
 		}									      \
 		done += len;						      \
 	} while(0)
+#endif
 
 
 
@@ -262,6 +264,7 @@ rudi_printf_fp ( char *ccc, const struct rudi_printf_info *info,
 
   if (special)
     {
+#ifdef FULL_FEAT_PRINTF
       int width = info->width;
 
       if (is_neg || info->showsign || info->space)
@@ -277,11 +280,17 @@ rudi_printf_fp ( char *ccc, const struct rudi_printf_info *info,
 	outchar ('+');
       else if (info->space)
 	outchar (' ');
+#else
+      if (is_neg)
+	outchar ('-');
+#endif
 
       PRINT (special, 3 );
 
+#ifdef FULL_FEAT_PRINTF
       if (info->left && width > 0)
 	PADN (' ', width);
+#endif
 
       *ccc = '\0';
       return done;
@@ -651,7 +660,9 @@ rudi_printf_fp ( char *ccc, const struct rudi_printf_info *info,
     }
 
   {
+#ifdef FULL_FEAT_PRINTF
     int width = info->width;
+#endif
     char *wstartp, *wcp;
     size_t chars_needed;
     int expscale;
@@ -947,6 +958,7 @@ rudi_printf_fp ( char *ccc, const struct rudi_printf_info *info,
 	  }
       }
 
+#ifdef FULL_FEAT_PRINTF
     /* Compute number of characters which must be filled with the padding
        character.  */
     if (is_neg || info->showsign || info->space)
@@ -965,15 +977,20 @@ rudi_printf_fp ( char *ccc, const struct rudi_printf_info *info,
 
     if (!info->left && info->pad == '0' && width > 0)
       PADN ('0', width);
-
+#else
+    if (is_neg)
+      outchar ('-');
+#endif
     {
 
     PRINT (wstartp, wcp - wstartp );
 
     }
 
+#ifdef FULL_FEAT_PRINTF
     if (info->left && width > 0)
       PADN (info->pad, width);
+#endif
   }
 
   *ccc = '\0';
