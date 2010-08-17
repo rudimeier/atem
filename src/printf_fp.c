@@ -42,42 +42,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
-
-
-
-///////////////////////
-
-
-
-/**
- * taken from <fprintf.h> and modified:
- *    - removed flags: wide, extra, group, i18n, alt (treat them as unset)
- *                     is_short, is_long, is_char, __pad, user (not needed)
- *                     is_long_double (to be handled separately if needed)
- *    - spec must be lowercase char
- *    - spec and pad have type char instead of wchar_t
- */
-struct rudi_printf_info
-{
-  int prec;			/* Precision.  */
-  int width;			/* Width.  */
-  char spec;			/* Format letter.  */
-  unsigned int space:1;		/* Space flag.  */
-  unsigned int left:1;		/* - flag.  */
-  unsigned int showsign:1;	/* + flag.  */
-  char pad;			/* Padding character.  */
-};
-
-
-
-
-
-
-#ifndef NDEBUG
-# define NDEBUG			/* Undefine this for debugging assertions.  */
-#endif
-#undef NDEBUG
 #include <assert.h>
+#include "util.h" /* struct rudi_printf_info */
+
 
 
 
@@ -137,26 +104,13 @@ extern mp_size_t __mpn_extract_long_double (mp_ptr res_ptr, mp_size_t size,
 
 int
 #ifdef COMPILE_FOR_LONG_DOUBLE
-rudi_printf_fp_long ( char *ccc, const long double fpnum_ldbl )
+rudi_printf_fp_long ( char *ccc, const struct rudi_printf_info *info,
+	const long double fpnum_ldbl )
 #else
-rudi_printf_fp ( char *ccc, const double fpnum_dbl )
+rudi_printf_fp ( char *ccc, const struct rudi_printf_info *info,
+	const double fpnum_dbl )
 #endif
 {
-	struct rudi_printf_info _info;
-  _info.prec = 6;			/* Precision.  */
-  _info.width = 0;			/* Width.  */
-  _info.spec = 'g';			/* Format letter.  */
-  _info.space = 0;		/* Space flag.  */
-  _info.left = 0;		/* - flag.  */
-  _info.showsign = 0;	/* + flag.  */
-  _info.pad = ' ';			/* Padding character.  */
-
-	struct rudi_printf_info *info = &_info;
-
-
-
-
-
 	assert( info->spec > 60 /*lower case*/ );
 
 

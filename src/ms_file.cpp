@@ -7,6 +7,24 @@
 
 #if defined FAST_PRINTING
 	#include "util.h"
+
+static struct rudi_printf_info _pinfo;
+
+struct rudi_printf_info*  init_print_info()
+{
+	_pinfo.prec = 6;
+	_pinfo.width = 0;
+	_pinfo.spec = 'g';
+	_pinfo.space = 0;
+	_pinfo.left = 0;
+	_pinfo.showsign = 0;
+	_pinfo.pad = ' ';
+	return &_pinfo;
+}
+
+static struct rudi_printf_info *pinfo = init_print_info();
+
+
 #endif
 
 
@@ -638,7 +656,6 @@ void FDat::print( const char* header ) const
 	buf_p += h_size;
 	*buf_p++ = '\t';
 	
-	
 	while( record < end ) {
 		record_to_string( record, buf_p );
 		record += record_length;
@@ -656,17 +673,17 @@ int FDat::record_to_string( const char *record, char *s ) const
 	char *begin = s;
 	s += ltoa( floatToIntDate_YYY( readFloat( record, 0 )), s );
 	*s++ = '\t';
-	s += rudi_printf_fp( s, readFloat( record, 4 ) );
+	s += rudi_printf_fp( s, pinfo, readFloat( record, 4 ) );
 	*s++ = '\t';
-	s += rudi_printf_fp( s, readFloat( record, 8 ) );
+	s += rudi_printf_fp( s, pinfo, readFloat( record, 8 ) );
 	*s++ = '\t';
-	s += rudi_printf_fp( s, readFloat( record, 12 ) );
+	s += rudi_printf_fp( s, pinfo, readFloat( record, 12 ) );
 	*s++ = '\t';
-	s += rudi_printf_fp( s, readFloat( record, 16 ) );
+	s += rudi_printf_fp( s, pinfo, readFloat( record, 16 ) );
 	*s++ = '\t';
-	s += rudi_printf_fp( s, readFloat( record, 20 ) );
+	s += rudi_printf_fp( s, pinfo, readFloat( record, 20 ) );
 	*s++ = '\t';
-	s += rudi_printf_fp( s, record_length >= 28 ? readFloat( record, 24 ) : NAN );
+	s += rudi_printf_fp( s, pinfo, record_length >= 28 ? readFloat( record, 24 ) : NAN );
 	*s++ = '\n';
 	*s = '\0';
 	

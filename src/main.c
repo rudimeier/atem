@@ -8,6 +8,21 @@
 
 
 
+static struct rudi_printf_info pinfo;
+
+void init_print_info()
+{
+	pinfo.prec = 6;
+	pinfo.width = 0;
+	pinfo.spec = 'g';
+	pinfo.space = 0;
+	pinfo.left = 0;
+	pinfo.showsign = 0;
+	pinfo.pad = ' ';
+}
+
+
+
 
 int compare2()
 {
@@ -22,7 +37,7 @@ int compare2()
 		double f = *( (float*) (&i) );
 		
 		sprintf( s1, "%.6g", f );
-		rudi_printf_fp( s2, f);
+		rudi_printf_fp( s2, &pinfo, f);
 		
 		if( strcmp(s1, s2/*, l - 1*/) ) {
 			fprintf( stdout, "error(%d): %.18g  %s != %s\n", i, f, s1, s2 );
@@ -69,10 +84,11 @@ int compare2()
 
 int main(int argc, char *argv[])
 {
+	init_print_info();
 // 	return compare2();
-	double  f = -NAN;
+	double  f = NAN;
 	char ccc[512];
-	rudi_printf_fp( ccc, f);
+	rudi_printf_fp( ccc, &pinfo, f );
 	fprintf( stdout, "MY  : %s \n", ccc );
 	fprintf( stdout, "ORIG: %.6f \n", f );
 }
