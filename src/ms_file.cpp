@@ -14,7 +14,7 @@ struct rudi_printf_info*  init_print_info()
 {
 	_pinfo.prec = 6;
 	_pinfo.width = 0;
-	_pinfo.spec = 'g';
+	_pinfo.spec = 'f';
 	_pinfo.space = 0;
 	_pinfo.left = 0;
 	_pinfo.showsign = 0;
@@ -673,6 +673,7 @@ int FDat::record_to_string( const char *record, char *s ) const
 	char *begin = s;
 	s += ltoa( s, floatToIntDate_YYY( readFloat( record, 0 ) ) );
 	*s++ = '\t';
+	pinfo->prec = 5;
 	s += rudi_printf_fp( s, pinfo, readFloat( record, 4 ) );
 	*s++ = '\t';
 	s += rudi_printf_fp( s, pinfo, readFloat( record, 8 ) );
@@ -681,6 +682,7 @@ int FDat::record_to_string( const char *record, char *s ) const
 	*s++ = '\t';
 	s += rudi_printf_fp( s, pinfo, readFloat( record, 16 ) );
 	*s++ = '\t';
+	pinfo->prec = 0;
 	s += rudi_printf_fp( s, pinfo, readFloat( record, 20 ) );
 	*s++ = '\t';
 	s += rudi_printf_fp( s, pinfo, record_length >= 28 ? readFloat( record, 24 ) : NAN );
@@ -689,7 +691,7 @@ int FDat::record_to_string( const char *record, char *s ) const
 	
 	ret = s - begin;
 #else
-	ret = sprintf( s, "%d\t%.5f\t%.5f\t%.5f\t%.5f\t%g\t%g\n",
+	ret = sprintf( s, "%d\t%.5f\t%.5f\t%.5f\t%.5f\t%.0f\t%.0f\n",
 		floatToIntDate_YYY( readFloat( record, 0 ) ),
 		readFloat( record, 4 ),
 		readFloat( record, 8 ),
