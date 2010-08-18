@@ -23,8 +23,9 @@ Metastock::Metastock() :
 	ba_xmaster( new QByteArray() ),
 	error("")
 {
+#define MAX_MR_LEN 4096
 	mr_len = 0;
-	mr_list = (master_record**) calloc( 4096, sizeof(master_record*) );
+	mr_list = (master_record**) calloc( MAX_MR_LEN, sizeof(master_record*) );
 }
 
 
@@ -46,6 +47,13 @@ Metastock::~Metastock()
 	SAFE_DELETE( master );
 	SAFE_DELETE( dir );
 	
+	for( int i = 0; i < MAX_MR_LEN; i++ ) {
+		if( mr_list[i] != NULL ) {
+			mr_len--;
+			delete mr_list[i];
+		}
+	}
+	Q_ASSERT( mr_len == 0);
 	free( mr_list );
 }
 
@@ -120,28 +128,37 @@ void Metastock::parseMasters()
 	int cntM = mf.countRecords();
 	for( int i = 1; i<=cntM; i++ ) {
 		master_record *mr = new master_record;
+		mr_len++;
 		mf.getRecord( mr, i );
 		qDebug() << i << mr->record_number << mr->file_number;
+		Q_ASSERT( mr_list[mr->file_number] == NULL );
+		mr_list[mr->file_number] = mr;
 	}
 	}
 	
 	{
 	EMasterFile emf( ba_emaster->constData(), ba_emaster->size() );
 	int cntE = emf.countRecords();
+	master_record tmp;
 	for( int i = 1; i<=cntE; i++ ) {
-		master_record *mr = new master_record;
-		emf.getRecord( mr, i );
-		qDebug() << i << mr->record_number << mr->file_number;
+		emf.getRecord( &tmp, i );
+		qDebug() << i << tmp.record_number << tmp.file_number;
+		Q_ASSERT( mr_list[tmp.file_number] != NULL );
+		*mr_list[tmp.file_number] = tmp; // TODO should be a merge E->M
 	}
 	}
 	
+	if( xmaster != NULL )
 	{
 	XMasterFile xmf( ba_xmaster->constData(), ba_xmaster->size() );
 	int cntX = xmf.countRecords();
 	for( int i = 1; i<=cntX; i++ ) {
+		mr_len++;
 		master_record *mr = new master_record;
 		xmf.getRecord( mr, i );
 		qDebug() << i << mr->record_number << mr->file_number;
+		Q_ASSERT( mr_list[mr->file_number] == NULL );
+		mr_list[mr->file_number] = mr;
 	}
 	}
 }
