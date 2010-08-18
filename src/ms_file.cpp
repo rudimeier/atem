@@ -247,6 +247,23 @@ unsigned char MasterFile::countRecords() const
 }
 
 
+int MasterFile::getRecord( master_record *mr, int rnum ) const
+{
+	const char *record = buf + (record_length * rnum);
+	mr->record_number = rnum;
+	mr->kind = 'M';
+	mr->file_number = readUnsignedChar( record, 0 );
+	mr->record_length = readChar( record, 3 );
+	mr->fields_per_record = readChar( record, 3 );
+// 	r->field_bitset; /* E, X */
+// 	char barsize; /* E, X */
+	strcpy( mr->c_symbol, record + 36 );
+	strcpy( mr->c_short_name, record + 7 );
+// 	char c_long_name[64]; /* E, X  */
+	return 0;
+}
+
+
 int MasterFile::fileNumber( int r ) const
 {
 	const char *record = buf + (record_length * r);
@@ -424,6 +441,23 @@ unsigned char EMasterFile::countRecords() const
 }
 
 
+int EMasterFile::getRecord( master_record *mr, int rnum ) const
+{
+	const char *record = buf + (record_length * rnum);
+	mr->record_number = rnum;
+	mr->kind = 'E';
+	mr->file_number = readUnsignedChar( record, 2 );
+// 	int record_length; /* M */
+	mr->fields_per_record = readChar( record, 6 );
+	mr->field_bitset= readChar( record, 7 );
+	mr->barsize= readChar( record, 60 );
+	strcpy( mr->c_symbol, record + 11 );
+	strcpy( mr->c_short_name, record + 32 );
+	strcpy( mr->c_long_name, record + 139 );
+	return 0;
+}
+
+
 int EMasterFile::fileNumber( int r ) const
 {
 	const char *record = buf + (record_length * r);
@@ -594,6 +628,23 @@ void XMasterFile::printRecord( const char *record ) const
 unsigned short XMasterFile::countRecords() const
 {
 	return readUnsignedShort( buf, 10 );
+}
+
+
+int XMasterFile::getRecord( master_record *mr, int rnum ) const
+{
+	const char *record = buf + (record_length * rnum);
+	mr->record_number = rnum;
+	mr->kind = 'X';
+	mr->file_number = readUnsignedShort( record, 65 );
+// 	mr->record_length; /* M */
+// 	mr->fields_per_record; /* M, E */
+	mr->field_bitset = readUnsignedChar( record, 70 );
+	mr->barsize = readChar( record, 62 );
+	strcpy( mr->c_symbol, record + 1 );
+// 	mr->c_short_name[64]; /* M, E */
+	strcpy( mr->c_long_name, record + 16 );
+	return 0;
 }
 
 

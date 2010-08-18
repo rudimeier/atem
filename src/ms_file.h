@@ -29,6 +29,7 @@ class MasterFile
 		
 		bool check() const;
 		unsigned char countRecords() const;
+		int getRecord( master_record *, int rnum ) const;
 		int fileNumber( int record ) const;
 		int dataLength( int record ) const;
 		
@@ -60,6 +61,7 @@ class EMasterFile
 		
 		bool check() const;
 		unsigned char countRecords() const;
+		int getRecord( master_record *, int rnum ) const;
 		int fileNumber( int record ) const;
 		int dataLength( int record ) const;
 		
@@ -91,6 +93,7 @@ class XMasterFile
 		
 		bool check() const;
 		unsigned short countRecords() const;
+		int getRecord( master_record *, int rnum ) const;
 		int fileNumber( int record ) const;
 		int dataLength( int record ) const;
 		
