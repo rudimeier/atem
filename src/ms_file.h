@@ -2,6 +2,23 @@
 #define ATEM_MS_FILE_H
 
 
+
+struct master_record
+{
+	int record_number; /* position in master file */
+	char kind; /* (M)aster, (E)master, (X)Master */
+	int file_number; /* M, E, X */
+	int record_length; /* M */
+	int fields_per_record; /* M, E */
+	int field_bitset; /* E, X */
+	char barsize; /* E, X */
+	char c_symbol[64]; /* M, E, X */
+	char c_short_name[64]; /* M, E */
+	char c_long_name[64]; /* E, X  */
+};
+
+
+
 class MasterFile
 {
 	public:
