@@ -7,6 +7,7 @@ class QDir;
 class QFile;
 class QByteArray;
 class QFileInfo;
+struct master_record;
 
 
 class Metastock
@@ -39,6 +40,8 @@ class Metastock
 		QFile *emaster;
 		QFile *xmaster;
 		QHash<QString, QFileInfo> *files;
+		int mr_len;
+		master_record **mr_list;
 		
 		QByteArray *ba_master;
 		QByteArray *ba_emaster;

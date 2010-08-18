@@ -23,6 +23,8 @@ Metastock::Metastock() :
 	ba_xmaster( new QByteArray() ),
 	error("")
 {
+	mr_len = 0;
+	mr_list = (master_record**) calloc( 4096, sizeof(master_record*) );
 }
 
 
@@ -43,6 +45,8 @@ Metastock::~Metastock()
 	SAFE_DELETE( emaster );
 	SAFE_DELETE( master );
 	SAFE_DELETE( dir );
+	
+	free( mr_list );
 }
 
 
