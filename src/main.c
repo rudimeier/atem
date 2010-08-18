@@ -56,29 +56,29 @@ int compare2()
 
 
 
-// int compare1()
-// {
-// 	long start = 9999999999;
-// 	long count = INT_MAX;	
-// 	long end = start + count;
-// 	
-// 	for( long i = start; i<end; i++ ) {
-// 		char s1[32];
-// 		char s2[32];
-// 		
-// 		itoa( i, s1 );
-// 		sprintf( s2, "%ld", i );
-// 		
-// 		if( strcmp(s1, s2) ) {
-// 			fprintf( stdout, "error: %s != %s\n", s1, s2 );
-// 			return 1;
-// 		}
-// 		if( i % 0xfffff == 0) {
-// 			fprintf( stdout, "%lX, %s\n", i, s1 );
-// 		}
-// 	}
-// 	return 0;
-// }
+int compare1()
+{
+	long start = 9999999999;
+	long count = INT_MAX;	
+	long end = start + count;
+	
+	for( long i = start; i<end; i++ ) {
+		char s1[32];
+		char s2[32];
+		
+		sprintf( s1, "%ld", i );
+		itoa( s2, i );
+		
+		if( strcmp(s1, s2) ) {
+			fprintf( stdout, "error: %s != %s\n", s1, s2 );
+			return 1;
+		}
+		if( i % 0xfffff == 0) {
+			fprintf( stdout, "%lX, %s\n", i, s1 );
+		}
+	}
+	return 0;
+}
 
 
 

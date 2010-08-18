@@ -21,7 +21,7 @@ void reverse( char *s, int l )
 /**
  * ltoa:  convert n to characters in s
  */
-int ltoa( long n, char *s )
+int ltoa( char *s, long n )
 {
 	char *begin = s;
 	char *rev = s;
@@ -44,7 +44,7 @@ int ltoa( long n, char *s )
 }
 
 
-int ftoa(float f, char *s)
+int ftoa( char *s, float f )
 {
 	char *buf = s;
 	if( f < 0 ) {
@@ -61,8 +61,8 @@ int ftoa(float f, char *s)
 	} else {
 		b_ /= 10;
 	}
-	buf += ltoa(a, buf);
-	int d = ltoa( 100000 + b_, buf);
+	buf += ltoa( buf, a );
+	int d = ltoa( buf, 100000 + b_ );
 	*buf = '.';
 	return buf + d - s;
 }
@@ -93,7 +93,7 @@ static inline struct bla div1000(unsigned int a, unsigned int b)
 	_num = l2.rem 
 
 
-int itoa( long snum, char s[] )
+int itoa( char *s, long snum )
 {
 	struct bla l2;
 	char *ps = s;
@@ -147,7 +147,7 @@ L1:
 //---------------------------------------------------------------
 // itoas() - iMalc version updated ver. 0.8
 //---------------------------------------------------------------
-int itoa( long snum, char s[] )
+int itoa( char *s, long snum )
 {
 	char *ps = s;
 	unsigned long num1 = snum, num2, num3, div;

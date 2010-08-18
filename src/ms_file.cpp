@@ -671,7 +671,7 @@ int FDat::record_to_string( const char *record, char *s ) const
 	
 #if defined FAST_PRINTING
 	char *begin = s;
-	s += ltoa( floatToIntDate_YYY( readFloat( record, 0 )), s );
+	s += ltoa( s, floatToIntDate_YYY( readFloat( record, 0 ) ) );
 	*s++ = '\t';
 	s += rudi_printf_fp( s, pinfo, readFloat( record, 4 ) );
 	*s++ = '\t';

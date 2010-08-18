@@ -6,11 +6,11 @@
 /**
  * ltoa:  convert n to characters in s
  */
-extern int ltoa( long n, char *s );
+extern int ltoa( char *s, long n );
 
-extern int itoa( long n, char *s );
+extern int itoa( char *s, long n );
 
-extern int ftoa(float f, char *s);
+extern int ftoa( char *s, float f );
 
 
 
