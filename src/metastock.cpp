@@ -91,6 +91,7 @@ bool Metastock::setDir( const char* d )
 	xmaster = findMaster( "XMASTER" );
 	
 	readMasters();
+	parseMasters();
 	
 	return true;
 }
@@ -104,6 +105,40 @@ void readMaster( QFile *m, QByteArray *ba )
 		Q_ASSERT( ba->size() == m->size() ); //TODO
 	} else {
 		ba->clear();
+	}
+}
+
+
+void Metastock::parseMasters()
+{
+	{
+	MasterFile mf( ba_master->constData(), ba_master->size() );
+	int cntM = mf.countRecords();
+	for( int i = 1; i<=cntM; i++ ) {
+		master_record *mr = new master_record;
+		mf.getRecord( mr, i );
+		qDebug() << i << mr->record_number << mr->file_number;
+	}
+	}
+	
+	{
+	EMasterFile emf( ba_emaster->constData(), ba_emaster->size() );
+	int cntE = emf.countRecords();
+	for( int i = 1; i<=cntE; i++ ) {
+		master_record *mr = new master_record;
+		emf.getRecord( mr, i );
+		qDebug() << i << mr->record_number << mr->file_number;
+	}
+	}
+	
+	{
+	XMasterFile xmf( ba_xmaster->constData(), ba_xmaster->size() );
+	int cntX = xmf.countRecords();
+	for( int i = 1; i<=cntX; i++ ) {
+		master_record *mr = new master_record;
+		xmf.getRecord( mr, i );
+		qDebug() << i << mr->record_number << mr->file_number;
+	}
 	}
 }
 
