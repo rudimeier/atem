@@ -233,7 +233,7 @@ void Metastock::dumpDataDAT( int f ) const
 		int num_e = emf.fileNumber( i );
 		Q_ASSERT( num_m == num_e );
 		int l_m = mf.dataLength( i );
-		int l_e = mf.dataLength( i );
+		int l_e = emf.dataLength( i );
 		Q_ASSERT( l_m == l_e );
 		dumpData( num_m, l_m );
 	}

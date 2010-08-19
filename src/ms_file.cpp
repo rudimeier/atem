@@ -471,7 +471,7 @@ int EMasterFile::fileNumber( int r ) const
 int EMasterFile::dataLength( int r ) const
 {
 	const char *record = buf + (record_length * r);
-	return readUnsignedChar( record, 6 );
+	return readUnsignedChar( record, 6 ) * 4;
 }
 
 
