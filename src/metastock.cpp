@@ -124,42 +124,38 @@ void readMaster( QFile *m, QByteArray *ba )
 void Metastock::parseMasters()
 {
 	{
-	MasterFile mf( ba_master->constData(), ba_master->size() );
-	int cntM = mf.countRecords();
-	for( int i = 1; i<=cntM; i++ ) {
-		master_record *mr = new master_record;
-		mr_len++;
-		mf.getRecord( mr, i );
-		qDebug() << i << mr->record_number << mr->file_number;
-		Q_ASSERT( mr_list[mr->file_number] == NULL );
-		mr_list[mr->file_number] = mr;
-	}
+		MasterFile mf( ba_master->constData(), ba_master->size() );
+		int cntM = mf.countRecords();
+		for( int i = 1; i<=cntM; i++ ) {
+			master_record *mr = new master_record;
+			mr_len++;
+			mf.getRecord( mr, i );
+			Q_ASSERT( mr_list[mr->file_number] == NULL );
+			mr_list[mr->file_number] = mr;
+		}
 	}
 	
 	{
-	EMasterFile emf( ba_emaster->constData(), ba_emaster->size() );
-	int cntE = emf.countRecords();
-	master_record tmp;
-	for( int i = 1; i<=cntE; i++ ) {
-		emf.getRecord( &tmp, i );
-		qDebug() << i << tmp.record_number << tmp.file_number;
-		Q_ASSERT( mr_list[tmp.file_number] != NULL );
-		*mr_list[tmp.file_number] = tmp; // TODO should be a merge E->M
-	}
+		EMasterFile emf( ba_emaster->constData(), ba_emaster->size() );
+		int cntE = emf.countRecords();
+		master_record tmp;
+		for( int i = 1; i<=cntE; i++ ) {
+			emf.getRecord( &tmp, i );
+			Q_ASSERT( mr_list[tmp.file_number] != NULL );
+			*mr_list[tmp.file_number] = tmp; // TODO should be a merge E->M
+		}
 	}
 	
-	if( xmaster != NULL )
-	{
-	XMasterFile xmf( ba_xmaster->constData(), ba_xmaster->size() );
-	int cntX = xmf.countRecords();
-	for( int i = 1; i<=cntX; i++ ) {
-		mr_len++;
-		master_record *mr = new master_record;
-		xmf.getRecord( mr, i );
-		qDebug() << i << mr->record_number << mr->file_number;
-		Q_ASSERT( mr_list[mr->file_number] == NULL );
-		mr_list[mr->file_number] = mr;
-	}
+	if( xmaster != NULL ) {
+		XMasterFile xmf( ba_xmaster->constData(), ba_xmaster->size() );
+		int cntX = xmf.countRecords();
+		for( int i = 1; i<=cntX; i++ ) {
+			mr_len++;
+			master_record *mr = new master_record;
+			xmf.getRecord( mr, i );
+			Q_ASSERT( mr_list[mr->file_number] == NULL );
+			mr_list[mr->file_number] = mr;
+		}
 	}
 }
 
