@@ -8,6 +8,7 @@
 #include <QtCore/QDir>
 
 #include "ms_file.h"
+#include "util.h"
 
 
 
@@ -206,6 +207,64 @@ void Metastock::dumpData( int f ) const
 		dumpDataDAT( f );
 	} else {
 		dumpDataMWD( f );
+	}
+}
+
+
+int build_mr_string( char *dst, const master_record *mr )
+{
+	char *cp = dst;
+	int tmp = 0;
+	
+	tmp = strlen(mr->c_symbol);
+	memcpy( cp, mr->c_symbol, tmp );
+	cp += tmp;
+	*cp++ = '\t';
+	
+	tmp = strlen(mr->c_long_name);
+	if( tmp > 0 ) {
+		memcpy( cp, mr->c_long_name, tmp );
+	} else {
+		tmp = strlen(mr->c_short_name);
+		memcpy( cp, mr->c_short_name, tmp );
+	}
+	cp += tmp;
+	
+	*cp = '\0';
+	return cp - dst;
+}
+
+
+void Metastock::dumpDataPlus( int f ) const
+{
+	char buf[256];
+	char *cp = buf;
+	
+	if( f!=0 ) {
+		if( f > 0 && f < MAX_MR_LEN && mr_list[f] != NULL ) {
+			cp += itoa( buf, f );
+			cp++;
+			Q_ASSERT( mr_list[f]->file_number == f );
+			int len = build_mr_string( buf, mr_list[f] );
+			fprintf( stderr , "print #%d\n", f  );
+			qDebug() << buf << len;
+		} else {
+			fprintf( stderr , "error, "
+				"data file #%d not referenced by master files\n", f  );
+		}
+		return;
+	}
+	
+	for( int i = 1; i<MAX_MR_LEN; i++ ) {
+		if( i > 0 && i < MAX_MR_LEN && mr_list[i] != NULL ) {
+			fprintf( stderr , "print #%d\n", i  );
+			Q_ASSERT( mr_list[i]->file_number == i );
+			int len = build_mr_string( buf, mr_list[i] );
+			qDebug() << buf << len;
+		} else {
+			fprintf( stderr , "error, "
+				"data file #%d not referenced by master files\n", i  );
+		}
 	}
 }
 
