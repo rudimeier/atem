@@ -1,11 +1,13 @@
 #include "metastock.h"
 
+#include <stdlib.h>
 #include <math.h>
+#include <fts.h>
+#include <errno.h>
 
-#include <QtCore/QDebug>
-#include <QtCore/QStringList>
-#include <QtCore/QFileInfo>
-#include <QtCore/QDir>
+#include <QtCore/QString>
+#include <QtCore/QHash>
+#include <QtCore/QFile>
 
 #include "ms_file.h"
 #include "util.h"
@@ -18,7 +20,7 @@ Metastock::Metastock() :
 	master(NULL),
 	emaster(NULL),
 	xmaster(NULL),
-	files( new QHash<QString, QFileInfo>() ),
+	files( new QHash<QString, QString>() ),
 	ba_master( new QByteArray() ),
 	ba_emaster( new QByteArray() ),
 	ba_xmaster( new QByteArray() ),
@@ -46,7 +48,6 @@ Metastock::~Metastock()
 	SAFE_DELETE( xmaster );
 	SAFE_DELETE( emaster );
 	SAFE_DELETE( master );
-	SAFE_DELETE( dir );
 	
 	for( int i = 0; i < MAX_MR_LEN; i++ ) {
 		if( mr_list[i] != NULL ) {
@@ -61,11 +62,33 @@ Metastock::~Metastock()
 
 void Metastock::findFiles()
 {
-	QFileInfoList fil = dir->entryInfoList();
-	foreach( QFileInfo fi, fil ) {
-		QString key = fi.fileName().toUpper();
-		Q_ASSERT( !files->contains(key) ); // TODO handle ambiguous file error
-		files->insert( key, fi );
+	char *path_argv[] = { (char*)dir, NULL }; // TODO conversion to char*
+	FTS *tree = fts_open( path_argv,
+		FTS_NOCHDIR | FTS_LOGICAL | FTS_NOSTAT, NULL );
+	if (!tree) {
+		perror("fts_open");
+		Q_ASSERT(false);
+	}
+	FTSENT *node;
+	while ((node = fts_read(tree))) {
+		if( (node->fts_level > 0) && (node->fts_info == FTS_D ) ) {
+			fts_set(tree, node, FTS_SKIP);
+		} else if( node->fts_info == FTS_F ) {
+			QString key = QString(node->fts_name).toUpper();
+			Q_ASSERT( !files->contains(key) ); // TODO handle ambiguous file error
+			files->insert( key, QString( node->fts_path ) );
+		}
+	}
+	
+	//TODO error handling
+	if (errno) {
+		perror("fts_read");
+		Q_ASSERT( false );
+	}
+	
+	if (fts_close(tree)) {
+		perror("fts_close");
+		Q_ASSERT( false );
 	}
 }
 
@@ -73,7 +96,7 @@ void Metastock::findFiles()
 QFile* Metastock::findMaster( const char* name ) const
 {
 	if( files->contains( QString(name)) ) {
-		return new QFile( files->value(QString(name)).absoluteFilePath() );
+		return new QFile( files->value( QString(name) ) );
 	} else {
 		return NULL;
 	}
@@ -85,9 +108,8 @@ bool Metastock::setDir( const char* d )
 	SAFE_DELETE( xmaster );
 	SAFE_DELETE( emaster );
 	SAFE_DELETE( master );
-	SAFE_DELETE( dir );
 	
-	dir = new QDir(d);
+	dir = d;
 	findFiles();
 	
 	master = findMaster( "MASTER" );
