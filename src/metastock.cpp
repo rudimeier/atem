@@ -232,6 +232,7 @@ void Metastock::dumpData( int f ) const
 			Q_ASSERT( mr_list[f]->file_number == f );
 			int len = build_mr_string( buf, mr_list[f] );
 			fprintf( stderr , "#%d,%s, %d\n", f, buf, len  );
+			dumpData( f, mr_list[f]->field_bitset, buf );
 		} else {
 			fprintf( stderr , "error, "
 				"data file #%d not referenced by master files\n", f  );
@@ -244,6 +245,7 @@ void Metastock::dumpData( int f ) const
 			Q_ASSERT( mr_list[i]->file_number == i );
 			int len = build_mr_string( buf, mr_list[i] );
 			fprintf( stderr , "#%d,%s, %d\n", i, buf, len  );
+			dumpData( i, mr_list[i]->field_bitset, buf );
 		} else {
 			fprintf( stderr , "error, "
 				"data file #%d not referenced by master files\n", i  );
@@ -253,7 +255,7 @@ void Metastock::dumpData( int f ) const
 
 
 
-void Metastock::dumpData( int n, int l ) const
+void Metastock::dumpData( int n, unsigned int fields, const char *pfx ) const
 {
 	char tmp[17];
 	
@@ -273,12 +275,12 @@ void Metastock::dumpData( int n, int l ) const
 	QByteArray ba_fdat;
 	readMaster( fdat, &ba_fdat );
 	
-	FDat datfile( ba_fdat.constData(), ba_fdat.size(), l );
+	FDat datfile( ba_fdat.constData(), ba_fdat.size(), fields );
 	fprintf( stdout, "%s: %d x %d bytes\n",
-		tmp, datfile.countRecords(), l );
+		tmp, datfile.countRecords(), count_bits(fields) );
 	
 	datfile.checkHeader();
-	datfile.print( tmp );
+	datfile.print( pfx );
 	
 	delete fdat;
 
