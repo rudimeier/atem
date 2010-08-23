@@ -246,8 +246,7 @@ void Metastock::dumpDataPlus( int f ) const
 			cp++;
 			Q_ASSERT( mr_list[f]->file_number == f );
 			int len = build_mr_string( buf, mr_list[f] );
-			fprintf( stderr , "print #%d\n", f  );
-			qDebug() << buf << len;
+			fprintf( stderr , "#%d,%s, %d\n", f, buf, len  );
 		} else {
 			fprintf( stderr , "error, "
 				"data file #%d not referenced by master files\n", f  );
@@ -257,10 +256,9 @@ void Metastock::dumpDataPlus( int f ) const
 	
 	for( int i = 1; i<MAX_MR_LEN; i++ ) {
 		if( i > 0 && i < MAX_MR_LEN && mr_list[i] != NULL ) {
-			fprintf( stderr , "print #%d\n", i  );
 			Q_ASSERT( mr_list[i]->file_number == i );
 			int len = build_mr_string( buf, mr_list[i] );
-			qDebug() << buf << len;
+			fprintf( stderr , "#%d,%s, %d\n", i, buf, len  );
 		} else {
 			fprintf( stderr , "error, "
 				"data file #%d not referenced by master files\n", i  );
