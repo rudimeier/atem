@@ -144,6 +144,6 @@ int main(int argc, char *argv[])
 		}
 	}
 	if( dumpdatap >= 0 ) {
-		ms.dumpDataPlus( dumpdatap );
+		ms.dumpData( dumpdatap );
 	}
 }

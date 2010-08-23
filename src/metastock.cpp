@@ -196,21 +196,6 @@ void Metastock::dumpXMaster() const
 }
 
 
-void Metastock::dumpData( int f ) const
-{
-	if( f <= 0 ) {
-		dumpDataDAT();
-		if( hasXMaster() ) {
-			dumpDataMWD();
-		}
-	} else if( f <= 255 ) {
-		dumpDataDAT( f );
-	} else {
-		dumpDataMWD( f );
-	}
-}
-
-
 int build_mr_string( char *dst, const master_record *mr )
 {
 	char *cp = dst;
@@ -235,7 +220,7 @@ int build_mr_string( char *dst, const master_record *mr )
 }
 
 
-void Metastock::dumpDataPlus( int f ) const
+void Metastock::dumpData( int f ) const
 {
 	char buf[256];
 	char *cp = buf;
@@ -266,57 +251,6 @@ void Metastock::dumpDataPlus( int f ) const
 	}
 }
 
-
-void Metastock::dumpDataDAT( int f ) const
-{
-	MasterFile mf( ba_master->constData(), ba_master->size() );
-	EMasterFile emf( ba_emaster->constData(), ba_emaster->size() );
-	int cntMaster = mf.countRecords();
-	Q_ASSERT( cntMaster == emf.countRecords() );
-	
-	if( f!=0 ) {
-		int num_m = mf.fileNumber( f );
-		int num_e = emf.fileNumber( f );
-		Q_ASSERT( num_m == num_e );
-		int l_m = mf.dataLength( f );
-		int l_e = emf.dataLength( f );
-		Q_ASSERT( l_m == l_e );
-		dumpData( num_m, l_m );
-		return;
-	}
-	
-	for( int i = 1; i<=cntMaster; i++ ) {
-		int num_m = mf.fileNumber( i );
-		int num_e = emf.fileNumber( i );
-		Q_ASSERT( num_m == num_e );
-		int l_m = mf.dataLength( i );
-		int l_e = emf.dataLength( i );
-		Q_ASSERT( l_m == l_e );
-		dumpData( num_m, l_m );
-	}
-}
-
-
-void Metastock::dumpDataMWD( int f ) const
-{
-	XMasterFile xmf( ba_xmaster->constData(), ba_xmaster->size() );
-	int cntMaster = xmf.countRecords();
-	
-	if( f!=0 ) {
-		int num_x = xmf.fileNumber( f );
-		int l = xmf.dataLength( f );
-		Q_ASSERT( num_x > 255 );
-		dumpData( num_x, l );
-		return;
-	}
-	
-	for( int i = 1; i<=cntMaster; i++ ) {
-		int num_x = xmf.fileNumber( i );
-		int l = xmf.dataLength( i );
-		Q_ASSERT( num_x > 255 );
-		dumpData( num_x, l );
-	}
-}
 
 
 void Metastock::dumpData( int n, int l ) const
