@@ -223,15 +223,11 @@ int build_mr_string( char *dst, const master_record *mr )
 void Metastock::dumpData( int f ) const
 {
 	char buf[256];
-	char *cp = buf;
 	
 	if( f!=0 ) {
 		if( f > 0 && f < MAX_MR_LEN && mr_list[f] != NULL ) {
-			cp += itoa( buf, f );
-			cp++;
 			Q_ASSERT( mr_list[f]->file_number == f );
 			int len = build_mr_string( buf, mr_list[f] );
-			fprintf( stderr , "#%d,%s, %d\n", f, buf, len  );
 			dumpData( f, mr_list[f]->field_bitset, buf );
 		} else {
 			fprintf( stderr , "error, "
@@ -244,11 +240,7 @@ void Metastock::dumpData( int f ) const
 		if( i > 0 && i < MAX_MR_LEN && mr_list[i] != NULL ) {
 			Q_ASSERT( mr_list[i]->file_number == i );
 			int len = build_mr_string( buf, mr_list[i] );
-			fprintf( stderr , "#%d,%s, %d\n", i, buf, len  );
 			dumpData( i, mr_list[i]->field_bitset, buf );
-		} else {
-			fprintf( stderr , "error, "
-				"data file #%d not referenced by master files\n", i  );
 		}
 	}
 }
