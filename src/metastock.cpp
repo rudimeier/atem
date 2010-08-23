@@ -17,9 +17,9 @@
 
 Metastock::Metastock() :
 	dir(NULL),
-	master(NULL),
-	emaster(NULL),
-	xmaster(NULL),
+	master_name(NULL),
+	emaster_name(NULL),
+	xmaster_name(NULL),
 	files( new QHash<QString, QString>() ),
 	ba_master( new QByteArray() ),
 	ba_emaster( new QByteArray() ),
@@ -44,10 +44,10 @@ Metastock::~Metastock()
 	delete ba_xmaster;
 	delete ba_emaster;
 	delete ba_master;
-	delete files;
-	SAFE_DELETE( xmaster );
-	SAFE_DELETE( emaster );
-	SAFE_DELETE( master );
+	free(xmaster_name);
+	free(emaster_name);
+	free(master_name);
+	delete files;;
 	
 	for( int i = 0; i < MAX_MR_LEN; i++ ) {
 		if( mr_list[i] != NULL ) {
@@ -59,6 +59,14 @@ Metastock::~Metastock()
 	free( mr_list );
 }
 
+
+
+#define CHECK_MASTER( _dst_, _gen_name_ ) \
+	if( strcasecmp(_gen_name_, node->fts_name) == 0 ) { \
+		Q_ASSERT( _dst_ == NULL ); \
+		_dst_ = (char*) malloc( node->fts_pathlen ); \
+		strcpy( _dst_, node->fts_path   ); \
+	}
 
 void Metastock::findFiles()
 {
@@ -74,6 +82,10 @@ void Metastock::findFiles()
 		if( (node->fts_level > 0) && (node->fts_info == FTS_D ) ) {
 			fts_set(tree, node, FTS_SKIP);
 		} else if( node->fts_info == FTS_F ) {
+			CHECK_MASTER( master_name, "MASTER" );
+			CHECK_MASTER( emaster_name, "EMASTER" );
+			CHECK_MASTER( xmaster_name, "XMASTER" );
+			
 			QString key = QString(node->fts_name).toUpper();
 			Q_ASSERT( !files->contains(key) ); // TODO handle ambiguous file error
 			files->insert( key, QString( node->fts_path ) );
@@ -105,25 +117,18 @@ QFile* Metastock::findMaster( const char* name ) const
 
 bool Metastock::setDir( const char* d )
 {
-	SAFE_DELETE( xmaster );
-	SAFE_DELETE( emaster );
-	SAFE_DELETE( master );
-	
 	dir = d;
 	findFiles();
 	
-	master = findMaster( "MASTER" );
-	if( master == NULL ) {
+	if( master_name == NULL ) {
 		error = "no MASTER found";
 		return false;
 	}
-	emaster = findMaster( "EMASTER" );
-	if( emaster == NULL ) {
+	if( emaster_name == NULL ) {
 		error = "no EMASTER found";
 		return false;
 	}
 	// xmaster is optional
-	xmaster = findMaster( "XMASTER" );
 	
 	readMasters();
 	parseMasters();
@@ -138,6 +143,19 @@ void readMaster( QFile *m, QByteArray *ba )
 		m->open( QIODevice::ReadOnly );
 		*ba = m->readAll ();
 		Q_ASSERT( ba->size() == m->size() ); //TODO
+	} else {
+		ba->clear();
+	}
+}
+
+
+void readMaster( const char *filename , QByteArray *ba )
+{
+	if( filename != NULL ) {
+		QFile m(filename);
+		m.open( QIODevice::ReadOnly );
+		*ba = m.readAll ();
+		Q_ASSERT( ba->size() == m.size() ); //TODO
 	} else {
 		ba->clear();
 	}
@@ -169,7 +187,7 @@ void Metastock::parseMasters()
 		}
 	}
 	
-	if( xmaster != NULL ) {
+	if( hasXMaster() ) {
 		XMasterFile xmf( ba_xmaster->constData(), ba_xmaster->size() );
 		int cntX = xmf.countRecords();
 		for( int i = 1; i<=cntX; i++ ) {
@@ -185,9 +203,9 @@ void Metastock::parseMasters()
 
 void Metastock::readMasters()
 {
-	readMaster( master, ba_master );
-	readMaster( emaster, ba_emaster );
-	readMaster( xmaster, ba_xmaster );
+	readMaster( master_name, ba_master );
+	readMaster( emaster_name, ba_emaster );
+	readMaster( xmaster_name, ba_xmaster );
 }
 
 
@@ -303,5 +321,5 @@ void Metastock::dumpData( int n, unsigned int fields, const char *pfx ) const
 
 bool Metastock::hasXMaster() const
 {
-	return( xmaster != NULL  );
+	return( xmaster_name != NULL  );
 }

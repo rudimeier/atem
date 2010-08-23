@@ -32,9 +32,9 @@ class Metastock
 		QFile* findMaster( const char *name ) const;
 		
 		const char *dir;
-		QFile *master;
-		QFile *emaster;
-		QFile *xmaster;
+		char *master_name;
+		char *emaster_name;
+		char *xmaster_name;
 		QHash<QString, QString> *files;
 		int mr_len;
 		master_record **mr_list;
