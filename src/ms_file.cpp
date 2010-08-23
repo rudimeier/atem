@@ -676,8 +676,9 @@ int XMasterFile::dataLength( int r ) const
 
 
 
-FDat::FDat( const char *_buf, int _size, int l ) :
-	record_length( l),
+FDat::FDat( const char *_buf, int _size, unsigned int fields ) :
+	field_bitset( fields ),
+	record_length( count_bits(fields) ),
 	buf( _buf ),
 	size( _size )
 {

@@ -118,7 +118,7 @@ class XMasterFile
 class FDat
 {
 	public:
-		FDat( const char *buf, int size, int l );
+		FDat( const char *buf, int size, unsigned int fields );
 		
 		static bool checkHeader( const char* buf );
 		static bool checkRecord( const char* buf, int record  );
@@ -131,6 +131,7 @@ class FDat
 		int record_to_string( const char *record, char *s ) const;
 		
 		
+		const unsigned int field_bitset;
 		const unsigned int record_length;
 		
 		const char * const buf;
