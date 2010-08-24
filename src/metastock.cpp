@@ -20,7 +20,7 @@ Metastock::Metastock() :
 	master_name(NULL),
 	emaster_name(NULL),
 	xmaster_name(NULL),
-	files( new QHash<QString, QString>() ),
+	files( new QHash<QString, char*>() ),
 	ba_master( new QByteArray() ),
 	ba_emaster( new QByteArray() ),
 	ba_xmaster( new QByteArray() ),
@@ -47,7 +47,7 @@ Metastock::~Metastock()
 	free(xmaster_name);
 	free(emaster_name);
 	free(master_name);
-	delete files;;
+	delete files; // TODO free values
 	
 	for( int i = 0; i < MAX_MR_LEN; i++ ) {
 		if( mr_list[i] != NULL ) {
@@ -64,7 +64,7 @@ Metastock::~Metastock()
 #define CHECK_MASTER( _dst_, _gen_name_ ) \
 	if( strcasecmp(_gen_name_, node->fts_name) == 0 ) { \
 		Q_ASSERT( _dst_ == NULL ); \
-		_dst_ = (char*) malloc( node->fts_pathlen ); \
+		_dst_ = (char*) malloc( node->fts_pathlen + 1 ); \
 		strcpy( _dst_, node->fts_path   ); \
 	}
 
@@ -88,7 +88,9 @@ void Metastock::findFiles()
 			
 			QString key = QString(node->fts_name).toUpper();
 			Q_ASSERT( !files->contains(key) ); // TODO handle ambiguous file error
-			files->insert( key, QString( node->fts_path ) );
+			char * tmp = (char *) malloc( node->fts_pathlen + 1);
+			strcpy( tmp, node->fts_path );
+			files->insert( key, tmp );
 		}
 	}
 	
@@ -105,13 +107,9 @@ void Metastock::findFiles()
 }
 
 
-QFile* Metastock::findMaster( const char* name ) const
+const char* Metastock::findMaster( const char* name ) const
 {
-	if( files->contains( QString(name)) ) {
-		return new QFile( files->value( QString(name) ) );
-	} else {
-		return NULL;
-	}
+	return files->value( QString(name), NULL );
 }
 
 
@@ -134,18 +132,6 @@ bool Metastock::setDir( const char* d )
 	parseMasters();
 	
 	return true;
-}
-
-
-void readMaster( QFile *m, QByteArray *ba )
-{
-	if( m != NULL ) {
-		m->open( QIODevice::ReadOnly );
-		*ba = m->readAll ();
-		Q_ASSERT( ba->size() == m->size() ); //TODO
-	} else {
-		ba->clear();
-	}
 }
 
 
@@ -297,15 +283,15 @@ void Metastock::dumpData( int n, unsigned int fields, const char *pfx ) const
 		sprintf( tmp, "F%d.MWD", n );
 	}
 	
-	QFile *fdat = findMaster( tmp );
-	if( fdat == NULL ) {
+	const char* fdat_name = findMaster( tmp );
+	if( fdat_name == NULL ) {
 		Q_ASSERT(false);
 		error = "no fdat found";
 		return /*false*/;
 	}
 	
 	QByteArray ba_fdat;
-	readMaster( fdat, &ba_fdat );
+	readMaster( fdat_name, &ba_fdat );
 	
 	FDat datfile( ba_fdat.constData(), ba_fdat.size(), fields );
 	fprintf( stdout, "%s: %d x %d bytes\n",
@@ -313,9 +299,6 @@ void Metastock::dumpData( int n, unsigned int fields, const char *pfx ) const
 	
 	datfile.checkHeader();
 	datfile.print( pfx );
-	
-	delete fdat;
-
 }
 
 

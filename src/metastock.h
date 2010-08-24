@@ -3,7 +3,6 @@
 
 #include <QtCore/QtContainerFwd>
 
-class QFile;
 class QByteArray;
 struct master_record;
 
@@ -29,13 +28,13 @@ class Metastock
 		
 	private:
 		void findFiles();
-		QFile* findMaster( const char *name ) const;
+		const char* findMaster( const char *name ) const;
 		
 		const char *dir;
 		char *master_name;
 		char *emaster_name;
 		char *xmaster_name;
-		QHash<QString, QString> *files;
+		QHash<QString, char*> *files;
 		int mr_len;
 		master_record **mr_list;
 		
