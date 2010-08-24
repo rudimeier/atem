@@ -28,13 +28,13 @@ class Metastock
 		
 	private:
 		void findFiles();
-		const char* findMaster( const char *name ) const;
+		const char* findDatFile( int n ) const;
 		
 		const char *dir;
 		char *master_name;
 		char *emaster_name;
 		char *xmaster_name;
-		QHash<QString, char*> *files;
+		QHash< int, char*> *files;
 		int mr_len;
 		master_record **mr_list;
 		

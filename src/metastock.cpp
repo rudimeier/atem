@@ -10,7 +10,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include <QtCore/QString>
 #include <QtCore/QHash>
 
 #include "ms_file.h"
@@ -26,7 +25,7 @@ Metastock::Metastock() :
 	master_name(NULL),
 	emaster_name(NULL),
 	xmaster_name(NULL),
-	files( new QHash<QString, char*>() ),
+	files( new QHash< int, char*>() ),
 	ba_master( NULL ),
 	master_len(0),
 	ba_emaster( NULL ),
@@ -100,11 +99,10 @@ void Metastock::findFiles()
 				long int number = strtol( c_number, &end, 10 );
 				Q_ASSERT( number > 0 && c_number != end );
 				if( strcasecmp(end, ".MWD") == 0 || strcasecmp(end, ".DAT") == 0 ) {
-					QString key = QString(node->fts_name).toUpper();
-					Q_ASSERT( !files->contains(key) ); // TODO handle ambiguous file error
+						Q_ASSERT( !files->contains( number ) ); // TODO handle ambiguous file error
 					char * tmp = (char *) malloc( node->fts_pathlen + 1);
 					strcpy( tmp, node->fts_path );
-					files->insert( key, tmp );
+					files->insert( number, tmp );
 				}
 			} else {
 				CHECK_MASTER( master_name, "MASTER" );
@@ -127,9 +125,9 @@ void Metastock::findFiles()
 }
 
 
-const char* Metastock::findMaster( const char* name ) const
+const char* Metastock::findDatFile( int n ) const
 {
-	return files->value( QString(name), NULL );
+	return files->value( n, NULL );
 }
 
 
@@ -303,15 +301,7 @@ void Metastock::dumpData( int f ) const
 
 void Metastock::dumpData( int n, unsigned int fields, const char *pfx ) const
 {
-	char tmp[17];
-	
-	if( n <= 255 ) {
-		sprintf( tmp, "F%d.DAT", n ) ;
-	} else {
-		sprintf( tmp, "F%d.MWD", n );
-	}
-	
-	const char* fdat_name = findMaster( tmp );
+	const char* fdat_name = findDatFile( n );
 	if( fdat_name == NULL ) {
 		Q_ASSERT(false);
 		error = "no fdat found";
@@ -322,8 +312,8 @@ void Metastock::dumpData( int n, unsigned int fields, const char *pfx ) const
 	readMaster( fdat_name, ba_fdat, &fdat_len );
 	
 	FDat datfile( ba_fdat, fdat_len, fields );
-	fprintf( stdout, "%s: %d x %d bytes\n",
-		tmp, datfile.countRecords(), count_bits(fields) );
+	fprintf( stdout, "#%d: %d x %d bytes\n",
+		n, datfile.countRecords(), count_bits(fields) );
 	
 	datfile.checkHeader();
 	datfile.print( pfx );
