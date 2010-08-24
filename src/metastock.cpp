@@ -3,11 +3,15 @@
 #include <stdlib.h>
 #include <math.h>
 #include <fts.h>
+#include <stdio.h>
 #include <errno.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include <QtCore/QString>
 #include <QtCore/QHash>
-#include <QtCore/QFile>
 
 #include "ms_file.h"
 #include "util.h"
@@ -137,11 +141,18 @@ bool Metastock::setDir( const char* d )
 
 void readMaster( const char *filename , QByteArray *ba )
 {
+	char * buf = (char*) malloc(10000000); //TODO
 	if( filename != NULL ) {
-		QFile m(filename);
-		m.open( QIODevice::ReadOnly );
-		*ba = m.readAll ();
-		Q_ASSERT( ba->size() == m.size() ); //TODO
+		int fd = open( filename, O_RDWR );
+		if( fd < 0 ) {
+			perror("error open");
+			Q_ASSERT(false);
+		}
+		ssize_t rb = read( fd, buf, 100000000);
+		fprintf( stderr, "READ = %ld\n", rb);
+		close( fd );
+		*ba = QByteArray( buf, rb );
+		Q_ASSERT( ba->size() == rb ); //TODO
 	} else {
 		ba->clear();
 	}
