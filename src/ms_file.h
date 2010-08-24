@@ -10,7 +10,7 @@ struct master_record
 	int file_number; /* M, E, X */
 // 	int record_length; /* M */
 // 	int fields_per_record; /* M, E */
-	int field_bitset; /* E, X */
+	unsigned char field_bitset; /* E, X */
 	char barsize; /* E, X */
 	char c_symbol[64]; /* M, E, X */
 // 	char c_short_name[64]; /* M, E */
@@ -119,7 +119,7 @@ class XMasterFile
 class FDat
 {
 	public:
-		FDat( const char *buf, int size, unsigned int fields );
+		FDat( const char *buf, int size, unsigned char fields );
 		
 		static bool checkHeader( const char* buf );
 		static bool checkRecord( const char* buf, int record  );
@@ -132,7 +132,7 @@ class FDat
 		int record_to_string( const char *record, char *s ) const;
 		
 		
-		const unsigned int field_bitset;
+		const unsigned char field_bitset;
 		const unsigned int record_length;
 		
 		const char * const buf;

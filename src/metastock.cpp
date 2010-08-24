@@ -336,7 +336,7 @@ void Metastock::dumpData( int f ) const
 
 
 
-void Metastock::dumpData( int n, unsigned int fields, const char *pfx ) const
+void Metastock::dumpData( int n, unsigned char fields, const char *pfx ) const
 {
 	const char* fdat_name = mr_list[n].file_name;
 	if( fdat_name == NULL ) {

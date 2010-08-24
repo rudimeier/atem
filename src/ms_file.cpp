@@ -448,7 +448,7 @@ int EMasterFile::getRecord( master_record *mr, int rnum ) const
 	mr->file_number = readUnsignedChar( record, 2 );
 // 	int record_length; /* M */
 // 	mr->fields_per_record = readChar( record, 6 );
-	mr->field_bitset= readChar( record, 7 );
+	mr->field_bitset= readUnsignedChar( record, 7 );
 	mr->barsize= readChar( record, 60 );
 	strcpy( mr->c_symbol, record + 11 );
 	strcpy( mr->c_long_name, record + 32 );
@@ -677,7 +677,7 @@ int XMasterFile::dataLength( int r ) const
 
 
 
-FDat::FDat( const char *_buf, int _size, unsigned int fields ) :
+FDat::FDat( const char *_buf, int _size, unsigned char fields ) :
 	field_bitset( fields ),
 	record_length( count_bits(fields) * 4 ),
 	buf( _buf ),
