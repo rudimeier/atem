@@ -1,16 +1,17 @@
 #include "metastock.h"
 
+#include <string.h>
 #include <stdlib.h>
 #include <math.h>
 #include <fts.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <errno.h>
+#include <assert.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
-#include <QtCore/QHash>
 
 #include "ms_file.h"
 #include "util.h"
@@ -71,7 +72,7 @@ Metastock::~Metastock()
 			free( fdat_list[i] );
 		}
 	}
-	Q_ASSERT( mr_len == 0 && fdat_len == 0);
+	assert( mr_len == 0 && fdat_len == 0);
 	free( mr_list );
 	free( fdat_list );
 }
@@ -80,7 +81,7 @@ Metastock::~Metastock()
 
 #define CHECK_MASTER( _dst_, _gen_name_ ) \
 	if( strcasecmp(_gen_name_, node->fts_name) == 0 ) { \
-		Q_ASSERT( _dst_ == NULL ); \
+		assert( _dst_ == NULL ); \
 		_dst_ = (char*) malloc( node->fts_pathlen + 1 ); \
 		strcpy( _dst_, node->fts_path   ); \
 	}
@@ -92,7 +93,7 @@ void Metastock::findFiles()
 		FTS_NOCHDIR | FTS_LOGICAL | FTS_NOSTAT, NULL );
 	if (!tree) {
 		perror("fts_open");
-		Q_ASSERT(false);
+		assert(false);
 	}
 	FTSENT *node;
 	while ((node = fts_read(tree))) {
@@ -104,9 +105,9 @@ void Metastock::findFiles()
 				char *c_number = node->fts_name + 1;
 				char *end;
 				long int number = strtol( c_number, &end, 10 );
-				Q_ASSERT( number > 0 && number < MAX_MR_LEN && c_number != end );
+				assert( number > 0 && number < MAX_MR_LEN && c_number != end );
 				if( strcasecmp(end, ".MWD") == 0 || strcasecmp(end, ".DAT") == 0 ) {
-					Q_ASSERT( fdat_list[number] == NULL ); // TODO handle ambiguous file error
+					assert( fdat_list[number] == NULL ); // TODO handle ambiguous file error
 					char * tmp = (char *) malloc( node->fts_pathlen + 1);
 					strcpy( tmp, node->fts_path );
 					fdat_len++;
@@ -123,12 +124,12 @@ void Metastock::findFiles()
 	//TODO error handling
 	if (errno) {
 		perror("fts_read");
-		Q_ASSERT( false );
+		assert( false );
 	}
 	
 	if (fts_close(tree)) {
 		perror("fts_close");
-		Q_ASSERT( false );
+		assert( false );
 	}
 }
 
@@ -161,12 +162,12 @@ void readMaster( const char *filename , char *buf, int *len )
 		int fd = open( filename, O_RDWR );
 		if( fd < 0 ) {
 			perror("error open");
-			Q_ASSERT(false);
+			assert(false);
 		}
 		*len = read( fd, buf, MAX_FILE_LENGTH );
 		fprintf( stderr, "READ = %d\n", *len);
 		close( fd );
-//		Q_ASSERT( ba->size() == rb ); //TODO
+//		assert( ba->size() == rb ); //TODO
 	} else {
 // 		ba->clear();
 	}
@@ -182,7 +183,7 @@ void Metastock::parseMasters()
 			master_record *mr = new master_record;
 			mr_len++;
 			mf.getRecord( mr, i );
-			Q_ASSERT( mr_list[mr->file_number] == NULL );
+			assert( mr_list[mr->file_number] == NULL );
 			mr_list[mr->file_number] = mr;
 		}
 	}
@@ -193,7 +194,7 @@ void Metastock::parseMasters()
 		master_record tmp;
 		for( int i = 1; i<=cntE; i++ ) {
 			emf.getRecord( &tmp, i );
-			Q_ASSERT( mr_list[tmp.file_number] != NULL );
+			assert( mr_list[tmp.file_number] != NULL );
 			*mr_list[tmp.file_number] = tmp; // TODO should be a merge E->M
 		}
 	}
@@ -205,7 +206,7 @@ void Metastock::parseMasters()
 			mr_len++;
 			master_record *mr = new master_record;
 			xmf.getRecord( mr, i );
-			Q_ASSERT( mr_list[mr->file_number] == NULL );
+			assert( mr_list[mr->file_number] == NULL );
 			mr_list[mr->file_number] = mr;
 		}
 	}
@@ -280,7 +281,7 @@ void Metastock::dumpData( int f ) const
 	
 	if( f!=0 ) {
 		if( f > 0 && f < MAX_MR_LEN && mr_list[f] != NULL ) {
-			Q_ASSERT( mr_list[f]->file_number == f );
+			assert( mr_list[f]->file_number == f );
 			int len = build_mr_string( buf, mr_list[f] );
 			dumpData( f, mr_list[f]->field_bitset, buf );
 		} else {
@@ -292,7 +293,7 @@ void Metastock::dumpData( int f ) const
 	
 	for( int i = 1; i<MAX_MR_LEN; i++ ) {
 		if( i > 0 && i < MAX_MR_LEN && mr_list[i] != NULL ) {
-			Q_ASSERT( mr_list[i]->file_number == i );
+			assert( mr_list[i]->file_number == i );
 			int len = build_mr_string( buf, mr_list[i] );
 			dumpData( i, mr_list[i]->field_bitset, buf );
 		}
@@ -305,7 +306,7 @@ void Metastock::dumpData( int n, unsigned int fields, const char *pfx ) const
 {
 	const char* fdat_name = fdat_list[n];
 	if( fdat_name == NULL ) {
-		Q_ASSERT(false);
+		assert(false);
 		error = "no fdat found";
 		return /*false*/;
 	}

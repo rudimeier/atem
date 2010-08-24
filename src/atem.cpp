@@ -1,6 +1,6 @@
-#include <QtCore/QCoreApplication>
 #include <popt.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "metastock.h"
 
@@ -95,7 +95,7 @@ static const char** atem_parse_cl(size_t argc, const char *argv[])
 	int rc;
 	while( (rc = poptGetNextOpt(opt_ctx)) > 0 ) {
 		// handle options when we have returning ones
-		Q_ASSERT(false);
+		assert(false);
 	}
 	
 	if( rc != -1 ) {
@@ -118,10 +118,8 @@ static const char** atem_parse_cl(size_t argc, const char *argv[])
 
 int main(int argc, char *argv[])
 {
-	QCoreApplication app(argc, argv);
-	
 	const char **rest = atem_parse_cl(argc, (const char **)argv);
-	Q_ASSERT( rest == NULL );
+	assert( rest == NULL );
 	
 	Metastock ms;
 	if( ! ms.setDir( ms_dirp ) ) {

@@ -1,16 +1,12 @@
 TEMPLATE = app
 
-QT -= \
-  gui
-
 CONFIG += \
-  console \
   debug \
   warn_on \
   fast_printing
 
 CONFIG -= \
-  app_bundle
+  qt
 
 SOURCES += \
   atem.cpp \
