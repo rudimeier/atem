@@ -253,8 +253,8 @@ int MasterFile::getRecord( const master_record *mr, int rnum ) const
 	assert( mr->record_number == rnum );
 	assert( mr->kind == 'E' );
 	assert( mr->file_number == readUnsignedChar( record, 0 ) );
-	assert( count_bits(mr->field_bitset) == readChar( record, 3 ) );
-	assert( count_bits(mr->field_bitset)/4 == readChar( record, 4 ) );
+	assert( count_bits(mr->field_bitset) * 4 == readChar( record, 3 ) );
+	assert( count_bits(mr->field_bitset) == readChar( record, 4 ) );
 	//TODO trim strings and uncomment these asserts
 // 	assert( strcmp( mr->c_symbol, record + 36 ) == 0 );
 // 	assert( strcmp( mr->c_long_name, record + 7 ) == 0 );
@@ -679,7 +679,7 @@ int XMasterFile::dataLength( int r ) const
 
 FDat::FDat( const char *_buf, int _size, unsigned int fields ) :
 	field_bitset( fields ),
-	record_length( count_bits(fields) ),
+	record_length( count_bits(fields) * 4 ),
 	buf( _buf ),
 	size( _size )
 {

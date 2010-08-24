@@ -350,7 +350,7 @@ void Metastock::dumpData( int n, unsigned int fields, const char *pfx ) const
 	
 	FDat datfile( ba_fdat, fdat_len, fields );
 	fprintf( stdout, "#%d: %d x %d bytes\n",
-		n, datfile.countRecords(), count_bits(fields) );
+		n, datfile.countRecords(), count_bits(fields) * 4 );
 	
 	datfile.checkHeader();
 	datfile.print( pfx );

@@ -4,13 +4,13 @@
 
 
 
-inline unsigned int count_bits( unsigned int fields )
+inline unsigned char count_bits( unsigned int fields )
 {
 	unsigned int c = 0;
 	for (c = 0; fields; fields >>= 1) {
 		c += fields & 1;
 	}
-	return 4 * c;
+	return c;
 }
 
 
