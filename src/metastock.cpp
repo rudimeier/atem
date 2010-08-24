@@ -300,12 +300,7 @@ int build_mr_string( char *dst, const master_record *mr )
 	*cp++ = '\t';
 	
 	tmp = strlen(mr->c_long_name);
-	if( tmp > 0 ) {
-		memcpy( cp, mr->c_long_name, tmp );
-	} else {
-		tmp = strlen(mr->c_short_name);
-		memcpy( cp, mr->c_short_name, tmp );
-	}
+	memcpy( cp, mr->c_long_name, tmp );
 	cp += tmp;
 	
 	*cp = '\0';

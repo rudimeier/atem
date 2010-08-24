@@ -253,12 +253,12 @@ int MasterFile::getRecord( master_record *mr, int rnum ) const
 	mr->record_number = rnum;
 	mr->kind = 'M';
 	mr->file_number = readUnsignedChar( record, 0 );
-	mr->record_length = readChar( record, 3 );
-	mr->fields_per_record = readChar( record, 3 );
+// 	mr->record_length = readChar( record, 3 );
+// 	mr->fields_per_record = readChar( record, 3 );
 // 	r->field_bitset; /* E, X */
 // 	char barsize; /* E, X */
 	strcpy( mr->c_symbol, record + 36 );
-	strcpy( mr->c_short_name, record + 7 );
+	strcpy( mr->c_long_name, record + 7 );
 // 	char c_long_name[64]; /* E, X  */
 	return 0;
 }
@@ -448,12 +448,14 @@ int EMasterFile::getRecord( master_record *mr, int rnum ) const
 	mr->kind = 'E';
 	mr->file_number = readUnsignedChar( record, 2 );
 // 	int record_length; /* M */
-	mr->fields_per_record = readChar( record, 6 );
+// 	mr->fields_per_record = readChar( record, 6 );
 	mr->field_bitset= readChar( record, 7 );
 	mr->barsize= readChar( record, 60 );
 	strcpy( mr->c_symbol, record + 11 );
-	strcpy( mr->c_short_name, record + 32 );
-	strcpy( mr->c_long_name, record + 139 );
+	strcpy( mr->c_long_name, record + 32 );
+	if( strlen(record + 139) > 0 ) {
+		strcpy( mr->c_long_name, record + 139 );
+	}
 	return 0;
 }
 
