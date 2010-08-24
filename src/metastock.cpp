@@ -25,7 +25,6 @@ Metastock::Metastock() :
 	master_name(NULL),
 	emaster_name(NULL),
 	xmaster_name(NULL),
-	files( new QHash< int, char*>() ),
 	ba_master( NULL ),
 	master_len(0),
 	ba_emaster( NULL ),
@@ -38,6 +37,8 @@ Metastock::Metastock() :
 #define MAX_MR_LEN 4096
 	mr_len = 0;
 	mr_list = (master_record**) calloc( MAX_MR_LEN, sizeof(master_record*) );
+	fdat_len = 0;
+	fdat_list = (char**) calloc( MAX_MR_LEN, sizeof(char*) );
 }
 
 
@@ -57,7 +58,6 @@ Metastock::~Metastock()
 	free(xmaster_name);
 	free(emaster_name);
 	free(master_name);
-	delete files; // TODO free values
 	
 	for( int i = 0; i < MAX_MR_LEN; i++ ) {
 		if( mr_list[i] != NULL ) {
@@ -65,8 +65,15 @@ Metastock::~Metastock()
 			delete mr_list[i];
 		}
 	}
-	Q_ASSERT( mr_len == 0);
+	for( int i = 0; i < MAX_MR_LEN; i++ ) {
+		if( fdat_list[i] != NULL ) {
+			fdat_len--;
+			free( fdat_list[i] );
+		}
+	}
+	Q_ASSERT( mr_len == 0 && fdat_len == 0);
 	free( mr_list );
+	free( fdat_list );
 }
 
 
@@ -97,12 +104,13 @@ void Metastock::findFiles()
 				char *c_number = node->fts_name + 1;
 				char *end;
 				long int number = strtol( c_number, &end, 10 );
-				Q_ASSERT( number > 0 && c_number != end );
+				Q_ASSERT( number > 0 && number < MAX_MR_LEN && c_number != end );
 				if( strcasecmp(end, ".MWD") == 0 || strcasecmp(end, ".DAT") == 0 ) {
-						Q_ASSERT( !files->contains( number ) ); // TODO handle ambiguous file error
+					Q_ASSERT( fdat_list[number] == NULL ); // TODO handle ambiguous file error
 					char * tmp = (char *) malloc( node->fts_pathlen + 1);
 					strcpy( tmp, node->fts_path );
-					files->insert( number, tmp );
+					fdat_len++;
+					fdat_list[number] = tmp;
 				}
 			} else {
 				CHECK_MASTER( master_name, "MASTER" );
@@ -122,12 +130,6 @@ void Metastock::findFiles()
 		perror("fts_close");
 		Q_ASSERT( false );
 	}
-}
-
-
-const char* Metastock::findDatFile( int n ) const
-{
-	return files->value( n, NULL );
 }
 
 
@@ -301,7 +303,7 @@ void Metastock::dumpData( int f ) const
 
 void Metastock::dumpData( int n, unsigned int fields, const char *pfx ) const
 {
-	const char* fdat_name = findDatFile( n );
+	const char* fdat_name = fdat_list[n];
 	if( fdat_name == NULL ) {
 		Q_ASSERT(false);
 		error = "no fdat found";

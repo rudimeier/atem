@@ -1,9 +1,7 @@
 #ifndef METASTOCK_H
 #define METASTOCK_H
 
-#include <QtCore/QtContainerFwd>
 
-class QByteArray;
 struct master_record;
 
 
@@ -28,15 +26,15 @@ class Metastock
 		
 	private:
 		void findFiles();
-		const char* findDatFile( int n ) const;
 		
 		const char *dir;
 		char *master_name;
 		char *emaster_name;
 		char *xmaster_name;
-		QHash< int, char*> *files;
 		int mr_len;
 		master_record **mr_list;
+		int fdat_len;
+		char **fdat_list;
 		
 		char *ba_master;
 		int master_len;
