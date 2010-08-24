@@ -309,7 +309,7 @@ int build_mr_string( char *dst, const master_record *mr )
 }
 
 
-void Metastock::dumpData( int f ) const
+void Metastock::dumpData( unsigned short f ) const
 {
 	char buf[256];
 	
@@ -336,7 +336,7 @@ void Metastock::dumpData( int f ) const
 
 
 
-void Metastock::dumpData( int n, unsigned char fields, const char *pfx ) const
+void Metastock::dumpData( unsigned short n, unsigned char fields, const char *pfx ) const
 {
 	const char* fdat_name = mr_list[n].file_name;
 	if( fdat_name == NULL ) {

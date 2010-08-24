@@ -20,8 +20,8 @@ class Metastock
 		void dumpMaster() const;
 		void dumpEMaster() const;
 		void dumpXMaster() const;
-		void dumpData( int f ) const;
-		void dumpData( int number, unsigned char fields, const char *pfx) const;
+		void dumpData( unsigned short f ) const;
+		void dumpData( unsigned short number, unsigned char fields, const char *pfx) const;
 		const char* lastError() const;
 		
 	private:

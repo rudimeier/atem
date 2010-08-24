@@ -7,7 +7,7 @@ struct master_record
 {
 	int record_number; /* position in master file */
 	char kind; /* (M)aster, (E)master, (X)Master */
-	int file_number; /* M, E, X */
+	unsigned short file_number; /* M, E, X */
 // 	int record_length; /* M */
 // 	int fields_per_record; /* M, E */
 	unsigned char field_bitset; /* E, X */
