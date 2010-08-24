@@ -45,6 +45,8 @@ class Metastock
 		char *ba_xmaster;
 		int xmaster_len;
 		
+		char *ba_fdat;
+		
 		mutable const char* error;
 };
 

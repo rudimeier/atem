@@ -33,6 +33,7 @@ Metastock::Metastock() :
 	emaster_len(0),
 	ba_xmaster( NULL ),
 	xmaster_len(0),
+	ba_fdat( (char*) malloc( MAX_FILE_LENGTH ) ),
 	error("")
 {
 #define MAX_MR_LEN 4096
@@ -50,6 +51,7 @@ Metastock::Metastock() :
 
 Metastock::~Metastock()
 {
+	free( ba_fdat );
 	free( ba_xmaster );
 	free( ba_emaster);
 	free( ba_master);
@@ -307,7 +309,6 @@ void Metastock::dumpData( int n, unsigned int fields, const char *pfx ) const
 		return /*false*/;
 	}
 	
-	char *ba_fdat = (char*) malloc( MAX_FILE_LENGTH ); //TODO
 	int fdat_len = 0;
 	readMaster( fdat_name, ba_fdat, &fdat_len );
 	
@@ -317,7 +318,6 @@ void Metastock::dumpData( int n, unsigned int fields, const char *pfx ) const
 	
 	datfile.checkHeader();
 	datfile.print( pfx );
-	free( ba_fdat );
 }
 
 
