@@ -3,13 +3,18 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#include <fts.h>
+
+#ifdef USE_FTS
+	#include <fts.h>
+#else 
+	#include <dirent.h>
+#endif
+
 #include <stdio.h>
 #include <unistd.h>
 #include <errno.h>
 #include <assert.h>
 
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
@@ -62,6 +67,7 @@ Metastock::~Metastock()
 }
 
 
+#ifdef USE_FTS
 
 #define CHECK_MASTER( _dst_, _gen_name_ ) \
 	if( strcasecmp(_gen_name_, node->fts_name) == 0 ) { \
@@ -112,6 +118,61 @@ void Metastock::findFiles()
 		assert( false );
 	}
 }
+
+#undef CHECK_MASTER
+
+#else /*USE_FTS*/
+
+#define CHECK_MASTER( _dst_, _gen_name_ ) \
+	if( strcasecmp(_gen_name_, dirp->d_name) == 0 ) { \
+		assert( _dst_ == NULL ); \
+		_dst_ = (char*) malloc( path_len + strlen(dirp->d_name) + 1 ); \
+		strcpy( fullnamep, dirp->d_name ); \
+		strcpy( _dst_, fullname ); \
+	}
+
+void Metastock::findFiles()
+{
+	DIR *dirh;
+	struct dirent *dirp;
+	
+	if ((dirh = opendir( dir )) == NULL) {
+		perror("opendir");
+		exit(1);
+	}
+	
+	char fullname[256];
+	char *fullnamep = fullname;
+	int path_len = strlen(dir);
+	memcpy(fullnamep, dir, path_len );
+	fullnamep += path_len;
+	if( *(fullnamep - 1) != '/' ) {
+		path_len++;
+		*(fullnamep++) = '/';
+	}
+
+	for (dirp = readdir(dirh); dirp != NULL; dirp = readdir(dirh)) {
+		if( ( dirp->d_name[0] == 'F' || dirp->d_name[0] == 'f') &&
+			dirp->d_name[1] >= '1' && dirp->d_name[1] <= '9') {
+			char *c_number = dirp->d_name + 1;
+			char *end;
+			long int number = strtol( c_number, &end, 10 );
+			assert( number > 0 && number < MAX_MR_LEN && c_number != end );
+			if( strcasecmp(end, ".MWD") == 0 || strcasecmp(end, ".DAT") == 0 ) {
+				strcpy( fullnamep, dirp->d_name );
+				strcpy( mr_list[number].file_name, fullname );
+			}
+		} else {
+			CHECK_MASTER( master_name, "MASTER" );
+			CHECK_MASTER( emaster_name, "EMASTER" );
+			CHECK_MASTER( xmaster_name, "XMASTER" );
+		}
+	}
+}
+
+#undef CHECK_MASTER
+
+#endif /*USE_FTS*/
 
 
 bool Metastock::setDir( const char* d )
