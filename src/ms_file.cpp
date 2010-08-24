@@ -247,7 +247,7 @@ unsigned char MasterFile::countRecords() const
 }
 
 
-int MasterFile::getRecord( const master_record *mr, int rnum ) const
+int MasterFile::getRecord( const master_record *mr, unsigned short rnum ) const
 {
 	const char *record = buf + (record_length * rnum);
 	assert( mr->record_number == rnum );
@@ -440,7 +440,7 @@ unsigned char EMasterFile::countRecords() const
 }
 
 
-int EMasterFile::getRecord( master_record *mr, int rnum ) const
+int EMasterFile::getRecord( master_record *mr, unsigned short rnum ) const
 {
 	const char *record = buf + (record_length * rnum);
 	mr->record_number = rnum;
@@ -632,7 +632,7 @@ unsigned short XMasterFile::countRecords() const
 }
 
 
-int XMasterFile::getRecord( master_record *mr, int rnum ) const
+int XMasterFile::getRecord( master_record *mr, unsigned short rnum ) const
 {
 	const char *record = buf + (record_length * rnum);
 	mr->record_number = rnum;

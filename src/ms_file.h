@@ -5,7 +5,7 @@
 
 struct master_record
 {
-	int record_number; /* position in master file */
+	unsigned short record_number; /* position in master file */
 	char kind; /* (M)aster, (E)master, (X)Master */
 	unsigned short file_number; /* M, E, X */
 // 	int record_length; /* M */
@@ -30,7 +30,7 @@ class MasterFile
 		
 		bool check() const;
 		unsigned char countRecords() const;
-		int getRecord( const master_record *, int rnum ) const;
+		int getRecord( const master_record *, unsigned short rnum ) const;
 		int fileNumber( int record ) const;
 		int dataLength( int record ) const;
 		
@@ -62,7 +62,7 @@ class EMasterFile
 		
 		bool check() const;
 		unsigned char countRecords() const;
-		int getRecord( master_record *, int rnum ) const;
+		int getRecord( master_record *, unsigned short rnum ) const;
 		int fileNumber( int record ) const;
 		int dataLength( int record ) const;
 		
@@ -94,7 +94,7 @@ class XMasterFile
 		
 		bool check() const;
 		unsigned short countRecords() const;
-		int getRecord( master_record *, int rnum ) const;
+		int getRecord( master_record *, unsigned short rnum ) const;
 		int fileNumber( int record ) const;
 		int dataLength( int record ) const;
 		
