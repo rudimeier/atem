@@ -38,8 +38,6 @@ Metastock::Metastock() :
 #define MAX_MR_LEN 4096
 	mr_len = 0;
 	mr_list = (master_record*) calloc( MAX_MR_LEN, sizeof(master_record) );
-	fdat_len = 0;
-	fdat_list = (char**) calloc( MAX_MR_LEN, sizeof(char*) );
 }
 
 
@@ -60,15 +58,7 @@ Metastock::~Metastock()
 	free(emaster_name);
 	free(master_name);
 	
-	for( int i = 0; i < MAX_MR_LEN; i++ ) {
-		if( fdat_list[i] != NULL ) {
-			fdat_len--;
-			free( fdat_list[i] );
-		}
-	}
-	assert( fdat_len == 0);
 	free( mr_list );
-	free( fdat_list );
 }
 
 
@@ -101,11 +91,7 @@ void Metastock::findFiles()
 				long int number = strtol( c_number, &end, 10 );
 				assert( number > 0 && number < MAX_MR_LEN && c_number != end );
 				if( strcasecmp(end, ".MWD") == 0 || strcasecmp(end, ".DAT") == 0 ) {
-					assert( fdat_list[number] == NULL ); // TODO handle ambiguous file error
-					char * tmp = (char *) malloc( node->fts_pathlen + 1);
-					strcpy( tmp, node->fts_path );
-					fdat_len++;
-					fdat_list[number] = tmp;
+					strcpy( mr_list[number].file_name, node->fts_path );
 				}
 			} else {
 				CHECK_MASTER( master_name, "MASTER" );
@@ -174,22 +160,20 @@ void Metastock::parseMasters()
 		MasterFile mf( ba_master, master_len );
 		int cntM = mf.countRecords();
 		for( int i = 1; i<=cntM; i++ ) {
-			master_record mr;
+			master_record *mr = &mr_list[ mf.fileNumber(i) ];
+			assert( mr->record_number == 0 );
 			mr_len++;
-			mf.getRecord( &mr, i );
-			assert( mr_list[mr.file_number].record_number == 0 );
-			mr_list[mr.file_number] = mr;
+			mf.getRecord( mr, i );
 		}
 	}
 	
 	{
 		EMasterFile emf( ba_emaster, emaster_len );
 		int cntE = emf.countRecords();
-		master_record tmp;
 		for( int i = 1; i<=cntE; i++ ) {
-			emf.getRecord( &tmp, i );
-			assert( mr_list[tmp.file_number].record_number != 0 );
-			mr_list[tmp.file_number] = tmp; // TODO should be a merge E->M
+			master_record *mr = &mr_list[ emf.fileNumber(i) ];
+			assert( mr->record_number != 0 );
+			emf.getRecord( mr, i ); // TODO should be a merge E->M
 		}
 	}
 	
@@ -197,11 +181,10 @@ void Metastock::parseMasters()
 		XMasterFile xmf( ba_xmaster, xmaster_len );
 		int cntX = xmf.countRecords();
 		for( int i = 1; i<=cntX; i++ ) {
+			master_record *mr = &mr_list[ xmf.fileNumber(i) ];
+			assert( mr->record_number == 0 );
 			mr_len++;
-			master_record mr;
-			xmf.getRecord( &mr, i );
-			assert( mr_list[mr.file_number].record_number == 0 );
-			mr_list[mr.file_number] = mr;
+			xmf.getRecord( mr, i );
 		}
 	}
 }
@@ -298,7 +281,7 @@ void Metastock::dumpData( int f ) const
 
 void Metastock::dumpData( int n, unsigned int fields, const char *pfx ) const
 {
-	const char* fdat_name = fdat_list[n];
+	const char* fdat_name = mr_list[n].file_name;
 	if( fdat_name == NULL ) {
 		assert(false);
 		error = "no fdat found";
