@@ -18,6 +18,8 @@
 
 
 
+#define MAX_FILE_LENGTH (1024*1024)
+
 
 Metastock::Metastock() :
 	dir(NULL),
@@ -150,7 +152,7 @@ void readMaster( const char *filename , char *buf, int *len )
 			perror("error open");
 			Q_ASSERT(false);
 		}
-		*len = read( fd, buf, 100000000);
+		*len = read( fd, buf, MAX_FILE_LENGTH );
 		fprintf( stderr, "READ = %d\n", *len);
 		close( fd );
 //		Q_ASSERT( ba->size() == rb ); //TODO
@@ -201,11 +203,11 @@ void Metastock::parseMasters()
 
 void Metastock::readMasters()
 {
-	ba_master = (char*) malloc(10000000); //TODO
+	ba_master = (char*) malloc( MAX_FILE_LENGTH ); //TODO
 	readMaster( master_name, ba_master, &master_len );
-	ba_emaster = (char*) malloc(10000000); //TODO
+	ba_emaster = (char*) malloc( MAX_FILE_LENGTH ); //TODO
 	readMaster( emaster_name, ba_emaster, &emaster_len );
-	ba_xmaster = (char*) malloc(10000000); //TODO
+	ba_xmaster = (char*) malloc( MAX_FILE_LENGTH ); //TODO
 	readMaster( xmaster_name, ba_xmaster,  &xmaster_len );
 }
 
@@ -305,7 +307,7 @@ void Metastock::dumpData( int n, unsigned int fields, const char *pfx ) const
 		return /*false*/;
 	}
 	
-	char *ba_fdat = (char*) malloc(10000000); //TODO
+	char *ba_fdat = (char*) malloc( MAX_FILE_LENGTH ); //TODO
 	int fdat_len = 0;
 	readMaster( fdat_name, ba_fdat, &fdat_len );
 	
