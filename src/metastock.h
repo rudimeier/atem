@@ -38,9 +38,12 @@ class Metastock
 		int mr_len;
 		master_record **mr_list;
 		
-		QByteArray *ba_master;
-		QByteArray *ba_emaster;
-		QByteArray *ba_xmaster;
+		char *ba_master;
+		int master_len;
+		char *ba_emaster;
+		int emaster_len;
+		char *ba_xmaster;
+		int xmaster_len;
 		
 		mutable const char* error;
 };

@@ -25,9 +25,12 @@ Metastock::Metastock() :
 	emaster_name(NULL),
 	xmaster_name(NULL),
 	files( new QHash<QString, char*>() ),
-	ba_master( new QByteArray() ),
-	ba_emaster( new QByteArray() ),
-	ba_xmaster( new QByteArray() ),
+	ba_master( NULL ),
+	master_len(0),
+	ba_emaster( NULL ),
+	emaster_len(0),
+	ba_xmaster( NULL ),
+	xmaster_len(0),
 	error("")
 {
 #define MAX_MR_LEN 4096
@@ -45,9 +48,9 @@ Metastock::Metastock() :
 
 Metastock::~Metastock()
 {
-	delete ba_xmaster;
-	delete ba_emaster;
-	delete ba_master;
+	free( ba_xmaster );
+	free( ba_emaster);
+	free( ba_master);
 	free(xmaster_name);
 	free(emaster_name);
 	free(master_name);
@@ -139,22 +142,20 @@ bool Metastock::setDir( const char* d )
 }
 
 
-void readMaster( const char *filename , QByteArray *ba )
+void readMaster( const char *filename , char *buf, int *len )
 {
-	char * buf = (char*) malloc(10000000); //TODO
 	if( filename != NULL ) {
 		int fd = open( filename, O_RDWR );
 		if( fd < 0 ) {
 			perror("error open");
 			Q_ASSERT(false);
 		}
-		ssize_t rb = read( fd, buf, 100000000);
-		fprintf( stderr, "READ = %ld\n", rb);
+		*len = read( fd, buf, 100000000);
+		fprintf( stderr, "READ = %d\n", *len);
 		close( fd );
-		*ba = QByteArray( buf, rb );
-		Q_ASSERT( ba->size() == rb ); //TODO
+//		Q_ASSERT( ba->size() == rb ); //TODO
 	} else {
-		ba->clear();
+// 		ba->clear();
 	}
 }
 
@@ -162,7 +163,7 @@ void readMaster( const char *filename , QByteArray *ba )
 void Metastock::parseMasters()
 {
 	{
-		MasterFile mf( ba_master->constData(), ba_master->size() );
+		MasterFile mf( ba_master, master_len );
 		int cntM = mf.countRecords();
 		for( int i = 1; i<=cntM; i++ ) {
 			master_record *mr = new master_record;
@@ -174,7 +175,7 @@ void Metastock::parseMasters()
 	}
 	
 	{
-		EMasterFile emf( ba_emaster->constData(), ba_emaster->size() );
+		EMasterFile emf( ba_emaster, emaster_len );
 		int cntE = emf.countRecords();
 		master_record tmp;
 		for( int i = 1; i<=cntE; i++ ) {
@@ -185,7 +186,7 @@ void Metastock::parseMasters()
 	}
 	
 	if( hasXMaster() ) {
-		XMasterFile xmf( ba_xmaster->constData(), ba_xmaster->size() );
+		XMasterFile xmf( ba_xmaster, xmaster_len );
 		int cntX = xmf.countRecords();
 		for( int i = 1; i<=cntX; i++ ) {
 			mr_len++;
@@ -200,9 +201,12 @@ void Metastock::parseMasters()
 
 void Metastock::readMasters()
 {
-	readMaster( master_name, ba_master );
-	readMaster( emaster_name, ba_emaster );
-	readMaster( xmaster_name, ba_xmaster );
+	ba_master = (char*) malloc(10000000); //TODO
+	readMaster( master_name, ba_master, &master_len );
+	ba_emaster = (char*) malloc(10000000); //TODO
+	readMaster( emaster_name, ba_emaster, &emaster_len );
+	ba_xmaster = (char*) malloc(10000000); //TODO
+	readMaster( xmaster_name, ba_xmaster,  &xmaster_len );
 }
 
 
@@ -214,21 +218,21 @@ const char* Metastock::lastError() const
 
 void Metastock::dumpMaster() const
 {
-	MasterFile mf( ba_master->constData(), ba_master->size() );
+	MasterFile mf( ba_master, master_len );
 	mf.check();
 }
 
 
 void Metastock::dumpEMaster() const
 {
-	EMasterFile emf( ba_emaster->constData(), ba_emaster->size() );
+	EMasterFile emf( ba_emaster, emaster_len );
 	emf.check();
 }
 
 
 void Metastock::dumpXMaster() const
 {
-	XMasterFile xmf( ba_xmaster->constData(), ba_xmaster->size() );
+	XMasterFile xmf( ba_xmaster, xmaster_len );
 	xmf.check();
 }
 
@@ -301,15 +305,17 @@ void Metastock::dumpData( int n, unsigned int fields, const char *pfx ) const
 		return /*false*/;
 	}
 	
-	QByteArray ba_fdat;
-	readMaster( fdat_name, &ba_fdat );
+	char *ba_fdat = (char*) malloc(10000000); //TODO
+	int fdat_len = 0;
+	readMaster( fdat_name, ba_fdat, &fdat_len );
 	
-	FDat datfile( ba_fdat.constData(), ba_fdat.size(), fields );
+	FDat datfile( ba_fdat, fdat_len, fields );
 	fprintf( stdout, "%s: %d x %d bytes\n",
 		tmp, datfile.countRecords(), count_bits(fields) );
 	
 	datfile.checkHeader();
 	datfile.print( pfx );
+	free( ba_fdat );
 }
 
 
