@@ -97,7 +97,7 @@ void Metastock::findFiles()
 				long int number = strtol( c_number, &end, 10 );
 				assert( number > 0 && number < MAX_MR_LEN && c_number != end );
 				if( strcasecmp(end, ".MWD") == 0 || strcasecmp(end, ".DAT") == 0 ) {
-					strcpy( mr_list[number].file_name, node->fts_path );
+					strcpy( mr_list[number].file_name, node->fts_name );
 				}
 			} else {
 				CHECK_MASTER( master_name, "MASTER" );
@@ -141,16 +141,6 @@ void Metastock::findFiles()
 		exit(1);
 	}
 	
-	char fullname[256];
-	char *fullnamep = fullname;
-	int path_len = strlen(dir);
-	memcpy(fullnamep, dir, path_len );
-	fullnamep += path_len;
-	if( *(fullnamep - 1) != '/' ) {
-		path_len++;
-		*(fullnamep++) = '/';
-	}
-
 	for (dirp = readdir(dirh); dirp != NULL; dirp = readdir(dirh)) {
 		if( ( dirp->d_name[0] == 'F' || dirp->d_name[0] == 'f') &&
 			dirp->d_name[1] >= '1' && dirp->d_name[1] <= '9') {
@@ -159,10 +149,18 @@ void Metastock::findFiles()
 			long int number = strtol( c_number, &end, 10 );
 			assert( number > 0 && number < MAX_MR_LEN && c_number != end );
 			if( strcasecmp(end, ".MWD") == 0 || strcasecmp(end, ".DAT") == 0 ) {
-				strcpy( fullnamep, dirp->d_name );
-				strcpy( mr_list[number].file_name, fullname );
+				strcpy( mr_list[number].file_name, dirp->d_name );
 			}
 		} else {
+			char fullname[256];
+			char *fullnamep = fullname;
+			int path_len = strlen(dir);
+			memcpy(fullnamep, dir, path_len );
+			fullnamep += path_len;
+			if( *(fullnamep - 1) != '/' ) {
+				path_len++;
+				*(fullnamep++) = '/';
+			}
 			CHECK_MASTER( master_name, "MASTER" );
 			CHECK_MASTER( emaster_name, "EMASTER" );
 			CHECK_MASTER( xmaster_name, "XMASTER" );
@@ -338,7 +336,13 @@ void Metastock::dumpData( unsigned short f ) const
 
 void Metastock::dumpData( unsigned short n, unsigned char fields, const char *pfx ) const
 {
-	const char* fdat_name = mr_list[n].file_name;
+	char fdat_name[255];
+	char *cp = fdat_name;
+	strcpy( cp, dir );
+	cp += strlen(dir);
+	*(cp++) = '/';
+	strcpy( cp, mr_list[n].file_name );
+	
 	if( fdat_name == NULL ) {
 		assert(false);
 		error = "no fdat found";

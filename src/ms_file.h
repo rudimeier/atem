@@ -15,7 +15,7 @@ struct master_record
 	char c_symbol[64]; /* M, E, X */
 // 	char c_short_name[64]; /* M, E */
 	char c_long_name[64]; /* E, X  */
-	char file_name[32];
+	char file_name[11];
 };
 
 
