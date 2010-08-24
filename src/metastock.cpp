@@ -218,23 +218,24 @@ void readMaster( const char *filename , char *buf, int *len )
 void Metastock::parseMasters()
 {
 	{
-		MasterFile mf( ba_master, master_len );
-		int cntM = mf.countRecords();
-		for( int i = 1; i<=cntM; i++ ) {
-			master_record *mr = &mr_list[ mf.fileNumber(i) ];
-			assert( mr->record_number == 0 );
-			mr_len++;
-			mf.getRecord( mr, i );
-		}
-	}
-	
-	{
 		EMasterFile emf( ba_emaster, emaster_len );
 		int cntE = emf.countRecords();
 		for( int i = 1; i<=cntE; i++ ) {
 			master_record *mr = &mr_list[ emf.fileNumber(i) ];
+			assert( mr->record_number == 0 );
+			mr_len++;
+			emf.getRecord( mr, i );
+		}
+	}
+	
+	{
+		// NOTE this is just a check EMaster vs. Master
+		MasterFile mf( ba_master, master_len );
+		int cntM = mf.countRecords();
+		for( int i = 1; i<=cntM; i++ ) {
+			const master_record *mr = &mr_list[ mf.fileNumber(i) ];
 			assert( mr->record_number != 0 );
-			emf.getRecord( mr, i ); // TODO should be a merge E->M
+			mf.getRecord( mr, i );
 		}
 	}
 	

@@ -30,7 +30,7 @@ class MasterFile
 		
 		bool check() const;
 		unsigned char countRecords() const;
-		int getRecord( master_record *, int rnum ) const;
+		int getRecord( const master_record *, int rnum ) const;
 		int fileNumber( int record ) const;
 		int dataLength( int record ) const;
 		

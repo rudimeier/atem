@@ -247,19 +247,18 @@ unsigned char MasterFile::countRecords() const
 }
 
 
-int MasterFile::getRecord( master_record *mr, int rnum ) const
+int MasterFile::getRecord( const master_record *mr, int rnum ) const
 {
 	const char *record = buf + (record_length * rnum);
-	mr->record_number = rnum;
-	mr->kind = 'M';
-	mr->file_number = readUnsignedChar( record, 0 );
-// 	mr->record_length = readChar( record, 3 );
-// 	mr->fields_per_record = readChar( record, 3 );
-// 	r->field_bitset; /* E, X */
-// 	char barsize; /* E, X */
-	strcpy( mr->c_symbol, record + 36 );
-	strcpy( mr->c_long_name, record + 7 );
-// 	char c_long_name[64]; /* E, X  */
+	assert( mr->record_number == rnum );
+	assert( mr->kind == 'E' );
+	assert( mr->file_number == readUnsignedChar( record, 0 ) );
+	assert( count_bits(mr->field_bitset) == readChar( record, 3 ) );
+	assert( count_bits(mr->field_bitset)/4 == readChar( record, 4 ) );
+	//TODO trim strings and uncomment these asserts
+// 	assert( strcmp( mr->c_symbol, record + 36 ) == 0 );
+// 	assert( strcmp( mr->c_long_name, record + 7 ) == 0 );
+	
 	return 0;
 }
 
