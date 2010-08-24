@@ -32,7 +32,7 @@ class Metastock
 		char *emaster_name;
 		char *xmaster_name;
 		int mr_len;
-		master_record **mr_list;
+		master_record *mr_list;
 		int fdat_len;
 		char **fdat_list;
 		

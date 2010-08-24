@@ -37,7 +37,7 @@ Metastock::Metastock() :
 {
 #define MAX_MR_LEN 4096
 	mr_len = 0;
-	mr_list = (master_record**) calloc( MAX_MR_LEN, sizeof(master_record*) );
+	mr_list = (master_record*) calloc( MAX_MR_LEN, sizeof(master_record) );
 	fdat_len = 0;
 	fdat_list = (char**) calloc( MAX_MR_LEN, sizeof(char*) );
 }
@@ -61,18 +61,12 @@ Metastock::~Metastock()
 	free(master_name);
 	
 	for( int i = 0; i < MAX_MR_LEN; i++ ) {
-		if( mr_list[i] != NULL ) {
-			mr_len--;
-			delete mr_list[i];
-		}
-	}
-	for( int i = 0; i < MAX_MR_LEN; i++ ) {
 		if( fdat_list[i] != NULL ) {
 			fdat_len--;
 			free( fdat_list[i] );
 		}
 	}
-	assert( mr_len == 0 && fdat_len == 0);
+	assert( fdat_len == 0);
 	free( mr_list );
 	free( fdat_list );
 }
@@ -180,11 +174,11 @@ void Metastock::parseMasters()
 		MasterFile mf( ba_master, master_len );
 		int cntM = mf.countRecords();
 		for( int i = 1; i<=cntM; i++ ) {
-			master_record *mr = new master_record;
+			master_record mr;
 			mr_len++;
-			mf.getRecord( mr, i );
-			assert( mr_list[mr->file_number] == NULL );
-			mr_list[mr->file_number] = mr;
+			mf.getRecord( &mr, i );
+			assert( mr_list[mr.file_number].record_number == 0 );
+			mr_list[mr.file_number] = mr;
 		}
 	}
 	
@@ -194,8 +188,8 @@ void Metastock::parseMasters()
 		master_record tmp;
 		for( int i = 1; i<=cntE; i++ ) {
 			emf.getRecord( &tmp, i );
-			assert( mr_list[tmp.file_number] != NULL );
-			*mr_list[tmp.file_number] = tmp; // TODO should be a merge E->M
+			assert( mr_list[tmp.file_number].record_number != 0 );
+			mr_list[tmp.file_number] = tmp; // TODO should be a merge E->M
 		}
 	}
 	
@@ -204,10 +198,10 @@ void Metastock::parseMasters()
 		int cntX = xmf.countRecords();
 		for( int i = 1; i<=cntX; i++ ) {
 			mr_len++;
-			master_record *mr = new master_record;
-			xmf.getRecord( mr, i );
-			assert( mr_list[mr->file_number] == NULL );
-			mr_list[mr->file_number] = mr;
+			master_record mr;
+			xmf.getRecord( &mr, i );
+			assert( mr_list[mr.file_number].record_number == 0 );
+			mr_list[mr.file_number] = mr;
 		}
 	}
 }
@@ -280,10 +274,10 @@ void Metastock::dumpData( int f ) const
 	char buf[256];
 	
 	if( f!=0 ) {
-		if( f > 0 && f < MAX_MR_LEN && mr_list[f] != NULL ) {
-			assert( mr_list[f]->file_number == f );
-			int len = build_mr_string( buf, mr_list[f] );
-			dumpData( f, mr_list[f]->field_bitset, buf );
+		if( f > 0 && f < MAX_MR_LEN && mr_list[f].record_number != 0 ) {
+			assert( mr_list[f].file_number == f );
+			int len = build_mr_string( buf, &mr_list[f] );
+			dumpData( f, mr_list[f].field_bitset, buf );
 		} else {
 			fprintf( stderr , "error, "
 				"data file #%d not referenced by master files\n", f  );
@@ -292,10 +286,10 @@ void Metastock::dumpData( int f ) const
 	}
 	
 	for( int i = 1; i<MAX_MR_LEN; i++ ) {
-		if( i > 0 && i < MAX_MR_LEN && mr_list[i] != NULL ) {
-			assert( mr_list[i]->file_number == i );
-			int len = build_mr_string( buf, mr_list[i] );
-			dumpData( i, mr_list[i]->field_bitset, buf );
+		if( i > 0 && i < MAX_MR_LEN && mr_list[i].record_number != 0 ) {
+			assert( mr_list[i].file_number == i );
+			int len = build_mr_string( buf, &mr_list[i] );
+			dumpData( i, mr_list[i].field_bitset, buf );
 		}
 	}
 }
