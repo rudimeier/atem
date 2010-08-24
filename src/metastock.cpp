@@ -93,15 +93,24 @@ void Metastock::findFiles()
 		if( (node->fts_level > 0) && (node->fts_info == FTS_D ) ) {
 			fts_set(tree, node, FTS_SKIP);
 		} else if( node->fts_info == FTS_F ) {
-			CHECK_MASTER( master_name, "MASTER" );
-			CHECK_MASTER( emaster_name, "EMASTER" );
-			CHECK_MASTER( xmaster_name, "XMASTER" );
-			
-			QString key = QString(node->fts_name).toUpper();
-			Q_ASSERT( !files->contains(key) ); // TODO handle ambiguous file error
-			char * tmp = (char *) malloc( node->fts_pathlen + 1);
-			strcpy( tmp, node->fts_path );
-			files->insert( key, tmp );
+			if( (*node->fts_name == 'F' || *node->fts_name == 'f') &&
+				node->fts_name[1] >= '1' && node->fts_name[1] <= '9') {
+				char *c_number = node->fts_name + 1;
+				char *end;
+				long int number = strtol( c_number, &end, 10 );
+				Q_ASSERT( number > 0 && c_number != end );
+				if( strcasecmp(end, ".MWD") == 0 || strcasecmp(end, ".DAT") == 0 ) {
+					QString key = QString(node->fts_name).toUpper();
+					Q_ASSERT( !files->contains(key) ); // TODO handle ambiguous file error
+					char * tmp = (char *) malloc( node->fts_pathlen + 1);
+					strcpy( tmp, node->fts_path );
+					files->insert( key, tmp );
+				}
+			} else {
+				CHECK_MASTER( master_name, "MASTER" );
+				CHECK_MASTER( emaster_name, "EMASTER" );
+				CHECK_MASTER( xmaster_name, "XMASTER" );
+			}
 		}
 	}
 	
