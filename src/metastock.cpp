@@ -27,7 +27,7 @@
 
 
 Metastock::Metastock() :
-	dir(NULL),
+	ms_dir(NULL),
 	master_name(NULL),
 	emaster_name(NULL),
 	xmaster_name(NULL),
@@ -59,11 +59,13 @@ Metastock::~Metastock()
 	free( ba_xmaster );
 	free( ba_emaster);
 	free( ba_master);
-	free(xmaster_name);
-	free(emaster_name);
-	free(master_name);
 	
 	free( mr_list );
+	
+	free( xmaster_name );
+	free( emaster_name );
+	free( master_name );
+	free( ms_dir );
 }
 
 
@@ -72,13 +74,13 @@ Metastock::~Metastock()
 #define CHECK_MASTER( _dst_, _gen_name_ ) \
 	if( strcasecmp(_gen_name_, node->fts_name) == 0 ) { \
 		assert( _dst_ == NULL ); \
-		_dst_ = (char*) malloc( node->fts_pathlen + 1 ); \
-		strcpy( _dst_, node->fts_path   ); \
+		_dst_ = (char*) malloc( node->fts_namelen + 1 ); \
+		strcpy( _dst_, node->fts_name   ); \
 	}
 
 void Metastock::findFiles()
 {
-	char *path_argv[] = { (char*)dir, NULL }; // TODO conversion to char*
+	char *path_argv[] = { ms_dir, NULL };
 	FTS *tree = fts_open( path_argv,
 		FTS_NOCHDIR | FTS_LOGICAL | FTS_NOSTAT, NULL );
 	if (!tree) {
@@ -126,9 +128,8 @@ void Metastock::findFiles()
 #define CHECK_MASTER( _dst_, _gen_name_ ) \
 	if( strcasecmp(_gen_name_, dirp->d_name) == 0 ) { \
 		assert( _dst_ == NULL ); \
-		_dst_ = (char*) malloc( path_len + strlen(dirp->d_name) + 1 ); \
-		strcpy( fullnamep, dirp->d_name ); \
-		strcpy( _dst_, fullname ); \
+		_dst_ = (char*) malloc( strlen(dirp->d_name) + 1 ); \
+		strcpy( _dst_, dirp->d_name ); \
 	}
 
 void Metastock::findFiles()
@@ -136,7 +137,7 @@ void Metastock::findFiles()
 	DIR *dirh;
 	struct dirent *dirp;
 	
-	if ((dirh = opendir( dir )) == NULL) {
+	if ((dirh = opendir( ms_dir )) == NULL) {
 		perror("opendir");
 		exit(1);
 	}
@@ -152,15 +153,6 @@ void Metastock::findFiles()
 				strcpy( mr_list[number].file_name, dirp->d_name );
 			}
 		} else {
-			char fullname[256];
-			char *fullnamep = fullname;
-			int path_len = strlen(dir);
-			memcpy(fullnamep, dir, path_len );
-			fullnamep += path_len;
-			if( *(fullnamep - 1) != '/' ) {
-				path_len++;
-				*(fullnamep++) = '/';
-			}
 			CHECK_MASTER( master_name, "MASTER" );
 			CHECK_MASTER( emaster_name, "EMASTER" );
 			CHECK_MASTER( xmaster_name, "XMASTER" );
@@ -175,7 +167,15 @@ void Metastock::findFiles()
 
 bool Metastock::setDir( const char* d )
 {
-	dir = d;
+	// set member ms_dir inclusive trailing '/'
+	int dir_len = strlen(d);
+	ms_dir = (char*) realloc( ms_dir, dir_len + 2 );
+	strcpy( ms_dir, d );
+	if( ms_dir[ dir_len - 1] != '/' ) {
+		ms_dir[dir_len] = '/';
+		ms_dir[dir_len + 1] = '\0';
+	}
+	
 	findFiles();
 	
 	if( master_name == NULL ) {
@@ -195,21 +195,23 @@ bool Metastock::setDir( const char* d )
 }
 
 
-void readMaster( const char *filename , char *buf, int *len )
+void Metastock::readFile( const char *file_name , char *buf, int *len ) const
 {
-	if( filename != NULL ) {
-		int fd = open( filename, O_RDWR );
-		if( fd < 0 ) {
-			perror("error open");
-			assert(false);
-		}
-		*len = read( fd, buf, MAX_FILE_LENGTH );
-		fprintf( stderr, "READ = %d\n", *len);
-		close( fd );
-//		assert( ba->size() == rb ); //TODO
-	} else {
-// 		ba->clear();
+	// build file name with full path
+	char *file_path = (char*) alloca( strlen(ms_dir) + strlen(file_name) + 1 );
+	strcpy( file_path, ms_dir );
+	strcpy( file_path + strlen(ms_dir), file_name );
+	
+	
+	int fd = open( file_path, O_RDWR );
+	if( fd < 0 ) {
+		perror("error open");
+		assert(false);
 	}
+	*len = read( fd, buf, MAX_FILE_LENGTH );
+	fprintf( stderr, "read %s: %d bytes\n", file_path, *len);
+	close( fd );
+//	assert( ba->size() == rb ); //TODO
 }
 
 
@@ -253,11 +255,13 @@ void Metastock::parseMasters()
 void Metastock::readMasters()
 {
 	ba_master = (char*) malloc( MAX_FILE_LENGTH ); //TODO
-	readMaster( master_name, ba_master, &master_len );
+	readFile( master_name, ba_master, &master_len );
 	ba_emaster = (char*) malloc( MAX_FILE_LENGTH ); //TODO
-	readMaster( emaster_name, ba_emaster, &emaster_len );
-	ba_xmaster = (char*) malloc( MAX_FILE_LENGTH ); //TODO
-	readMaster( xmaster_name, ba_xmaster,  &xmaster_len );
+	readFile( emaster_name, ba_emaster, &emaster_len );
+	if( hasXMaster() ) {
+		ba_xmaster = (char*) malloc( MAX_FILE_LENGTH ); //TODO
+		readFile( xmaster_name, ba_xmaster,  &xmaster_len );
+	}
 }
 
 
@@ -336,12 +340,7 @@ void Metastock::dumpData( unsigned short f ) const
 
 void Metastock::dumpData( unsigned short n, unsigned char fields, const char *pfx ) const
 {
-	char fdat_name[255];
-	char *cp = fdat_name;
-	strcpy( cp, dir );
-	cp += strlen(dir);
-	*(cp++) = '/';
-	strcpy( cp, mr_list[n].file_name );
+	const char *fdat_name = mr_list[n].file_name;
 	
 	if( fdat_name == NULL ) {
 		assert(false);
@@ -350,7 +349,7 @@ void Metastock::dumpData( unsigned short n, unsigned char fields, const char *pf
 	}
 	
 	int fdat_len = 0;
-	readMaster( fdat_name, ba_fdat, &fdat_len );
+	readFile( fdat_name, ba_fdat, &fdat_len );
 	
 	FDat datfile( ba_fdat, fdat_len, fields );
 	fprintf( stdout, "#%d: %d x %d bytes\n",

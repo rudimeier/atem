@@ -26,8 +26,9 @@ class Metastock
 		
 	private:
 		void findFiles();
+		void readFile( const char *file_name , char *buf, int *len ) const;
 		
-		const char *dir;
+		char *ms_dir;
 		char *master_name;
 		char *emaster_name;
 		char *xmaster_name;
