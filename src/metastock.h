@@ -1,9 +1,9 @@
 #ifndef METASTOCK_H
 #define METASTOCK_H
 
-
 struct master_record;
 
+#define ERROR_LENGTH 256
 
 class Metastock
 {
@@ -25,6 +25,7 @@ class Metastock
 		const char* lastError() const;
 		
 	private:
+		void setError( const char* e1, const char* e2 = "" ) const;
 		void findFiles();
 		void readFile( const char *file_name , char *buf, int *len ) const;
 		
@@ -44,7 +45,7 @@ class Metastock
 		
 		char *ba_fdat;
 		
-		mutable const char* error;
+		mutable char error[ERROR_LENGTH];
 };
 
 

@@ -37,9 +37,9 @@ Metastock::Metastock() :
 	emaster_len(0),
 	ba_xmaster( NULL ),
 	xmaster_len(0),
-	ba_fdat( (char*) malloc( MAX_FILE_LENGTH ) ),
-	error("")
+	ba_fdat( (char*) malloc( MAX_FILE_LENGTH ) )
 {
+	error[0] = '\0';
 #define MAX_MR_LEN 4096
 	mr_len = 0;
 	mr_list = (master_record*) calloc( MAX_MR_LEN, sizeof(master_record) );
@@ -179,11 +179,11 @@ bool Metastock::setDir( const char* d )
 	findFiles();
 	
 	if( master_name == NULL ) {
-		error = "no MASTER found";
+		setError( "no MASTER found" );
 		return false;
 	}
 	if( emaster_name == NULL ) {
-		error = "no EMASTER found";
+		setError( "no EMASTER found" );
 		return false;
 	}
 	// xmaster is optional
@@ -271,6 +271,16 @@ const char* Metastock::lastError() const
 }
 
 
+void Metastock::setError( const char* e1, const char* e2 ) const
+{
+	if( e2 == NULL || *e2 == '\0' ) {
+		snprintf( error, ERROR_LENGTH, "%s", e1);
+	} else {
+		snprintf( error, ERROR_LENGTH, "%s: %s", e1, e2 );
+	}
+}
+
+
 void Metastock::dumpMaster() const
 {
 	MasterFile mf( ba_master, master_len );
@@ -344,7 +354,7 @@ void Metastock::dumpData( unsigned short n, unsigned char fields, const char *pf
 	
 	if( fdat_name == NULL ) {
 		assert(false);
-		error = "no fdat found";
+		setError( "no fdat found" );
 		return /*false*/;
 	}
 	
