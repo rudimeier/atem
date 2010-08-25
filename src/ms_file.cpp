@@ -249,15 +249,20 @@ unsigned char MasterFile::countRecords() const
 
 int MasterFile::getRecord( const master_record *mr, unsigned short rnum ) const
 {
+	char tmp[64];
+	int tmp_len;
+	
 	const char *record = buf + (record_length * rnum);
 	assert( mr->record_number == rnum );
 	assert( mr->kind == 'E' );
 	assert( mr->file_number == readUnsignedChar( record, 0 ) );
 	assert( count_bits(mr->field_bitset) * 4 == readChar( record, 3 ) );
 	assert( count_bits(mr->field_bitset) == readChar( record, 4 ) );
-	//TODO trim strings and uncomment these asserts
-// 	assert( strcmp( mr->c_symbol, record + 36 ) == 0 );
-// 	assert( strcmp( mr->c_long_name, record + 7 ) == 0 );
+	
+	trim_end( tmp, record + 36);
+	assert( strcmp( mr->c_symbol, tmp ) == 0 );
+	tmp_len = trim_end( tmp, record + 7);
+	assert( strncmp( mr->c_long_name, tmp, tmp_len ) == 0 );
 	
 	return 0;
 }
@@ -450,9 +455,11 @@ int EMasterFile::getRecord( master_record *mr, unsigned short rnum ) const
 	assert( count_bits(mr->field_bitset) == readUnsignedChar( record, 6 ) );
 	mr->barsize= readChar( record, 60 );
 	strcpy( mr->c_symbol, record + 11 );
-	strcpy( mr->c_long_name, record + 32 );
 	if( strlen(record + 139) > 0 ) {
+		assert( strncmp( record + 32, record + 139, strlen(record + 32) ) == 0 );
 		strcpy( mr->c_long_name, record + 139 );
+	} else {
+		strcpy( mr->c_long_name, record + 32 );
 	}
 	return 0;
 }

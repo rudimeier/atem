@@ -12,7 +12,7 @@ struct master_record
 // 	int fields_per_record; /* M, E */
 	unsigned char field_bitset; /* E, X */
 	char barsize; /* E, X */
-	char c_symbol[64]; /* M, E, X */
+	char c_symbol[17]; /* M, E, X */
 // 	char c_short_name[64]; /* M, E */
 	char c_long_name[64]; /* E, X  */
 	char file_name[11];
