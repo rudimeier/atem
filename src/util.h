@@ -14,6 +14,22 @@ inline unsigned char count_bits( unsigned int fields )
 }
 
 
+inline int trim_end( char *dst, const char *src )
+{
+	char *cp = dst;
+	char *lst = dst;
+	while( *src != '\0' ) {
+		*cp++ = *src;
+		if( *src != ' ' ) {
+			lst = cp;
+		}
+		src++;
+	}
+	*lst = '\0';
+	return lst - dst;
+}
+
+
 /**
  * ltoa:  convert n to characters in s
  */
