@@ -26,7 +26,7 @@ class Metastock
 		
 	private:
 		void setError( const char* e1, const char* e2 = "" ) const;
-		void findFiles();
+		bool findFiles();
 		void readFile( const char *file_name , char *buf, int *len ) const;
 		
 		char *ms_dir;

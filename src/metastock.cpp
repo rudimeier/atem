@@ -78,8 +78,9 @@ Metastock::~Metastock()
 		strcpy( _dst_, node->fts_name   ); \
 	}
 
-void Metastock::findFiles()
+bool Metastock::findFiles()
 {
+	//TODO error handling!
 	char *path_argv[] = { ms_dir, NULL };
 	FTS *tree = fts_open( path_argv,
 		FTS_NOCHDIR | FTS_LOGICAL | FTS_NOSTAT, NULL );
@@ -109,7 +110,6 @@ void Metastock::findFiles()
 		}
 	}
 	
-	//TODO error handling
 	if (errno) {
 		perror("fts_read");
 		assert( false );
@@ -132,14 +132,14 @@ void Metastock::findFiles()
 		strcpy( _dst_, dirp->d_name ); \
 	}
 
-void Metastock::findFiles()
+bool Metastock::findFiles()
 {
 	DIR *dirh;
 	struct dirent *dirp;
 	
 	if ((dirh = opendir( ms_dir )) == NULL) {
-		perror("opendir");
-		exit(1);
+		setError( ms_dir, strerror(errno) );
+		return false;
 	}
 	
 	for (dirp = readdir(dirh); dirp != NULL; dirp = readdir(dirh)) {
@@ -158,6 +158,7 @@ void Metastock::findFiles()
 			CHECK_MASTER( xmaster_name, "XMASTER" );
 		}
 	}
+	return true;
 }
 
 #undef CHECK_MASTER
@@ -176,7 +177,9 @@ bool Metastock::setDir( const char* d )
 		ms_dir[dir_len + 1] = '\0';
 	}
 	
-	findFiles();
+	if( !findFiles() ) {
+		return false;
+	}
 	
 	if( master_name == NULL ) {
 		setError( "no MASTER found" );
