@@ -16,6 +16,7 @@ static const char *ms_dirp = ".";
 static int dumpmasterp = 0;
 static int dumpemasterp = 0;
 static int dumpxmasterp = 0;
+static int dumpsymbolsp = -1;
 static int dumpdatap = -1;
 
 
@@ -49,6 +50,8 @@ static struct poptOption flow_opts[] = {
 		"Dump EMASTER file.", NULL},
 	{"dump-xmasterp", 'x', POPT_ARG_NONE, &dumpxmasterp, 0,
 		"Dump XMASTER file.", NULL},
+	{"dump-symbols", 's', POPT_ARG_INT | POPT_ARGFLAG_OPTIONAL, &dumpsymbolsp, 0,
+		"Dump all symbol info.", NULL},
 	{"dump-data", 'd', POPT_ARG_INT | POPT_ARGFLAG_OPTIONAL, &dumpdatap, 0,
 		"Dump data files.", NULL},
 	POPT_TABLEEND
@@ -138,6 +141,14 @@ int main(int argc, const char *argv[])
 			fprintf( stderr, "warning: %s\n", "no XMASTER found" );
 		}
 	}
+	
+	if( dumpsymbolsp >= 0 ) {
+		if( ! ms.dumpSymbolInfo( dumpsymbolsp ) ) {
+			fprintf( stderr, "error: %s\n", ms.lastError() );
+			return 2; // exit
+		}
+	}
+	
 	if( dumpdatap >= 0 ) {
 		if( ! ms.dumpData( dumpdatap ) ) {
 			fprintf( stderr, "error: %s\n", ms.lastError() );

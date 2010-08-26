@@ -28,6 +28,42 @@ static struct rudi_printf_info *pinfo = init_print_info();
 #endif
 
 
+int mr_record_to_string( char *dest, const struct master_record* mr )
+{
+	char * cp = dest;
+	int tmp;
+	
+	cp += ltoa( cp, mr->record_number );
+	*cp++ = SEP;
+	*cp++ = mr->kind;
+	*cp++ = SEP;
+	cp += ltoa( cp, mr->file_number );
+	*cp++ = SEP;
+	cp += ltoa( cp, mr->field_bitset );
+	*cp++ = SEP;
+	*cp++ = mr->barsize;
+	*cp++ = SEP;
+	
+	tmp = strlen(mr->c_symbol);
+	memcpy( cp, mr->c_symbol, tmp );
+	cp += tmp;
+	*cp++ = SEP;
+	
+	tmp = strlen(mr->c_long_name);
+	memcpy( cp, mr->c_long_name, tmp );
+	cp += tmp;
+	*cp++ = SEP;
+	
+	tmp = strlen(mr->file_name);
+	memcpy( cp, mr->file_name, tmp );
+	cp += tmp;
+	
+	*cp = '\0';
+	assert( (cp - dest) < MAX_SIZE_MR_STRING );
+	return cp - dest;
+}
+
+
 
 
 char readChar( const char *c, int offset )

@@ -1,6 +1,8 @@
 #ifndef ATEM_MS_FILE_H
 #define ATEM_MS_FILE_H
 
+// field separator
+#define SEP '\t'
 
 
 struct master_record
@@ -17,6 +19,14 @@ struct master_record
 	char c_long_name[64]; /* E, X  */
 	char file_name[11];
 };
+
+/* estimated maximum string length returned by mr_record_to_string()
+   sizes of ints (incl. seperators) + char* lengths (+/- seperator/zero) */
+#define MAX_SIZE_MR_STRING (6 + 2 + 6 + 4 + 2) + (17 + 64 + 11)
+
+
+int mr_record_to_string( char *dest, const struct master_record* );
+
 
 
 

@@ -323,6 +323,37 @@ void Metastock::dumpXMaster() const
 }
 
 
+bool Metastock::dumpSymbolInfo( unsigned short f ) const
+{
+	char buf[MAX_SIZE_MR_STRING + 1];
+	
+	if( f!=0 ) {
+		if( f > 0 && f < MAX_MR_LEN && mr_list[f].record_number != 0 ) {
+			assert( mr_list[f].file_number == f );
+			int len = mr_record_to_string( buf, &mr_list[f] );
+			buf[len] = '\n';
+			buf[len+1] = '\0';
+			fputs( buf, stdout );
+		} else {
+			setError("data file not referenced by master files");
+			return false;
+		}
+		return true;
+	}
+	
+	for( int i = 1; i<MAX_MR_LEN; i++ ) {
+		if( i > 0 && i < MAX_MR_LEN && mr_list[i].record_number != 0 ) {
+			assert( mr_list[i].file_number == i );
+			int len = mr_record_to_string( buf, &mr_list[i] );
+			buf[len] = '\n';
+			buf[len+1] = '\0';
+			fputs( buf, stdout );
+		}
+	}
+	return true;
+}
+
+
 int build_mr_string( char *dst, const master_record *mr )
 {
 	char *cp = dst;
