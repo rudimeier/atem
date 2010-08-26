@@ -14,20 +14,21 @@ class Metastock
 		bool hasXMaster() const;
 		
 		bool setDir( const char* dir );
-		void readMasters();
 		
 		void parseMasters();
 		void dumpMaster() const;
 		void dumpEMaster() const;
 		void dumpXMaster() const;
-		void dumpData( unsigned short f ) const;
-		void dumpData( unsigned short number, unsigned char fields, const char *pfx) const;
+		bool dumpData( unsigned short f ) const;
 		const char* lastError() const;
 		
 	private:
 		void setError( const char* e1, const char* e2 = "" ) const;
 		bool findFiles();
-		void readFile( const char *file_name , char *buf, int *len ) const;
+		bool readFile( const char *file_name , char *buf, int *len ) const;
+		bool readMasters();
+		bool dumpData( unsigned short number, unsigned char fields,
+			const char *pfx) const;
 		
 		char *ms_dir;
 		char *master_name;

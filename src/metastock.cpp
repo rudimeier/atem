@@ -181,24 +181,16 @@ bool Metastock::setDir( const char* d )
 		return false;
 	}
 	
-	if( master_name == NULL ) {
-		setError( "no MASTER found" );
+	if( !readMasters() ){
 		return false;
 	}
-	if( emaster_name == NULL ) {
-		setError( "no EMASTER found" );
-		return false;
-	}
-	// xmaster is optional
-	
-	readMasters();
 	parseMasters();
 	
 	return true;
 }
 
 
-void Metastock::readFile( const char *file_name , char *buf, int *len ) const
+bool Metastock::readFile( const char *file_name , char *buf, int *len ) const
 {
 	// build file name with full path
 	char *file_path = (char*) alloca( strlen(ms_dir) + strlen(file_name) + 1 );
@@ -208,13 +200,15 @@ void Metastock::readFile( const char *file_name , char *buf, int *len ) const
 	
 	int fd = open( file_path, O_RDWR );
 	if( fd < 0 ) {
-		perror("error open");
-		assert(false);
+		setError( file_path, strerror(errno) );
+		return false;
 	}
 	*len = read( fd, buf, MAX_FILE_LENGTH );
 	fprintf( stderr, "read %s: %d bytes\n", file_path, *len);
 	close( fd );
 //	assert( ba->size() == rb ); //TODO
+	
+	return true;
 }
 
 
@@ -255,16 +249,38 @@ void Metastock::parseMasters()
 }
 
 
-void Metastock::readMasters()
+bool Metastock::readMasters()
 {
-	ba_master = (char*) malloc( MAX_FILE_LENGTH ); //TODO
-	readFile( master_name, ba_master, &master_len );
-	ba_emaster = (char*) malloc( MAX_FILE_LENGTH ); //TODO
-	readFile( emaster_name, ba_emaster, &emaster_len );
-	if( hasXMaster() ) {
-		ba_xmaster = (char*) malloc( MAX_FILE_LENGTH ); //TODO
-		readFile( xmaster_name, ba_xmaster,  &xmaster_len );
+	if( master_name != NULL ) {
+		ba_master = (char*) malloc( MAX_FILE_LENGTH ); //TODO
+		if( !readFile( master_name, ba_master, &master_len ) ) {
+			return false;
+		}
+	} else {
+		setError("Master file not found");
+		return false;
 	}
+	
+	if( emaster_name != NULL ) {
+		ba_emaster = (char*) malloc( MAX_FILE_LENGTH ); //TODO
+		if( !readFile( emaster_name, ba_emaster, &emaster_len ) ) {
+			return false;
+		}
+	}else {
+		setError("EMaster file not found");
+		return false;
+	}
+	
+	if( xmaster_name != NULL ) {
+		ba_xmaster = (char*) malloc( MAX_FILE_LENGTH ); //TODO
+		if( !readFile( xmaster_name, ba_xmaster,  &xmaster_len ) ) {
+			return false;
+		}
+	} else {
+		// xmaster is optional, but we could check for existing f#.mwd >255
+	}
+	
+	return true;
 }
 
 
@@ -324,7 +340,7 @@ int build_mr_string( char *dst, const master_record *mr )
 }
 
 
-void Metastock::dumpData( unsigned short f ) const
+bool Metastock::dumpData( unsigned short f ) const
 {
 	char buf[256];
 	
@@ -332,44 +348,52 @@ void Metastock::dumpData( unsigned short f ) const
 		if( f > 0 && f < MAX_MR_LEN && mr_list[f].record_number != 0 ) {
 			assert( mr_list[f].file_number == f );
 			int len = build_mr_string( buf, &mr_list[f] );
-			dumpData( f, mr_list[f].field_bitset, buf );
+			if( !dumpData( f, mr_list[f].field_bitset, buf ) ) {
+				return false;
+			}
 		} else {
-			fprintf( stderr , "error, "
-				"data file #%d not referenced by master files\n", f  );
+			setError("data file not referenced by master files");
+			return false;
 		}
-		return;
+		return true;
 	}
 	
 	for( int i = 1; i<MAX_MR_LEN; i++ ) {
 		if( i > 0 && i < MAX_MR_LEN && mr_list[i].record_number != 0 ) {
 			assert( mr_list[i].file_number == i );
 			int len = build_mr_string( buf, &mr_list[i] );
-			dumpData( i, mr_list[i].field_bitset, buf );
+			if( !dumpData( i, mr_list[i].field_bitset, buf ) ) {
+				return false;
+			}
 		}
 	}
+	return true;
 }
 
 
 
-void Metastock::dumpData( unsigned short n, unsigned char fields, const char *pfx ) const
+bool Metastock::dumpData( unsigned short n, unsigned char fields, const char *pfx ) const
 {
 	const char *fdat_name = mr_list[n].file_name;
 	
-	if( fdat_name == NULL ) {
-		assert(false);
+	if( *fdat_name == '\0' ) {
 		setError( "no fdat found" );
-		return /*false*/;
+		return false;
 	}
 	
 	int fdat_len = 0;
-	readFile( fdat_name, ba_fdat, &fdat_len );
+	if( ! readFile( fdat_name, ba_fdat, &fdat_len ) ) {
+		return false;
+	}
 	
 	FDat datfile( ba_fdat, fdat_len, fields );
-	fprintf( stdout, "#%d: %d x %d bytes\n",
+	fprintf( stderr, "#%d: %d x %d bytes\n",
 		n, datfile.countRecords(), count_bits(fields) * 4 );
 	
 	datfile.checkHeader();
 	datfile.print( pfx );
+	
+	return true;
 }
 
 

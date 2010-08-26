@@ -123,9 +123,8 @@ int main(int argc, char *argv[])
 	
 	Metastock ms;
 	if( ! ms.setDir( ms_dirp ) ) {
-		fprintf( stderr, "error: %s\n",
-			ms.lastError() );
-			exit(2);
+		fprintf( stderr, "error: %s\n", ms.lastError() );
+		exit(2);
 	}
 	
 	if( dumpmasterp == 1 ) {
@@ -142,6 +141,9 @@ int main(int argc, char *argv[])
 		}
 	}
 	if( dumpdatap >= 0 ) {
-		ms.dumpData( dumpdatap );
+		if( ! ms.dumpData( dumpdatap ) ) {
+			fprintf( stderr, "error: %s\n", ms.lastError() );
+			exit(2);
+		}
 	}
 }
