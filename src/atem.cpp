@@ -27,7 +27,7 @@ static void displayArgs( poptContext con, poptCallbackReason /*foo*/,
 	if (key->shortName == 'h') {
 		poptPrintHelp(con, stdout, 0);
 	} else if (key->shortName == 'V') {
-		fprintf(stdout, "GA Index Calcuator %d.%d.%d\n",
+		fprintf(stdout, "atem - metastock reverse (%d.%d.%d)\n",
 			VERSION_MAJOR, VERSION_MINOR, VERSION_RELEASE);
 	} else {
 		poptPrintUsage(con, stdout, 0);
@@ -85,8 +85,7 @@ static const char** atem_parse_cl(size_t argc, const char *argv[])
 	poptContext opt_ctx;
 	
 	opt_ctx = poptGetContext(NULL, argc, argv, atem_opts, 0);
-	poptSetOtherOptionHelp(
-		opt_ctx, "[options] [configuration file]");
+	poptSetOtherOptionHelp( opt_ctx, "[OPTION...]");
 	
 	int rc;
 	while( (rc = poptGetNextOpt(opt_ctx)) > 0 ) {
