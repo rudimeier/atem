@@ -5,8 +5,10 @@
 #include <string.h>
 #include <math.h> // NAN, really needed?
 
+
+#include "util.h"
+
 #if defined FAST_PRINTING
-	#include "util.h"
 
 static struct rudi_printf_info _pinfo;
 
