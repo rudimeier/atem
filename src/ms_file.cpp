@@ -718,6 +718,7 @@ void FDat::print( const char* header ) const
 		
 		fputs( buf, stdout );
 	}
+	fflush( stdout );
 }
 
 
