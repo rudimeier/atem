@@ -158,6 +158,8 @@ bool Metastock::findFiles()
 			CHECK_MASTER( xmaster_name, "XMASTER" );
 		}
 	}
+	
+	closedir( dirh );
 	return true;
 }
 

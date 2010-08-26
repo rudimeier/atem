@@ -33,12 +33,8 @@ static void displayArgs( poptContext con, poptCallbackReason /*foo*/,
 		poptPrintUsage(con, stdout, 0);
 	}
 	
-#if !defined(__LCLINT__)
-	// XXX keep both splint & valgrind happy
-	con = poptFreeContext(con);
-#endif
-	exit(0); // TODO we shouldn't exit here
-	return;
+	poptFreeContext(con);
+	exit(0);
 }
 
 
@@ -101,30 +97,33 @@ static const char** atem_parse_cl(size_t argc, const char *argv[])
 	if( rc != -1 ) {
 		fprintf( stderr, "error: %s '%s'\n",
 			poptStrerror(rc), poptBadOption(opt_ctx, 0) );
-		exit(2); // TODO we shouldn't exit here
+		poptFreeContext(opt_ctx);
+		exit(2);
 	}
 	
 	const char** rest = poptGetArgs(opt_ctx);
 	if( rest != NULL ) {
 		fprintf( stderr, "error: bad usage\n" );
+		poptFreeContext(opt_ctx);
 		exit(2);
 	}
 	
+	// we cannot free it when have a non-NULL rest
+	poptFreeContext(opt_ctx);
 	return rest;
 }
 
 
 
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
-	const char **rest = atem_parse_cl(argc, (const char **)argv);
-	assert( rest == NULL );
+	atem_parse_cl(argc, argv);
 	
 	Metastock ms;
 	if( ! ms.setDir( ms_dirp ) ) {
 		fprintf( stderr, "error: %s\n", ms.lastError() );
-		exit(2);
+		return 2; // exit
 	}
 	
 	if( dumpmasterp == 1 ) {
@@ -143,7 +142,9 @@ int main(int argc, char *argv[])
 	if( dumpdatap >= 0 ) {
 		if( ! ms.dumpData( dumpdatap ) ) {
 			fprintf( stderr, "error: %s\n", ms.lastError() );
-			exit(2);
+			return 2; // exit
 		}
 	}
+	
+	return 0;
 }
