@@ -762,26 +762,52 @@ void FDat::print( const char* header ) const
 
 int FDat::record_to_string( const char *record, char *s ) const
 {
+	unsigned char DAT = 1;
+	unsigned char OPE = 2;
+	unsigned char HIG = 4;
+	unsigned char LOW = 8;
+	unsigned char CLO = 16;
+	unsigned char VOL = 32;
+	unsigned char OPI = 64;
+	
+	unsigned char print_bitset = DAT | OPE | HIG | LOW | CLO | VOL | OPI;
+	
+
 	int ret;
 	
 #if defined FAST_PRINTING
 	char *begin = s;
-	s += ltoa( s, floatToIntDate_YYY( readFloat( record, 0 ) ) );
-	*s++ = '\t';
+	if( print_bitset & DAT ) {
+		s += ltoa( s, floatToIntDate_YYY( readFloat( record, 0 ) ) );
+		*s++ = '\t';
+	}
 	pinfo->prec = 5;
-	s += rudi_printf_fp( s, pinfo, readFloat( record, 4 ) );
-	*s++ = '\t';
-	s += rudi_printf_fp( s, pinfo, readFloat( record, 8 ) );
-	*s++ = '\t';
-	s += rudi_printf_fp( s, pinfo, readFloat( record, 12 ) );
-	*s++ = '\t';
-	s += rudi_printf_fp( s, pinfo, readFloat( record, 16 ) );
-	*s++ = '\t';
+	if( print_bitset &  OPE) {
+		s += rudi_printf_fp( s, pinfo, readFloat( record, 4 ) );
+		*s++ = '\t';
+	}
+	if( print_bitset & HIG ) {
+		s += rudi_printf_fp( s, pinfo, readFloat( record, 8 ) );
+		*s++ = '\t';
+	}
+	if( print_bitset & LOW ) {
+		s += rudi_printf_fp( s, pinfo, readFloat( record, 12 ) );
+		*s++ = '\t';
+	}
+	if( print_bitset & CLO ) {
+		s += rudi_printf_fp( s, pinfo, readFloat( record, 16 ) );
+		*s++ = '\t';
+	}
 	pinfo->prec = 0;
-	s += rudi_printf_fp( s, pinfo, readFloat( record, 20 ) );
-	*s++ = '\t';
-	s += rudi_printf_fp( s, pinfo, record_length >= 28 ? readFloat( record, 24 ) : NAN );
-	*s++ = '\n';
+	if( print_bitset & VOL ) {
+		s += rudi_printf_fp( s, pinfo, readFloat( record, 20 ) );
+		*s++ = '\t';
+	}
+	if( print_bitset & OPI ) {
+		s += rudi_printf_fp( s, pinfo, record_length >= 28 ? readFloat( record, 24 ) : NAN );
+		*s++ = '\t';
+	}
+	*(s-1) = '\n'; // fails if print_bitset == 0
 	*s = '\0';
 	
 	ret = s - begin;
