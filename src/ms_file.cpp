@@ -727,7 +727,17 @@ FDat::FDat( const char *_buf, int _size, unsigned char fields ) :
 }
 
 
+char FDat::print_sep = SEP;
 unsigned char FDat::print_bitset = DAT | OPE | HIG | LOW | CLO | VOL | OPI;
+
+
+void FDat::initPrinter( char sep, unsigned char bitset )
+{
+	print_sep = sep;
+	if( bitset > 0  ) {
+		print_bitset = bitset;
+	}
+}
 
 
 bool FDat::checkHeader() const

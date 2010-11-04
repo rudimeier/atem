@@ -143,6 +143,7 @@ class FDat
 		
 		static bool checkHeader( const char* buf );
 		static bool checkRecord( const char* buf, int record  );
+		static void initPrinter( char sep, unsigned char bitset );
 		
 		bool checkHeader() const;
 		void print( const char* header ) const;
@@ -151,7 +152,7 @@ class FDat
 	private:
 		int record_to_string( const char *record, char *s ) const;
 		
-		
+		static char print_sep;
 		static unsigned char print_bitset;
 		
 		const unsigned char field_bitset;
