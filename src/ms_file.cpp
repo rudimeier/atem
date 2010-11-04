@@ -727,8 +727,11 @@ FDat::FDat( const char *_buf, int _size, unsigned char fields ) :
 }
 
 
-char FDat::print_sep = SEP;
+char FDat::print_sep = '\t';
 unsigned char FDat::print_bitset = DAT | OPE | HIG | LOW | CLO | VOL | OPI;
+#if ! defined FAST_PRINTING
+char FDat::sprintf_format[64] = "%d\t%.5f\t%.5f\t%.5f\t%.5f\t%.0f\t%.0f\n";
+#endif
 
 
 void FDat::initPrinter( char sep, unsigned char bitset )
@@ -737,6 +740,12 @@ void FDat::initPrinter( char sep, unsigned char bitset )
 	if( bitset > 0  ) {
 		print_bitset = bitset;
 	}
+#if ! defined FAST_PRINTING
+	// TODO implement constructing sprintf_format
+	sprintf_format[2] = sprintf_format[7] = sprintf_format[12]
+		= sprintf_format[17] = sprintf_format[22] = sprintf_format[27]
+		= sep;
+#endif
 }
 
 
@@ -814,7 +823,8 @@ int FDat::record_to_string( const char *record, char *s ) const
 	
 	ret = s - begin;
 #else
-	ret = sprintf( s, "%d\t%.5f\t%.5f\t%.5f\t%.5f\t%.0f\t%.0f\n",
+	// TODO implement constructing sprintf_format
+	ret = sprintf( s, sprintf_format,
 		floatToIntDate_YYY( readFloat( record, 0 ) ),
 		readFloat( record, 4 ),
 		readFloat( record, 8 ),
