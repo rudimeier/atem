@@ -18,6 +18,8 @@ static int dumpemasterp = 0;
 static int dumpxmasterp = 0;
 static int dumpsymbolsp = -1;
 static int dumpdatap = -1;
+static const char* sepp = "\t";
+static int formatp = 0;
 
 
 
@@ -54,6 +56,10 @@ static struct poptOption flow_opts[] = {
 		"Dump all symbol info.", NULL},
 	{"dump-data", 'd', POPT_ARG_INT | POPT_ARGFLAG_OPTIONAL, &dumpdatap, 0,
 		"Dump data files.", NULL},
+	{"field-separator", 'F', POPT_ARG_STRING, &sepp, 0,
+		"field separator", NULL},
+	{"format", 'f', POPT_ARG_INT, &formatp, 0,
+		"output format", NULL},
 	POPT_TABLEEND
 };
 
@@ -124,6 +130,11 @@ int main(int argc, const char *argv[])
 	
 	Metastock ms;
 	if( ! ms.setDir( ms_dirp ) ) {
+		fprintf( stderr, "error: %s\n", ms.lastError() );
+		return 2; // exit
+	}
+	
+	if( ! ms.setOutputFormat( *sepp, formatp ) ) {
 		fprintf( stderr, "error: %s\n", ms.lastError() );
 		return 2; // exit
 	}
