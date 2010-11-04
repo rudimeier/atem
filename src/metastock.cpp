@@ -192,6 +192,17 @@ bool Metastock::setDir( const char* d )
 }
 
 
+bool Metastock::setOutputFormat( char sep, int format )
+{
+	if( format < 0 ) {
+		setError( "wrong output format" );
+		return false;
+	}
+	FDat::initPrinter( sep, format );
+	return true;
+}
+
+
 bool Metastock::readFile( const char *file_name , char *buf, int *len ) const
 {
 	// build file name with full path

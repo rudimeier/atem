@@ -14,6 +14,7 @@ class Metastock
 		bool hasXMaster() const;
 		
 		bool setDir( const char* dir );
+		bool setOutputFormat(  char sep, int format );
 		
 		void parseMasters();
 		void dumpMaster() const;
