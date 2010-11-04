@@ -200,7 +200,7 @@ bool Metastock::readFile( const char *file_name , char *buf, int *len ) const
 	strcpy( file_path + strlen(ms_dir), file_name );
 	
 	
-	int fd = open( file_path, O_RDWR );
+	int fd = open( file_path, O_RDONLY );
 	if( fd < 0 ) {
 		setError( file_path, strerror(errno) );
 		return false;
