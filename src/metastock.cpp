@@ -25,6 +25,8 @@
 
 #define MAX_FILE_LENGTH (1024*1024)
 
+char Metastock::print_sep = '\t';
+
 
 Metastock::Metastock() :
 	ms_dir(NULL),
@@ -194,6 +196,7 @@ bool Metastock::setDir( const char* d )
 
 bool Metastock::setOutputFormat( char sep, int format )
 {
+	print_sep = sep;
 	if( format < 0 ) {
 		setError( "wrong output format" );
 		return false;
@@ -365,7 +368,7 @@ bool Metastock::dumpSymbolInfo( unsigned short f ) const
 }
 
 
-int build_mr_string( char *dst, const master_record *mr )
+int Metastock::build_mr_string( char *dst, const master_record *mr ) const
 {
 	char *cp = dst;
 	int tmp = 0;
@@ -373,7 +376,7 @@ int build_mr_string( char *dst, const master_record *mr )
 	tmp = strlen(mr->c_symbol);
 	memcpy( cp, mr->c_symbol, tmp );
 	cp += tmp;
-	*cp++ = '\t';
+	*cp++ = print_sep;
 	
 	tmp = strlen(mr->c_long_name);
 	memcpy( cp, mr->c_long_name, tmp );
