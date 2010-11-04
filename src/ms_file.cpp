@@ -728,13 +728,13 @@ FDat::FDat( const char *_buf, int _size, unsigned char fields ) :
 
 
 char FDat::print_sep = '\t';
-unsigned char FDat::print_bitset = DAT | OPE | HIG | LOW | CLO | VOL | OPI;
+unsigned int FDat::print_bitset = DAT | OPE | HIG | LOW | CLO | VOL | OPI;
 #if ! defined FAST_PRINTING
 char FDat::sprintf_format[64] = "%d\t%.5f\t%.5f\t%.5f\t%.5f\t%.0f\t%.0f\n";
 #endif
 
 
-void FDat::initPrinter( char sep, unsigned char bitset )
+void FDat::initPrinter( char sep, unsigned int bitset )
 {
 	print_sep = sep;
 	if( bitset > 0  ) {

@@ -5,6 +5,28 @@
 #define SEP '\t'
 
 
+enum ms_fields {
+	// master fields
+	RNO = 0x1,
+	KND = 0x2,
+	FNO = 0x4,
+	FLD = 0x8,
+	PER = 0x10,
+	SYM = 0x20,
+	NAM = 0x40,
+	FIL = 0x80,
+	// data fields
+	DAT = 0x100,
+	OPE = 0x200,
+	HIG = 0x400,
+	LOW = 0x800,
+	CLO = 0x1000,
+	VOL = 0x2000,
+	OPI = 0x4000 
+};
+
+
+
 struct master_record
 {
 	unsigned short record_number; /* position in master file */
@@ -129,21 +151,11 @@ class XMasterFile
 class FDat
 {
 	public:
-		enum dat_field {
-			DAT = 1,
-			OPE = 2,
-			HIG = 4,
-			LOW = 8,
-			CLO = 16,
-			VOL = 32,
-			OPI = 64
-		};
-		
 		FDat( const char *buf, int size, unsigned char fields );
 		
 		static bool checkHeader( const char* buf );
 		static bool checkRecord( const char* buf, int record  );
-		static void initPrinter( char sep, unsigned char bitset );
+		static void initPrinter( char sep, unsigned int bitset );
 		
 		bool checkHeader() const;
 		void print( const char* header ) const;
@@ -153,7 +165,7 @@ class FDat
 		int record_to_string( const char *record, char *s ) const;
 		
 		static char print_sep;
-		static unsigned char print_bitset;
+		static unsigned int print_bitset;
 #if ! defined FAST_PRINTING
 		static char sprintf_format[64];
 #endif
