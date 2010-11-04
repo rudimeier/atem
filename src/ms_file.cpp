@@ -727,6 +727,9 @@ FDat::FDat( const char *_buf, int _size, unsigned char fields ) :
 }
 
 
+unsigned char FDat::print_bitset = DAT | OPE | HIG | LOW | CLO | VOL | OPI;
+
+
 bool FDat::checkHeader() const
 {
 	assert( size % record_length == 0 );
@@ -762,17 +765,6 @@ void FDat::print( const char* header ) const
 
 int FDat::record_to_string( const char *record, char *s ) const
 {
-	unsigned char DAT = 1;
-	unsigned char OPE = 2;
-	unsigned char HIG = 4;
-	unsigned char LOW = 8;
-	unsigned char CLO = 16;
-	unsigned char VOL = 32;
-	unsigned char OPI = 64;
-	
-	unsigned char print_bitset = DAT | OPE | HIG | LOW | CLO | VOL | OPI;
-	
-
 	int ret;
 	
 #if defined FAST_PRINTING

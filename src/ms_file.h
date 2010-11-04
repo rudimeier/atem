@@ -129,6 +129,16 @@ class XMasterFile
 class FDat
 {
 	public:
+		enum dat_field {
+			DAT = 1,
+			OPE = 2,
+			HIG = 4,
+			LOW = 8,
+			CLO = 16,
+			VOL = 32,
+			OPI = 64
+		};
+		
 		FDat( const char *buf, int size, unsigned char fields );
 		
 		static bool checkHeader( const char* buf );
@@ -141,6 +151,8 @@ class FDat
 	private:
 		int record_to_string( const char *record, char *s ) const;
 		
+		
+		static unsigned char print_bitset;
 		
 		const unsigned char field_bitset;
 		const unsigned int record_length;
