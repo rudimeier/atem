@@ -30,31 +30,32 @@ static struct rudi_printf_info *pinfo = init_print_info();
 #endif
 
 
-int mr_record_to_string( char *dest, const struct master_record* mr )
+int mr_record_to_string( char *dest, const struct master_record* mr,
+	unsigned char prnt_master_fields, char sep )
 {
 	char * cp = dest;
 	int tmp;
 	
 	cp += ltoa( cp, mr->record_number );
-	*cp++ = SEP;
+	*cp++ = sep;
 	*cp++ = mr->kind;
-	*cp++ = SEP;
+	*cp++ = sep;
 	cp += ltoa( cp, mr->file_number );
-	*cp++ = SEP;
+	*cp++ = sep;
 	cp += ltoa( cp, mr->field_bitset );
-	*cp++ = SEP;
+	*cp++ = sep;
 	*cp++ = mr->barsize;
-	*cp++ = SEP;
+	*cp++ = sep;
 	
 	tmp = strlen(mr->c_symbol);
 	memcpy( cp, mr->c_symbol, tmp );
 	cp += tmp;
-	*cp++ = SEP;
+	*cp++ = sep;
 	
 	tmp = strlen(mr->c_long_name);
 	memcpy( cp, mr->c_long_name, tmp );
 	cp += tmp;
-	*cp++ = SEP;
+	*cp++ = sep;
 	
 	tmp = strlen(mr->file_name);
 	memcpy( cp, mr->file_name, tmp );

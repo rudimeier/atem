@@ -1,8 +1,7 @@
 #ifndef ATEM_MS_FILE_H
 #define ATEM_MS_FILE_H
 
-// field separator
-#define SEP '\t'
+
 
 
 enum ms_master_field {
@@ -51,7 +50,8 @@ struct master_record
 #define MAX_SIZE_MR_STRING (6 + 2 + 6 + 4 + 2) + (17 + 64 + 11)
 
 
-int mr_record_to_string( char *dest, const struct master_record* );
+int mr_record_to_string( char *dest, const struct master_record*,
+	unsigned char print_bitset, char sep );
 
 
 
