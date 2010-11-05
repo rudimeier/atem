@@ -26,6 +26,9 @@
 #define MAX_FILE_LENGTH (1024*1024)
 
 char Metastock::print_sep = '\t';
+unsigned char Metastock::prnt_master_fields = 0;
+unsigned char Metastock::prnt_data_fields = 0;
+unsigned char Metastock::prnt_data_mr_fields = 0;
 
 
 Metastock::Metastock() :
@@ -201,7 +204,11 @@ bool Metastock::setOutputFormat( char sep, int format )
 		setError( "wrong output format" );
 		return false;
 	}
-	FDat::initPrinter( sep, format );
+	prnt_master_fields = format >> 9;
+	prnt_data_fields = format;
+	prnt_data_mr_fields = format >> 9;
+	
+	FDat::initPrinter( sep, prnt_data_fields );
 	return true;
 }
 
