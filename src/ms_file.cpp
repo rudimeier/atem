@@ -748,8 +748,7 @@ FDat::FDat( const char *_buf, int _size, unsigned char fields ) :
 
 
 char FDat::print_sep = '\t';
-unsigned int FDat::print_bitset = D_DAT | D_OPE | D_HIG | D_LOW | D_CLO
-	| D_VOL | D_OPI;
+unsigned int FDat::print_bitset = 0xff;
 #if ! defined FAST_PRINTING
 char FDat::sprintf_format[64] = "%d\t%.5f\t%.5f\t%.5f\t%.5f\t%.0f\t%.0f\n";
 #endif
@@ -758,9 +757,8 @@ char FDat::sprintf_format[64] = "%d\t%.5f\t%.5f\t%.5f\t%.5f\t%.0f\t%.0f\n";
 void FDat::initPrinter( char sep, unsigned int bitset )
 {
 	print_sep = sep;
-	if( bitset > 0  ) {
-		print_bitset = bitset;
-	}
+	print_bitset = bitset;
+	
 #if ! defined FAST_PRINTING
 	// TODO implement constructing sprintf_format
 	sprintf_format[2] = sprintf_format[7] = sprintf_format[12]
@@ -793,7 +791,10 @@ void FDat::print( const char* header ) const
 	buf_p += h_size;
 	
 	while( record < end ) {
-		record_to_string( record, buf_p );
+		int len = record_to_string( record, buf_p );
+		buf_p[len++] = '\n';
+		buf_p[len] = '\0';
+		
 		record += record_length;
 		
 		fputs( buf, stdout );
@@ -805,41 +806,90 @@ void FDat::print( const char* header ) const
 int FDat::record_to_string( const char *record, char *s ) const
 {
 	int ret;
+	int offset = 0;
+	
 	
 #if defined FAST_PRINTING
 	char *begin = s;
 	if( print_bitset & D_DAT ) {
-		s += ltoa( s, floatToIntDate_YYY( readFloat( record, 0 ) ) );
+		if( field_bitset & D_DAT ) {
+			s += ltoa( s, floatToIntDate_YYY( readFloat(record, offset) ) );
+			offset += 4;
+		} else {
+			s += ltoa( s, 10000101 );
+		}
 		*s++ = print_sep;
+	}
+	if( print_bitset & D_TIM ) {
+		if( field_bitset & D_TIM ) {
+			// TODO never seen a time field, we would print it here at this
+			// position but probably it is the last float in the record
+			assert(false);
+		}
+		// NOTE the only field we don't print if not exists
 	}
 	pinfo->prec = 5;
 	if( print_bitset & D_OPE) {
-		s += rudi_printf_fp( s, pinfo, readFloat( record, 4 ) );
+		if( field_bitset & D_OPE ) {
+			s += rudi_printf_fp( s, pinfo, readFloat(record, offset) );
+			offset += 4;
+		} else {
+			s += rudi_printf_fp( s, pinfo, NAN );
+		}
 		*s++ = print_sep;
 	}
 	if( print_bitset & D_HIG ) {
-		s += rudi_printf_fp( s, pinfo, readFloat( record, 8 ) );
+		if( field_bitset & D_HIG ) {
+			s += rudi_printf_fp( s, pinfo, readFloat(record, offset) );
+			offset += 4;
+		} else {
+			s += rudi_printf_fp( s, pinfo, NAN );
+		}
 		*s++ = print_sep;
 	}
 	if( print_bitset & D_LOW ) {
-		s += rudi_printf_fp( s, pinfo, readFloat( record, 12 ) );
+		if( field_bitset & D_LOW ) {
+			s += rudi_printf_fp( s, pinfo, readFloat(record, offset) );
+			offset += 4;
+		} else {
+			s += rudi_printf_fp( s, pinfo, NAN );
+		}
 		*s++ = print_sep;
 	}
 	if( print_bitset & D_CLO ) {
-		s += rudi_printf_fp( s, pinfo, readFloat( record, 16 ) );
+		if( field_bitset & D_CLO ) {
+			s += rudi_printf_fp( s, pinfo, readFloat(record, offset) );
+			offset += 4;
+		} else {
+			s += rudi_printf_fp( s, pinfo, NAN );
+		}
 		*s++ = print_sep;
 	}
 	pinfo->prec = 0;
 	if( print_bitset & D_VOL ) {
-		s += rudi_printf_fp( s, pinfo, readFloat( record, 20 ) );
+		if( field_bitset & D_VOL ) {
+			s += rudi_printf_fp( s, pinfo, readFloat(record, offset) );
+			offset += 4;
+		} else {
+			s += rudi_printf_fp( s, pinfo, NAN );
+		}
 		*s++ = print_sep;
 	}
 	if( print_bitset & D_OPI ) {
-		s += rudi_printf_fp( s, pinfo, record_length >= 28 ? readFloat( record, 24 ) : NAN );
+		if( field_bitset & D_OPI ) {
+			s += rudi_printf_fp( s, pinfo, readFloat(record, offset) );
+			offset += 4;
+		} else {
+			s += rudi_printf_fp( s, pinfo, NAN );
+		}
 		*s++ = print_sep;
 	}
-	*(s-1) = '\n'; // fails if print_bitset == 0
-	*s = '\0';
+	
+	if( s != begin ) {
+		*(--s) = '\0';
+	} else {
+		*s = '\0';
+	}
 	
 	ret = s - begin;
 #else
