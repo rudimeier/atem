@@ -807,8 +807,8 @@ void FDat::print( const char* header ) const
 
 int FDat::record_to_string( const char *record, char *s ) const
 {
-	int ret;
 	int offset = 0;
+	char *begin = s;
 	
 	
 #if defined FAST_PRINTING
@@ -823,7 +823,6 @@ int FDat::record_to_string( const char *record, char *s ) const
 		*s++ = print_sep; \
 	}
 
-	char *begin = s;
 	if( print_bitset & D_DAT ) {
 		if( field_bitset & D_DAT ) {
 			s += ltoa( s, floatToIntDate_YYY( readFloat(record, offset) ) );
@@ -850,27 +849,55 @@ int FDat::record_to_string( const char *record, char *s ) const
 	PRINT_FIELD( D_VOL );
 	PRINT_FIELD( D_OPI );
 	
+#undef PRINT_FIELD
+#else
+#define PRINT_FIELD( _field_ ) \
+	if( print_bitset & _field_) { \
+		if( field_bitset & _field_ ) { \
+			s += sprintf( s, fmt, readFloat( record, offset ) ); \
+			offset += 4; \
+		} else { \
+			s += sprintf( s, fmt, DEFAULT_FLOAT ); \
+		} \
+		*s++ = print_sep; \
+	}
+	const char * fmt;
+	
+	if( print_bitset & D_DAT ) {
+		if( field_bitset & D_DAT ) {
+			s += sprintf( s, "%d", floatToIntDate_YYY( readFloat(record, offset) ) );
+			offset += 4;
+		} else {
+			s += sprintf( s, "%d", 10000101 );
+		}
+		*s++ = print_sep;
+	}
+	if( print_bitset & D_TIM ) {
+		if( field_bitset & D_TIM ) {
+			// TODO never seen a time field, we would print it here at this
+			// position but probably it is the last float in the record
+			assert(false);
+		}
+		// NOTE the only field we don't print if not exists
+	}
+	fmt = "%.5f";
+	PRINT_FIELD( D_OPE );
+	PRINT_FIELD( D_HIG );
+	PRINT_FIELD( D_LOW );
+	PRINT_FIELD( D_CLO );
+	fmt = "%.0f";
+	PRINT_FIELD( D_VOL );
+	PRINT_FIELD( D_OPI );
+#undef PRINT_FIELD
+#endif // FAST_PRINTING
+	
 	if( s != begin ) {
 		*(--s) = '\0';
 	} else {
 		*s = '\0';
 	}
 	
-	ret = s - begin;
-#undef PRINT_FIELD
-#else
-	// TODO implement constructing sprintf_format
-	ret = sprintf( s, sprintf_format,
-		floatToIntDate_YYY( readFloat( record, 0 ) ),
-		readFloat( record, 4 ),
-		readFloat( record, 8 ),
-		readFloat( record, 12 ),
-		readFloat( record, 16 ),
-		readFloat( record, 20 ),
-		(record_length >= 28) ? readFloat( record, 24 ) : DEFAULT_FLOAT);
-#endif
-	
-	return ret;
+	return s - begin;
 }
 
 #undef DEFAULT_FLOAT
