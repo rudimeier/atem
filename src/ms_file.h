@@ -5,24 +5,28 @@
 #define SEP '\t'
 
 
-enum ms_fields {
+enum ms_master_field {
 	// master fields
-	RNO = 0x1,
-	KND = 0x2,
-	FNO = 0x4,
-	FLD = 0x8,
-	PER = 0x10,
-	SYM = 0x20,
-	NAM = 0x40,
-	FIL = 0x80,
+	M_SYM = 01,
+	M_NAM = 02,
+	M_PER = 04,
+	M_FNO = 010,
+	M_FIL = 020,
+	M_FLD = 040,
+	M_RNO = 0100,
+	M_KND = 0200,
+};
+
+enum ms_data_field {
 	// data fields
-	DAT = 0x100,
-	OPE = 0x200,
-	HIG = 0x400,
-	LOW = 0x800,
-	CLO = 0x1000,
-	VOL = 0x2000,
-	OPI = 0x4000 
+	D_DAT = 01,
+	D_OPE = 02,
+	D_HIG = 04,
+	D_LOW = 010,
+	D_CLO = 020,
+	D_VOL = 040,
+	D_OPI = 0100,
+	D_TIM = 0200
 };
 
 
