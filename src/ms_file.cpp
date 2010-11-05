@@ -771,7 +771,6 @@ void FDat::print( const char* header ) const
 	int h_size = strlen( header );
 	memcpy( buf, header, h_size );
 	buf_p += h_size;
-	*buf_p++ = print_sep;
 	
 	while( record < end ) {
 		record_to_string( record, buf_p );
