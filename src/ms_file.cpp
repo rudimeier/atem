@@ -3,7 +3,6 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include <math.h> // NAN, really needed?
 
 
 #include "util.h"
@@ -803,6 +802,9 @@ void FDat::print( const char* header ) const
 }
 
 
+// to be printed when field does not exist
+#define DEFAULT_FLOAT 0.0
+
 int FDat::record_to_string( const char *record, char *s ) const
 {
 	int ret;
@@ -810,6 +812,17 @@ int FDat::record_to_string( const char *record, char *s ) const
 	
 	
 #if defined FAST_PRINTING
+#define PRINT_FIELD( _field_ ) \
+	if( print_bitset & _field_) { \
+		if( field_bitset & _field_ ) { \
+			s += rudi_printf_fp( s, pinfo, readFloat(record, offset) ); \
+			offset += 4; \
+		} else { \
+			s += rudi_printf_fp( s, pinfo, DEFAULT_FLOAT ); \
+		} \
+		*s++ = print_sep; \
+	}
+
 	char *begin = s;
 	if( print_bitset & D_DAT ) {
 		if( field_bitset & D_DAT ) {
@@ -829,61 +842,13 @@ int FDat::record_to_string( const char *record, char *s ) const
 		// NOTE the only field we don't print if not exists
 	}
 	pinfo->prec = 5;
-	if( print_bitset & D_OPE) {
-		if( field_bitset & D_OPE ) {
-			s += rudi_printf_fp( s, pinfo, readFloat(record, offset) );
-			offset += 4;
-		} else {
-			s += rudi_printf_fp( s, pinfo, NAN );
-		}
-		*s++ = print_sep;
-	}
-	if( print_bitset & D_HIG ) {
-		if( field_bitset & D_HIG ) {
-			s += rudi_printf_fp( s, pinfo, readFloat(record, offset) );
-			offset += 4;
-		} else {
-			s += rudi_printf_fp( s, pinfo, NAN );
-		}
-		*s++ = print_sep;
-	}
-	if( print_bitset & D_LOW ) {
-		if( field_bitset & D_LOW ) {
-			s += rudi_printf_fp( s, pinfo, readFloat(record, offset) );
-			offset += 4;
-		} else {
-			s += rudi_printf_fp( s, pinfo, NAN );
-		}
-		*s++ = print_sep;
-	}
-	if( print_bitset & D_CLO ) {
-		if( field_bitset & D_CLO ) {
-			s += rudi_printf_fp( s, pinfo, readFloat(record, offset) );
-			offset += 4;
-		} else {
-			s += rudi_printf_fp( s, pinfo, NAN );
-		}
-		*s++ = print_sep;
-	}
+	PRINT_FIELD( D_OPE );
+	PRINT_FIELD( D_HIG );
+	PRINT_FIELD( D_LOW );
+	PRINT_FIELD( D_CLO );
 	pinfo->prec = 0;
-	if( print_bitset & D_VOL ) {
-		if( field_bitset & D_VOL ) {
-			s += rudi_printf_fp( s, pinfo, readFloat(record, offset) );
-			offset += 4;
-		} else {
-			s += rudi_printf_fp( s, pinfo, NAN );
-		}
-		*s++ = print_sep;
-	}
-	if( print_bitset & D_OPI ) {
-		if( field_bitset & D_OPI ) {
-			s += rudi_printf_fp( s, pinfo, readFloat(record, offset) );
-			offset += 4;
-		} else {
-			s += rudi_printf_fp( s, pinfo, NAN );
-		}
-		*s++ = print_sep;
-	}
+	PRINT_FIELD( D_VOL );
+	PRINT_FIELD( D_OPI );
 	
 	if( s != begin ) {
 		*(--s) = '\0';
@@ -892,6 +857,7 @@ int FDat::record_to_string( const char *record, char *s ) const
 	}
 	
 	ret = s - begin;
+#undef PRINT_FIELD
 #else
 	// TODO implement constructing sprintf_format
 	ret = sprintf( s, sprintf_format,
@@ -901,11 +867,13 @@ int FDat::record_to_string( const char *record, char *s ) const
 		readFloat( record, 12 ),
 		readFloat( record, 16 ),
 		readFloat( record, 20 ),
-		(record_length >= 28) ? readFloat( record, 24 ) : NAN);
+		(record_length >= 28) ? readFloat( record, 24 ) : DEFAULT_FLOAT);
 #endif
 	
 	return ret;
 }
+
+#undef DEFAULT_FLOAT
 
 
 unsigned short FDat::countRecords() const
