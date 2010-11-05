@@ -36,32 +36,51 @@ int mr_record_to_string( char *dest, const struct master_record* mr,
 	char * cp = dest;
 	int tmp;
 	
-	cp += ltoa( cp, mr->record_number );
-	*cp++ = sep;
-	*cp++ = mr->kind;
-	*cp++ = sep;
-	cp += ltoa( cp, mr->file_number );
-	*cp++ = sep;
-	cp += ltoa( cp, mr->field_bitset );
-	*cp++ = sep;
-	*cp++ = mr->barsize;
-	*cp++ = sep;
+	if( prnt_master_fields & M_SYM ) {
+		tmp = strlen(mr->c_symbol);
+		memcpy( cp, mr->c_symbol, tmp );
+		cp += tmp;
+		*cp++ = sep;
+	}
+	if( prnt_master_fields & M_NAM ) {
+		tmp = strlen(mr->c_long_name);
+		memcpy( cp, mr->c_long_name, tmp );
+		cp += tmp;
+		*cp++ = sep;
+	}
+	if( prnt_master_fields & M_PER ) {
+		*cp++ = mr->barsize;
+		*cp++ = sep;
+	}
+	if( prnt_master_fields & M_FNO ) {
+		cp += ltoa( cp, mr->file_number );
+		*cp++ = sep;
+	}
+	if( prnt_master_fields & M_FIL ) {
+		tmp = strlen(mr->file_name);
+		memcpy( cp, mr->file_name, tmp );
+		cp += tmp;
+		*cp++ = sep;
+	}
+	if( prnt_master_fields & M_FLD ) {
+		cp += ltoa( cp, mr->field_bitset );
+		*cp++ = sep;
+	}
+	if( prnt_master_fields & M_RNO ) {
+		cp += ltoa( cp, mr->record_number );
+		*cp++ = sep;
+	}
+	if( prnt_master_fields & M_KND ) {
+		*cp++ = mr->kind;
+		*cp++ = sep;
+	}
 	
-	tmp = strlen(mr->c_symbol);
-	memcpy( cp, mr->c_symbol, tmp );
-	cp += tmp;
-	*cp++ = sep;
-	
-	tmp = strlen(mr->c_long_name);
-	memcpy( cp, mr->c_long_name, tmp );
-	cp += tmp;
-	*cp++ = sep;
-	
-	tmp = strlen(mr->file_name);
-	memcpy( cp, mr->file_name, tmp );
-	cp += tmp;
-	
-	*cp = '\0';
+	// remove last separator if exists
+	if( cp != dest ) {
+		*--cp = '\0';
+	} else {
+		*cp = '\0';
+	}
 	assert( (cp - dest) < MAX_SIZE_MR_STRING );
 	return cp - dest;
 }

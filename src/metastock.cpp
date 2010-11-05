@@ -353,8 +353,8 @@ bool Metastock::dumpSymbolInfo( unsigned short f ) const
 			assert( mr_list[f].file_number == f );
 			int len = mr_record_to_string( buf, &mr_list[f],
 				prnt_master_fields, print_sep );
-			buf[len] = '\n';
-			buf[len+1] = '\0';
+			buf[len++] = '\n';
+			buf[len] = '\0';
 			fputs( buf, stdout );
 		} else {
 			setError("data file not referenced by master files");
@@ -368,8 +368,8 @@ bool Metastock::dumpSymbolInfo( unsigned short f ) const
 			assert( mr_list[i].file_number == i );
 			int len = mr_record_to_string( buf, &mr_list[i],
 				prnt_master_fields, print_sep );
-			buf[len] = '\n';
-			buf[len+1] = '\0';
+			buf[len++] = '\n';
+			buf[len] = '\0';
 			fputs( buf, stdout );
 		}
 	}
@@ -408,7 +408,12 @@ bool Metastock::dumpData( unsigned short f ) const
 	if( f!=0 ) {
 		if( f > 0 && f < MAX_MR_LEN && mr_list[f].record_number != 0 ) {
 			assert( mr_list[f].file_number == f );
-			int len = build_mr_string( buf, &mr_list[f] );
+			int len = mr_record_to_string( buf, &mr_list[f],
+				prnt_data_mr_fields, print_sep );
+			if( len > 0 ) {
+				buf[len++] = print_sep;
+				buf[len] = '\0';
+			}
 			if( !dumpData( f, mr_list[f].field_bitset, buf ) ) {
 				return false;
 			}
@@ -422,7 +427,12 @@ bool Metastock::dumpData( unsigned short f ) const
 	for( int i = 1; i<MAX_MR_LEN; i++ ) {
 		if( i > 0 && i < MAX_MR_LEN && mr_list[i].record_number != 0 ) {
 			assert( mr_list[i].file_number == i );
-			int len = build_mr_string( buf, &mr_list[i] );
+			int len = mr_record_to_string( buf, &mr_list[i],
+				prnt_data_mr_fields, print_sep );
+			if( len > 0 ) {
+				buf[len++] = print_sep;
+				buf[len] = '\0';
+			}
 			if( !dumpData( i, mr_list[i].field_bitset, buf ) ) {
 				return false;
 			}
