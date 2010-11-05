@@ -19,7 +19,9 @@ static int dumpxmasterp = 0;
 static int dumpsymbolsp = -1;
 static int dumpdatap = -1;
 static const char* sepp = "\t";
-static int formatp = 0;
+static int format_datap = 0;
+static int format_symbolsp = 0;
+
 
 
 
@@ -58,8 +60,10 @@ static struct poptOption flow_opts[] = {
 		"Dump data files.", NULL},
 	{"field-separator", 'F', POPT_ARG_STRING, &sepp, 0,
 		"field separator", NULL},
-	{"format", 'f', POPT_ARG_INT, &formatp, 0,
-		"output format", NULL},
+	{"format-data", 'f', POPT_ARG_INT, &format_datap, 0,
+		"data output format", NULL},
+	{"format-symbols", 'g', POPT_ARG_INT, &format_symbolsp, 0,
+		"symbol info output format", NULL},
 	POPT_TABLEEND
 };
 
@@ -134,7 +138,7 @@ int main(int argc, const char *argv[])
 		return 2; // exit
 	}
 	
-	if( ! ms.setOutputFormat( *sepp, formatp ) ) {
+	if( ! ms.setOutputFormat( *sepp, format_datap, format_symbolsp ) ) {
 		fprintf( stderr, "error: %s\n", ms.lastError() );
 		return 2; // exit
 	}
