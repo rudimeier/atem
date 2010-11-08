@@ -74,6 +74,15 @@ int mr_record_to_string( char *dest, const struct master_record* mr,
 		*cp++ = sep;
 	}
 	
+	if( prnt_master_fields & 0xff ) {
+		cp += ltoa( cp, mr->from_date );
+		*cp++ = sep;
+	}
+	if( prnt_master_fields & 0xff ) {
+		cp += ltoa( cp, mr->to_date );
+		*cp++ = sep;
+	}
+	
 	// remove last separator if exists
 	if( cp != dest ) {
 		*--cp = '\0';
@@ -525,6 +534,8 @@ int EMasterFile::getRecord( master_record *mr, unsigned short rnum ) const
 	} else {
 		strcpy( mr->c_long_name, record + 32 );
 	}
+	mr->from_date = readInt(record, 126);
+	mr->to_date = floatToIntDate_YYY(readFloat_IEEE(record, 72));
 	return 0;
 }
 
@@ -712,6 +723,8 @@ int XMasterFile::getRecord( master_record *mr, unsigned short rnum ) const
 	mr->barsize = readChar( record, 62 );
 	strcpy( mr->c_symbol, record + 1 );
 	strcpy( mr->c_long_name, record + 16 );
+	mr->from_date = readInt( record, 108 );
+	mr->to_date = readInt( record, 116 );
 	return 0;
 }
 
