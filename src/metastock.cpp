@@ -124,6 +124,7 @@ bool Metastock::findFiles()
 		perror("fts_close");
 		assert( false );
 	}
+	return true;
 }
 
 #undef CHECK_MASTER
