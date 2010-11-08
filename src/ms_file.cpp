@@ -112,6 +112,13 @@ int readInt( const char *c, int offset )
 }
 
 
+float readFloat_IEEE(const char *c, int offset)
+{
+	float ret = * (const float*) (c+offset);
+	return ret;
+}
+
+
 float readFloat(const char *c, int offset)
 {
 	const float *src4 = (const float*) (c+offset);
