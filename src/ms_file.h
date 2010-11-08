@@ -9,11 +9,13 @@ enum ms_master_field {
 	M_SYM = 01,
 	M_NAM = 02,
 	M_PER = 04,
-	M_FNO = 010,
-	M_FIL = 020,
-	M_FLD = 040,
-	M_RNO = 0100,
-	M_KND = 0200,
+	M_DT1 = 010,
+	M_DT2 = 020,
+	M_FNO = 040,
+	M_FIL = 0100,
+	M_FLD = 0200,
+	M_RNO = 0400,
+	M_KND = 01000,
 };
 
 enum ms_data_field {
@@ -53,7 +55,7 @@ struct master_record
 
 
 int mr_record_to_string( char *dest, const struct master_record*,
-	unsigned char print_bitset, char sep );
+	unsigned short print_bitset, char sep );
 
 
 

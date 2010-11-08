@@ -30,7 +30,7 @@ static struct rudi_printf_info *pinfo = init_print_info();
 
 
 int mr_record_to_string( char *dest, const struct master_record* mr,
-	unsigned char prnt_master_fields, char sep )
+	unsigned short prnt_master_fields, char sep )
 {
 	char * cp = dest;
 	int tmp;
@@ -49,6 +49,14 @@ int mr_record_to_string( char *dest, const struct master_record* mr,
 	}
 	if( prnt_master_fields & M_PER ) {
 		*cp++ = mr->barsize;
+		*cp++ = sep;
+	}
+	if( prnt_master_fields & M_DT1 ) {
+		cp += ltoa( cp, mr->from_date );
+		*cp++ = sep;
+	}
+	if( prnt_master_fields & M_DT2 ) {
+		cp += ltoa( cp, mr->to_date );
 		*cp++ = sep;
 	}
 	if( prnt_master_fields & M_FNO ) {
@@ -71,15 +79,6 @@ int mr_record_to_string( char *dest, const struct master_record* mr,
 	}
 	if( prnt_master_fields & M_KND ) {
 		*cp++ = mr->kind;
-		*cp++ = sep;
-	}
-	
-	if( prnt_master_fields & 0xff ) {
-		cp += ltoa( cp, mr->from_date );
-		*cp++ = sep;
-	}
-	if( prnt_master_fields & 0xff ) {
-		cp += ltoa( cp, mr->to_date );
 		*cp++ = sep;
 	}
 	

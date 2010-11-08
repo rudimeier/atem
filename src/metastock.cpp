@@ -26,9 +26,9 @@
 #define MAX_FILE_LENGTH (1024*1024)
 
 char Metastock::print_sep = '\t';
-unsigned char Metastock::prnt_master_fields = 0;
+unsigned short Metastock::prnt_master_fields = 0;
 unsigned char Metastock::prnt_data_fields = 0;
-unsigned char Metastock::prnt_data_mr_fields = 0;
+unsigned short Metastock::prnt_data_mr_fields = 0;
 
 
 Metastock::Metastock() :
@@ -210,7 +210,7 @@ bool Metastock::setOutputFormat( char sep, int fmt_data, int fmt_symbols )
 	if( fmt_symbols ) {
 		prnt_master_fields = fmt_symbols;
 	} else {
-		prnt_master_fields = 0xFF;
+		prnt_master_fields = 0xFFFF;
 	}
 	
 	if( fmt_data ) {

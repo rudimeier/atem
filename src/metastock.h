@@ -34,9 +34,9 @@ class Metastock
 			const char *pfx) const;
 		
 		static char print_sep;
-		static unsigned char prnt_master_fields;
+		static unsigned short prnt_master_fields;
 		static unsigned char prnt_data_fields;
-		static unsigned char prnt_data_mr_fields;
+		static unsigned short prnt_data_mr_fields;
 		
 		
 		char *ms_dir;
