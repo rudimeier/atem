@@ -484,15 +484,15 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 void EMasterFile::printRecord( const char *record ) const
 {
 // 	fprintf( stdout, "F%d.dat\t%d\t%d\t%d\t%d\t'%s'\t'%s'\n",
-	fprintf( stdout, "F%4d.dat\t%d\t%d\t%c\t%X\t%X\t'%s'\t'%s'\t'%s'\n",
+	fprintf( stdout, "F%4d.dat\t%d\t%d\t%c\t%d\t%d\t%d\t%X\t%X\t'%s'\t'%s'\t'%s'\n",
 		readUnsignedChar( record, 2),  // F#.dat
 		readChar( record, 7 ), // fields bit set
 		readChar( record, 6 ), // dat fields count per record
 		readChar( record, 60 ), // time frame 'D'
 		// never saw these floats
-// 		readFloat( record, 64 ),
-// 		readFloat( record, 72 ),
-// 		readFloat( record, 126 ),
+		floatToIntDate_YYY(readFloat_IEEE( record, 64 )), // first date YYY but seems to be wrong
+		floatToIntDate_YYY(readFloat_IEEE( record, 72 )), // last date YYY
+		readInt( record, 126 ), // first date YYYY
 // 		readFloat( record, 131 ),
 // 		readFloat( record, 135 ),
 		readUnsignedChar( record, 0 ), // unknown, just print hex
@@ -688,8 +688,8 @@ void XMasterFile::printRecord( const char *record ) const
 		readInt( record, 80 ), // some date ?
 // 		readInt( record, 84 ), // stupid date? forst 3 bytes equal 
 		readInt( record, 104 ), // some date ?
-		readInt( record, 108 ), // some date ?
-		readInt( record, 116 ), // some date ?
+		readInt( record, 108 ), // looks like first date ?
+		readInt( record, 116 ), // looks like last date ?
 		record + 1, // symbol
 		record + 16 // name
 		);
