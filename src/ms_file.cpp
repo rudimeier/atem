@@ -466,7 +466,7 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 		assert( readChar( record, i ) == '\x00' );
 	}
 	for( int i = 130; i<=138; i++ ) {
-		assert( readChar( record, i ) == '\x00' );
+// 		assert( readChar( record, i ) == '\x00' );
 	}
 	assert( b_191 == '\x00' );
 	
