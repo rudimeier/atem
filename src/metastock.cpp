@@ -15,7 +15,6 @@
 #include <errno.h>
 #include <assert.h>
 
-#include <time.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
@@ -49,7 +48,6 @@ Metastock::Metastock() :
 #define MAX_MR_LEN 4096
 	mr_len = 0;
 	mr_list = (master_record*) calloc( MAX_MR_LEN, sizeof(master_record) );
-	mr_skip_list = (bool*) calloc( MAX_MR_LEN, sizeof(bool) );
 }
 
 
@@ -67,7 +65,6 @@ Metastock::~Metastock()
 	free( ba_emaster);
 	free( ba_master);
 	
-	free( mr_skip_list );
 	free( mr_list );
 	
 	free( xmaster_name );
@@ -160,7 +157,6 @@ bool Metastock::findFiles()
 			assert( number > 0 && number < MAX_MR_LEN && c_number != end );
 			if( strcasecmp(end, ".MWD") == 0 || strcasecmp(end, ".DAT") == 0 ) {
 				strcpy( mr_list[number].file_name, dirp->d_name );
-				assert( !mr_skip_list[number] );
 			}
 		} else {
 			CHECK_MASTER( master_name, "MASTER" );
@@ -362,37 +358,6 @@ void Metastock::dumpXMaster() const
 }
 
 
-bool Metastock::skipFiles( int older_than )
-{
-	time_t now;
-	time( &now );
-	
-	for( int i = 1; i<MAX_MR_LEN; i++ ) {
-		if( i > 0 && i < MAX_MR_LEN && mr_list[i].record_number != 0 ) {
-			assert( mr_list[i].file_number == i );
-			
-			char *file_path = (char*) alloca( strlen(ms_dir) + strlen( mr_list[i].file_name) + 1 );
-			strcpy( file_path, ms_dir );
-			strcpy( file_path + strlen(ms_dir), mr_list[i].file_name );
-			struct stat s;
-			stat( file_path, &s );
-			if( older_than >= 0 ) {
-				if( (now - s.st_mtime) > older_than  ) {
-					mr_skip_list[i] = true;
-					printf("SKIP: %s", ctime(&s.st_mtime));
-				}
-			} else {
-				if( (now - s.st_mtime) < -older_than  ) {
-					mr_skip_list[i] = true;
-					printf("SKIP: %s", ctime(&s.st_mtime));
-				}
-			}
-		}
-	}
-	return true;
-}
-
-
 bool Metastock::dumpSymbolInfo( unsigned short f ) const
 {
 	char buf[MAX_SIZE_MR_STRING + 1];
@@ -413,9 +378,6 @@ bool Metastock::dumpSymbolInfo( unsigned short f ) const
 	}
 	
 	for( int i = 1; i<MAX_MR_LEN; i++ ) {
-		if( mr_skip_list[i] ) {
-			continue;
-		}
 		if( i > 0 && i < MAX_MR_LEN && mr_list[i].record_number != 0 ) {
 			assert( mr_list[i].file_number == i );
 			int len = mr_record_to_string( buf, &mr_list[i],
@@ -460,9 +422,6 @@ bool Metastock::dumpData( unsigned short f ) const
 	if( f!=0 ) {
 		if( f > 0 && f < MAX_MR_LEN && mr_list[f].record_number != 0 ) {
 			assert( mr_list[f].file_number == f );
-			if( mr_skip_list[f] ) {
-				return true;
-			}
 			int len = mr_record_to_string( buf, &mr_list[f],
 				prnt_data_mr_fields, print_sep );
 			if( len > 0 ) {
@@ -480,9 +439,6 @@ bool Metastock::dumpData( unsigned short f ) const
 	}
 	
 	for( int i = 1; i<MAX_MR_LEN; i++ ) {
-		if( mr_skip_list[i] ) {
-			continue;
-		}
 		if( i > 0 && i < MAX_MR_LEN && mr_list[i].record_number != 0 ) {
 			assert( mr_list[i].file_number == i );
 			int len = mr_record_to_string( buf, &mr_list[i],
