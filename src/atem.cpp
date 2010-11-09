@@ -21,7 +21,7 @@ static int dumpdatap = -1;
 static const char* sepp = "\t";
 static int format_datap = 0;
 static int format_symbolsp = 0;
-
+static int exclude_older_thanp = 0;
 
 
 
@@ -64,6 +64,8 @@ static struct poptOption flow_opts[] = {
 		"data output format", NULL},
 	{"format-symbols", 'g', POPT_ARG_INT, &format_symbolsp, 0,
 		"symbol info output format", NULL},
+	{"exclude-older-than", '\0', POPT_ARG_INT, &exclude_older_thanp, 0,
+		"Don't process data files older than specified seconds.", NULL},
 	POPT_TABLEEND
 };
 
@@ -154,6 +156,10 @@ int main(int argc, const char *argv[])
 			fprintf( stderr, "error: %s\n", ms.lastError() );
 			return 2; // exit
 		}
+	}
+	
+	if( exclude_older_thanp != 0 ) {
+		ms.excludeFiles( exclude_older_thanp );
 	}
 	
 	if( dumpmasterp == 1 ) {
