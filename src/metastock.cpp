@@ -360,27 +360,28 @@ void Metastock::dumpXMaster() const
 }
 
 
-bool Metastock::dumpSymbolInfo( unsigned short f ) const
+bool Metastock::incudeFile( unsigned short f ) const
+{
+	for( int i = 1; i<MAX_MR_LEN; i++ ) {
+			mr_skip_list[i] = true;
+	}
+	
+	if( f > 0 && f < MAX_MR_LEN && mr_list[f].record_number != 0 ) {
+		mr_skip_list[f] = false;
+		return true;
+	} else {
+		setError("data file not referenced by master files");
+		return false;
+	}
+}
+
+
+bool Metastock::dumpSymbolInfo() const
 {
 	char buf[MAX_SIZE_MR_STRING + 1];
 	
-	if( f!=0 ) {
-		if( f > 0 && f < MAX_MR_LEN && mr_list[f].record_number != 0 ) {
-			assert( mr_list[f].file_number == f );
-			int len = mr_record_to_string( buf, &mr_list[f],
-				prnt_master_fields, print_sep );
-			buf[len++] = '\n';
-			buf[len] = '\0';
-			fputs( buf, stdout );
-		} else {
-			setError("data file not referenced by master files");
-			return false;
-		}
-		return true;
-	}
-	
 	for( int i = 1; i<MAX_MR_LEN; i++ ) {
-		if( i > 0 && i < MAX_MR_LEN && mr_list[i].record_number != 0 ) {
+		if( mr_list[i].record_number != 0 && !mr_skip_list[i] ) {
 			assert( mr_list[i].file_number == i );
 			int len = mr_record_to_string( buf, &mr_list[i],
 				prnt_master_fields, print_sep );
@@ -417,31 +418,12 @@ int Metastock::build_mr_string( char *dst, const master_record *mr ) const
 }
 
 
-bool Metastock::dumpData( unsigned short f ) const
+bool Metastock::dumpData() const
 {
 	char buf[256];
 	
-	if( f!=0 ) {
-		if( f > 0 && f < MAX_MR_LEN && mr_list[f].record_number != 0 ) {
-			assert( mr_list[f].file_number == f );
-			int len = mr_record_to_string( buf, &mr_list[f],
-				prnt_data_mr_fields, print_sep );
-			if( len > 0 ) {
-				buf[len++] = print_sep;
-				buf[len] = '\0';
-			}
-			if( !dumpData( f, mr_list[f].field_bitset, buf ) ) {
-				return false;
-			}
-		} else {
-			setError("data file not referenced by master files");
-			return false;
-		}
-		return true;
-	}
-	
 	for( int i = 1; i<MAX_MR_LEN; i++ ) {
-		if( i > 0 && i < MAX_MR_LEN && mr_list[i].record_number != 0 ) {
+		if( mr_list[i].record_number != 0 && !mr_skip_list[i] ) {
 			assert( mr_list[i].file_number == i );
 			int len = mr_record_to_string( buf, &mr_list[i],
 				prnt_data_mr_fields, print_sep );

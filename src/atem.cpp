@@ -143,6 +143,19 @@ int main(int argc, const char *argv[])
 		return 2; // exit
 	}
 	
+	//TODO maybe parameters of -s and -d should be another one
+	if( dumpsymbolsp > 0 || dumpdatap > 0 ) {
+		if( dumpsymbolsp > 0 && dumpdatap > 0 && dumpsymbolsp != dumpdatap ) {
+			fprintf( stderr, "error: %s\n", "parameter s != d" );
+			return 2; // exit
+		}
+		int f = dumpsymbolsp > dumpdatap ? dumpsymbolsp : dumpdatap;
+		if( ! ms.incudeFile( f ) ) {
+			fprintf( stderr, "error: %s\n", ms.lastError() );
+			return 2; // exit
+		}
+	}
+	
 	if( dumpmasterp == 1 ) {
 		ms.dumpMaster();
 	}
@@ -158,14 +171,14 @@ int main(int argc, const char *argv[])
 	}
 	
 	if( dumpsymbolsp >= 0 ) {
-		if( ! ms.dumpSymbolInfo( dumpsymbolsp ) ) {
+		if( ! ms.dumpSymbolInfo() ) {
 			fprintf( stderr, "error: %s\n", ms.lastError() );
 			return 2; // exit
 		}
 	}
 	
 	if( dumpdatap >= 0 ) {
-		if( ! ms.dumpData( dumpdatap ) ) {
+		if( ! ms.dumpData() ) {
 			fprintf( stderr, "error: %s\n", ms.lastError() );
 			return 2; // exit
 		}
