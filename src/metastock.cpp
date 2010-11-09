@@ -447,35 +447,6 @@ bool Metastock::excludeFiles( const char *stamp ) const
 }
 
 
-bool Metastock::excludeFiles( int older_than ) const
-{
-	time_t now;
-	time( &now );
-	
-	for( int i = 1; i<MAX_MR_LEN; i++ ) {
-		if( mr_list[i].record_number != 0 ) {
-			assert( mr_list[i].file_number == i );
-			
-			char *file_path = (char*) alloca( strlen(ms_dir) + strlen( mr_list[i].file_name) + 1 );
-			strcpy( file_path, ms_dir );
-			strcpy( file_path + strlen(ms_dir), mr_list[i].file_name );
-			struct stat s;
-			stat( file_path, &s );
-			if( older_than >= 0 ) {
-				if( (now - s.st_mtime) > older_than  ) {
-					mr_skip_list[i] = true;
-				}
-			} else {
-				if( (now - s.st_mtime) < -older_than  ) {
-					mr_skip_list[i] = true;
-				}
-			}
-		}
-	}
-	return true;
-}
-
-
 bool Metastock::dumpSymbolInfo() const
 {
 	char buf[MAX_SIZE_MR_STRING + 1];

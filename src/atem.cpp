@@ -158,10 +158,6 @@ int main(int argc, const char *argv[])
 		}
 	}
 	
-// 	if( exclude_older_thanp != 0 ) {
-// 		ms.excludeFiles( exclude_older_thanp );
-// 	}
-	
 	if( *exclude_older_thanp != '\0' ) {
 		if( !ms.excludeFiles( exclude_older_thanp ) ) {
 			fprintf( stderr, "error: %s\n", ms.lastError() );
