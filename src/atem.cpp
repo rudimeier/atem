@@ -157,6 +157,8 @@ int main(int argc, const char *argv[])
 		}
 	}
 	
+	ms.skipFiles( -86400 );
+	
 	if( dumpsymbolsp >= 0 ) {
 		if( ! ms.dumpSymbolInfo( dumpsymbolsp ) ) {
 			fprintf( stderr, "error: %s\n", ms.lastError() );

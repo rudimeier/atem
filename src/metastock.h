@@ -20,6 +20,7 @@ class Metastock
 		void dumpMaster() const;
 		void dumpEMaster() const;
 		void dumpXMaster() const;
+		bool skipFiles( int older_than );
 		bool dumpSymbolInfo( unsigned short f ) const;
 		bool dumpData( unsigned short f ) const;
 		const char* lastError() const;
@@ -45,6 +46,7 @@ class Metastock
 		char *xmaster_name;
 		int mr_len;
 		master_record *mr_list;
+		bool *mr_skip_list;
 		
 		char *ba_master;
 		int master_len;
