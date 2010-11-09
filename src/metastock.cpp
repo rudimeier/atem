@@ -48,6 +48,7 @@ Metastock::Metastock() :
 #define MAX_MR_LEN 4096
 	mr_len = 0;
 	mr_list = (master_record*) calloc( MAX_MR_LEN, sizeof(master_record) );
+	mr_skip_list = (bool*) calloc( MAX_MR_LEN, sizeof(bool) );
 }
 
 
@@ -65,6 +66,7 @@ Metastock::~Metastock()
 	free( ba_emaster);
 	free( ba_master);
 	
+	free( mr_skip_list );
 	free( mr_list );
 	
 	free( xmaster_name );

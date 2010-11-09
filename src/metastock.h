@@ -45,6 +45,7 @@ class Metastock
 		char *xmaster_name;
 		int mr_len;
 		master_record *mr_list;
+		bool *mr_skip_list;
 		
 		char *ba_master;
 		int master_len;
