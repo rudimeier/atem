@@ -380,22 +380,18 @@ bool Metastock::incudeFile( unsigned short f ) const
 
 time_t str2time( const char* s)
 {
-		struct tm dt;
+	struct tm dt;
 	time_t dt_t;
 	bzero( &dt, sizeof(tm) );
 	
 	int ret = sscanf( s, "%d-%d-%d %d:%d:%d", &dt.tm_year,
 		&dt.tm_mon, &dt.tm_mday, &dt.tm_hour, &dt.tm_min, &dt.tm_sec );
 	
-	printf("%d-%d-%d %d:%d:%d\n", dt.tm_year,
-		dt.tm_mon, dt.tm_mday, dt.tm_hour, dt.tm_min, dt.tm_sec);
-	
 	if( ret < 0 ) {
 		return -1;
 	} else if( ret != 6  && ret != 3 ) {
 		return -1;
 	}
-	printf("CCC %d\n", ret);
 	
 	
 	dt.tm_year -= 1900;
@@ -403,9 +399,6 @@ time_t str2time( const char* s)
 	dt.tm_isdst = -1;
 	
 	dt_t = mktime( &dt );
-	printf("%ld, %s, %d\n", dt_t, ctime(&dt_t), dt.tm_wday );
-	assert( dt_t != (time_t) -1);
-	perror(NULL);
 	
 	return dt_t;
 }
@@ -413,25 +406,44 @@ time_t str2time( const char* s)
 
 bool Metastock::excludeFiles( const char *stamp ) const
 {
+	bool revert = false;
+	if( *stamp == '-' ) {
+		stamp++;
+		revert = true;
+	}
 	time_t oldest_t = str2time( stamp );
+	if( oldest_t < 0 ) {
+		setError("parsing date time");
+		return false;
+	}
 	
-// 	for( int i = 1; i<MAX_MR_LEN; i++ ) {
-// 		if( mr_list[i].record_number != 0 && !mr_skip_list[i] ) {
-// 			assert( mr_list[i].file_number == i );
-// 			
-// 			char *file_path = (char*) alloca( strlen(ms_dir) + strlen( mr_list[i].file_name) + 1 );
-// 			strcpy( file_path, ms_dir );
-// 			strcpy( file_path + strlen(ms_dir), mr_list[i].file_name );
-// 			struct stat s;
-// 			stat( file_path, &s );
-// 			if( oldest_t > s.st_mtime ) {
-// 				if( s.st_mtime) > older_than  ) {
-// 					mr_skip_list[i] = true;
-// 				}
-// 			}
-// 		}
-// 	}
-// 	return true;
+	for( int i = 1; i<MAX_MR_LEN; i++ ) {
+		if( *mr_list[i].file_name == '\0' || mr_skip_list[i] ) {
+			continue;
+		}
+		assert( mr_list[i].file_number == i );
+		
+		char *file_path = (char*) alloca( strlen(ms_dir) + strlen( mr_list[i].file_name) + 1 );
+		strcpy( file_path, ms_dir );
+		strcpy( file_path + strlen(ms_dir), mr_list[i].file_name );
+		
+		struct stat s;
+		int tmp = stat( file_path, &s );
+		if( tmp < 0 ) {
+			setError( file_path,  strerror(errno) );
+			return false;
+		}
+		if( !revert ) {
+			if( oldest_t > s.st_mtime ) {
+				mr_skip_list[i] = true;
+			}
+		} else {
+			if( oldest_t <= s.st_mtime ) {
+				mr_skip_list[i] = true;
+			}
+		}
+	}
+	return true;
 }
 
 
