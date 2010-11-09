@@ -18,6 +18,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <time.h>
+#include <limits.h>
 
 #include "ms_file.h"
 #include "util.h"
@@ -374,6 +375,63 @@ bool Metastock::incudeFile( unsigned short f ) const
 		setError("data file not referenced by master files");
 		return false;
 	}
+}
+
+
+time_t str2time( const char* s)
+{
+		struct tm dt;
+	time_t dt_t;
+	bzero( &dt, sizeof(tm) );
+	
+	int ret = sscanf( s, "%d-%d-%d %d:%d:%d", &dt.tm_year,
+		&dt.tm_mon, &dt.tm_mday, &dt.tm_hour, &dt.tm_min, &dt.tm_sec );
+	
+	printf("%d-%d-%d %d:%d:%d\n", dt.tm_year,
+		dt.tm_mon, dt.tm_mday, dt.tm_hour, dt.tm_min, dt.tm_sec);
+	
+	if( ret < 0 ) {
+		return -1;
+	} else if( ret != 6  && ret != 3 ) {
+		return -1;
+	}
+	printf("CCC %d\n", ret);
+	
+	
+	dt.tm_year -= 1900;
+	dt.tm_mon -= 1;
+	dt.tm_isdst = -1;
+	
+	dt_t = mktime( &dt );
+	printf("%ld, %s, %d\n", dt_t, ctime(&dt_t), dt.tm_wday );
+	assert( dt_t != (time_t) -1);
+	perror(NULL);
+	
+	return dt_t;
+}
+
+
+bool Metastock::excludeFiles( const char *stamp ) const
+{
+	time_t oldest_t = str2time( stamp );
+	
+// 	for( int i = 1; i<MAX_MR_LEN; i++ ) {
+// 		if( mr_list[i].record_number != 0 && !mr_skip_list[i] ) {
+// 			assert( mr_list[i].file_number == i );
+// 			
+// 			char *file_path = (char*) alloca( strlen(ms_dir) + strlen( mr_list[i].file_name) + 1 );
+// 			strcpy( file_path, ms_dir );
+// 			strcpy( file_path + strlen(ms_dir), mr_list[i].file_name );
+// 			struct stat s;
+// 			stat( file_path, &s );
+// 			if( oldest_t > s.st_mtime ) {
+// 				if( s.st_mtime) > older_than  ) {
+// 					mr_skip_list[i] = true;
+// 				}
+// 			}
+// 		}
+// 	}
+// 	return true;
 }
 
 
