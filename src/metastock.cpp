@@ -245,7 +245,7 @@ bool Metastock::readFile( const char *file_name , char *buf, int *len ) const
 		return false;
 	}
 	*len = read( fd, buf, MAX_FILE_LENGTH );
-	fprintf( stderr, "read %s: %d bytes\n", file_path, *len);
+// 	fprintf( stderr, "read %s: %d bytes\n", file_path, *len);
 	close( fd );
 //	assert( ba->size() == rb ); //TODO
 	
@@ -527,8 +527,8 @@ bool Metastock::dumpData( unsigned short n, unsigned char fields, const char *pf
 	}
 	
 	FDat datfile( ba_fdat, fdat_len, fields );
-	fprintf( stderr, "#%d: %d x %d bytes\n",
-		n, datfile.countRecords(), count_bits(fields) * 4 );
+// 	fprintf( stderr, "#%d: %d x %d bytes\n",
+// 		n, datfile.countRecords(), count_bits(fields) * 4 );
 	
 	datfile.checkHeader();
 	datfile.print( pfx );
