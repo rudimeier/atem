@@ -21,6 +21,7 @@ static int dumpdatap = -1;
 static const char* sepp = "\t";
 static int format_datap = 0;
 static int format_symbolsp = 0;
+static const char *date_fromp = "";
 static const char *exclude_older_thanp = "";
 
 
@@ -64,6 +65,8 @@ static struct poptOption flow_opts[] = {
 		"data output format", NULL},
 	{"format-symbols", 'g', POPT_ARG_INT, &format_symbolsp, 0,
 		"symbol info output format", NULL},
+	{"date-from", '\0', POPT_ARG_STRING, &date_fromp, 0,
+		"Print data from specified date on.", NULL},
 	{"exclude-older-than", '\0', POPT_ARG_STRING, &exclude_older_thanp, 0,
 		"Don't process data files older than specified seconds.", NULL},
 	POPT_TABLEEND
@@ -153,6 +156,13 @@ int main(int argc, const char *argv[])
 		}
 		int f = dumpsymbolsp > dumpdatap ? dumpsymbolsp : dumpdatap;
 		if( ! ms.incudeFile( f ) ) {
+			fprintf( stderr, "error: %s\n", ms.lastError() );
+			return 2; // exit
+		}
+	}
+	
+	if( *date_fromp != '\0' ) {
+		if( !ms.setPrintDateFrom( date_fromp ) ) {
 			fprintf( stderr, "error: %s\n", ms.lastError() );
 			return 2; // exit
 		}

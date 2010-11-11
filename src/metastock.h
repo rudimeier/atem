@@ -15,6 +15,7 @@ class Metastock
 		
 		bool setDir( const char* dir );
 		bool setOutputFormat(  char sep, int fmt_data, int fmt_symbols );
+		bool setPrintDateFrom( const char *date );
 		
 		void parseMasters();
 		void dumpMaster() const;
@@ -39,6 +40,7 @@ class Metastock
 		static unsigned short prnt_master_fields;
 		static unsigned char prnt_data_fields;
 		static unsigned short prnt_data_mr_fields;
+		int print_date_from;
 		
 		
 		char *ms_dir;

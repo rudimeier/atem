@@ -34,6 +34,7 @@ unsigned short Metastock::prnt_data_mr_fields = 0;
 
 
 Metastock::Metastock() :
+	print_date_from(0),
 	ms_dir(NULL),
 	master_name(NULL),
 	emaster_name(NULL),
@@ -401,6 +402,37 @@ time_t str2time( const char* s)
 	dt_t = mktime( &dt );
 	
 	return dt_t;
+}
+
+
+int str2date( const char* s)
+{
+	int y, m, d;
+	y = m = d = 0;
+	
+	int ret = sscanf( s, "%d-%d-%d", &y, &m, &d );
+	
+	if( ret != 3 ) {
+		return -1;
+	}
+	
+	if( !(y>=0 && y<=9999) ||  !(m>=1 && m<=12 ) || !(d>=1 && d<=31) ) {
+		return -1;
+	}
+	
+	return 10000 * y + 100 * m + d;
+}
+
+
+bool Metastock::setPrintDateFrom( const char *date )
+{
+	int dt = str2date( date );
+	if( dt < 0 ) {
+		setError("parsing date time");
+		return false;
+	}
+	print_date_from = dt;
+	return true;
 }
 
 
