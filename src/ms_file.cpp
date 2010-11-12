@@ -189,8 +189,6 @@ int floatToIntDate_YYY( float d )
 {
 	int i = (int)d;
 	
-	// between 1900-01-01 and 2099-12-31
-	assert( i>=101 && i <= 1991231 );
 	// is integer
 	assert( d == i );
 	
