@@ -904,90 +904,79 @@ void FDat::print( const char* header ) const
 
 // to be printed when field does not exist
 #define DEFAULT_FLOAT -0.0
+#define READ_FIELD( _dst_, _field_) \
+	if( field_bitset & _field_ ) { \
+		 _dst_ = readFloat(record, offset); \
+		offset += 4; \
+	}
 
 int FDat::record_to_string( const char *record, char *s ) const
 {
 	int offset = 0;
 	char *begin = s;
 	
+	float date, time, open, high , low, close, volume, openint;
+	date = time = open = high = low = close = volume = openint = DEFAULT_FLOAT;
+	
+	READ_FIELD( date, D_DAT );
+	READ_FIELD( time, D_TIM );
+	READ_FIELD( open, D_OPE );
+	READ_FIELD( high, D_HIG );
+	READ_FIELD( low, D_LOW );
+	READ_FIELD( close, D_CLO );
+	READ_FIELD( volume, D_VOL );
+	READ_FIELD( openint, D_OPI );
+	
 	
 #if defined FAST_PRINTING
-#define PRINT_FIELD( _field_ ) \
+#define PRINT_FIELD( _field_, _var_ ) \
 	if( print_bitset & _field_) { \
-		if( field_bitset & _field_ ) { \
-			s += rudi_printf_fp( s, pinfo, readFloat(record, offset) ); \
-			offset += 4; \
-		} else { \
-			s += rudi_printf_fp( s, pinfo, DEFAULT_FLOAT ); \
-		} \
+		s += rudi_printf_fp( s, pinfo, _var_ ); \
 		*s++ = print_sep; \
 	}
 
 	if( print_bitset & D_DAT ) {
-		if( field_bitset & D_DAT ) {
-			s += ltoa( s, floatToIntDate_YYY( readFloat(record, offset) ) );
-			offset += 4;
-		} else {
-			s += ltoa( s, 10000101 );
-		}
+		s += ltoa( s, floatToIntDate_YYY(date) );
 		*s++ = print_sep;
 	}
 	if( print_bitset & D_TIM ) {
-		if( field_bitset & D_TIM ) {
-			s += ltoa( s, (int) readFloat(record, offset) );
-			offset += 4;
-			*s++ = print_sep;
-		}
-		// NOTE the only field we don't print if not exists
+		s += ltoa( s, (int) time );
+		*s++ = print_sep;
 	}
 	pinfo->prec = 5;
-	PRINT_FIELD( D_OPE );
-	PRINT_FIELD( D_HIG );
-	PRINT_FIELD( D_LOW );
-	PRINT_FIELD( D_CLO );
+	PRINT_FIELD( D_OPE, open );
+	PRINT_FIELD( D_HIG, high );
+	PRINT_FIELD( D_LOW, low );
+	PRINT_FIELD( D_CLO, close );
 	pinfo->prec = 0;
-	PRINT_FIELD( D_VOL );
-	PRINT_FIELD( D_OPI );
+	PRINT_FIELD( D_VOL, volume );
+	PRINT_FIELD( D_OPI, openint );
 	
 #undef PRINT_FIELD
 #else
-#define PRINT_FIELD( _field_ ) \
+#define PRINT_FIELD( _field_, _var_ ) \
 	if( print_bitset & _field_) { \
-		if( field_bitset & _field_ ) { \
-			s += sprintf( s, fmt, readFloat( record, offset ) ); \
-			offset += 4; \
-		} else { \
-			s += sprintf( s, fmt, DEFAULT_FLOAT ); \
-		} \
+		s += sprintf( s, fmt, readFloat( record, offset ) ); \
 		*s++ = print_sep; \
 	}
 	const char * fmt;
 	
 	if( print_bitset & D_DAT ) {
-		if( field_bitset & D_DAT ) {
-			s += sprintf( s, "%d", floatToIntDate_YYY( readFloat(record, offset) ) );
-			offset += 4;
-		} else {
-			s += sprintf( s, "%d", 10000101 );
-		}
+		s += sprintf( s, "%d", floatToIntDate_YYY(date) );
 		*s++ = print_sep;
 	}
 	if( print_bitset & D_TIM ) {
-		if( field_bitset & D_TIM ) {
-			s += sprintf( s, "%d", (int) readFloat(record, offset) );
-			offset += 4;
-			*s++ = print_sep;
-		}
-		// NOTE the only field we don't print if not exists
+		s += sprintf( s, "%d", (int) time );
+		*s++ = print_sep;
 	}
 	fmt = "%.5f";
-	PRINT_FIELD( D_OPE );
-	PRINT_FIELD( D_HIG );
-	PRINT_FIELD( D_LOW );
-	PRINT_FIELD( D_CLO );
+	PRINT_FIELD( D_OPE, open );
+	PRINT_FIELD( D_HIG, high);
+	PRINT_FIELD( D_LOW, low );
+	PRINT_FIELD( D_CLO, close );
 	fmt = "%.0f";
-	PRINT_FIELD( D_VOL );
-	PRINT_FIELD( D_OPI );
+	PRINT_FIELD( D_VOL, volume );
+	PRINT_FIELD( D_OPI, openint );
 #undef PRINT_FIELD
 #endif // FAST_PRINTING
 	
@@ -1001,6 +990,7 @@ int FDat::record_to_string( const char *record, char *s ) const
 }
 
 #undef DEFAULT_FLOAT
+#undef READ_FIELD
 
 
 unsigned short FDat::countRecords() const
