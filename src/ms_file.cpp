@@ -286,8 +286,8 @@ bool MasterFile::checkRecord( unsigned char r ) const
 	//  #7, 16b: char*, security name
 	//           only alphanumeric characters (error #1010)
 	// #23,  2b: short, always 0 (error #1011)
-	// #25,  4b: date ...
-	// #29,  4b: date ...
+	// #25,  4b: float(ms basic), first date, valid (error #1012)
+	// #29,  4b: float(ms basic), last date, valid (error #1013)
 	// #33,  1b: char, periodicity, must be 'I', 'D', 'W', 'M' (error #1014)
 	// #34,  2b: short, intraday time frame between 0 and 60 minutes
 	//           (error #1015)
@@ -295,7 +295,9 @@ bool MasterFile::checkRecord( unsigned char r ) const
 	//           not always (or never?) zero terminated
 	//           only alphanumeric characters (error #1016)
 	// #50,  1b: char, always a space ' ' (error #1017)
+	//           note, premium data sets '\0'
 	// #51,  1b: char, chart flag, always ' ' or '*' (error #1018)
+	//           note, premium data sets '\0'
 	// #52,  1b: char, always '\0' (error #1019)
 	
 	assert( readUnsignedShort( record, 1 ) == 101 );
@@ -305,11 +307,15 @@ bool MasterFile::checkRecord( unsigned char r ) const
 	assert( record[6] == '\0' );
 	
 	assert( readUnsignedShort( record, 23 ) == 0 );
-
+	int date1 = floatToIntDate_YYY( readFloat( record, 25 ) );
+	int date2 = floatToIntDate_YYY( readFloat( record, 29 ) );
+	assert( date1 <= date2 );
 	assert( record[33] == 'D' );
+	unsigned short intrTimeFrame = readUnsignedShort( record, 34 );
+	assert( intrTimeFrame == 0 );
 	
-	assert( record[50] == ' ' );
-	assert( record[51] == ' ' || record[51] == '*' );
+	assert( record[50] == ' ' || record[50] == '\0' );
+	assert( record[51] == ' ' || record[51] == '*' || record[51] == '\0' );
 	assert( record[52] == '\0' );
 	
 	
