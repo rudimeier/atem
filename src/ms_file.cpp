@@ -483,7 +483,21 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	//  #60,  1b: char, periodicity, must be 'I', 'D', 'W', 'M' (error #1038)
 	//  #61,  1b: char, always zero (error #1039)
 	//  #62,  2b: short, intraday time frame between 0 and 60 minutes (error #1040)
-	
+	// note, we have only times when intraday time == 'I'
+	//  #64,  4b: float(ieee), first date, valid (error #1041)
+	//  #68,  4b: float(ieee), first time, valid (error #1042)
+	//  #72,  4b: float(ieee), last date, valid (error #1043)
+	//  #76,  4b: float(ieee), last time, valid (error #1044)
+	//  #80,  4b: float(ieee), start trade time, not always set,
+	//            valid (error #1045)
+	//  #84,  4b: float(ieee), end trade time, not always set,
+	//            valid (error #1046)
+	//  #88, 38b: char*, assume always zero but should something about composite
+	//            ticker stuff, see error #1047 - #1054
+	// #126,  4b: int, first date again as integer, equal to #64 or invalid 19000101
+	// #130,  9b: char* assume always zero
+	// #139, 52b: char*, long name
+	// #191,  1b: char, last byte zero
 	
 	unsigned short version = readUnsignedShort( record, 0 );
 	assert( version == 0 || version == 0x3636 );
@@ -507,27 +521,37 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	assert( intrTimeFrame == 0
 		|| (record[60] == 'I' && intrTimeFrame > 0 && intrTimeFrame <= 60) );
 	
-	
-	// char 64 - 67 first date
-	// char 68 - 71 always zero
-	// char 72 - 75 last date
-	// char 76 - 125 always zero (start/end times could be here)
-	// char 126 - 129 last date in long format
-	// char 130 - 138 always zero
-	// char 139 - 191 long name?
-	char b_191 = readChar( record, 191); // last byte always zero
-	
-	for( int i = 68; i<=71; i++ ) {
-		assert( readChar( record, i ) == '\x00' );
+	int date1 = floatToIntDate_YYY( readFloat_IEEE( record, 64 ) );
+	int time1 = readFloat_IEEE( record, 68 );
+	int date2 = floatToIntDate_YYY( readFloat_IEEE( record, 72 ) );
+	int time2 = readFloat_IEEE( record, 76 );
+	int timeA = readFloat_IEEE( record, 80 );
+	int timeB = readFloat_IEEE( record, 84 );
+	for( int i = 88; i<126; i++ ) {
+		assert( record[i] == '\0' );
 	}
-	for( int i = 76; i<=125; i++ ) {
-		// some where here are start/end times
-		assert( readChar( record, i ) == '\x00' );
+	int dateL = readInt( record, 126 );
+	
+	
+	if( date1 > date2 ) {
+		//HACK premium data have year like 128 (+1900) but should be 28 (+1900)
+		date1 -= 1000000;
 	}
+	if( dateL > date2 ) {
+		//HACK premium data have year like 128 (+1900) but should be 28 (+1900)
+		dateL -= 1000000;
+	}
+	assert( date1 >0 && date2>0 );
+	assert( (record[60] != 'I' && time1 == 0 && time2 == 0 && timeA == 0 && timeB == 0)
+		|| ( record[60] == 'I' && time1 > 0 && time2 > 0 && timeA >= 0 && timeB >= 0) );
+	assert( (long) date1*1000000+time1 <= (long) date2*1000000+time2 );
+	
+	assert( date1 == dateL || dateL == 19000101 );
+	
 	for( int i = 130; i<=138; i++ ) {
-// 		assert( readChar( record, i ) == '\x00' );
+		assert( record[i] == '\0' );
 	}
-	assert( b_191 == '\x00' );
+	assert( record[191] == '\0' );
 	
 	return true;
 }
@@ -536,14 +560,18 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 void EMasterFile::printRecord( const char *record ) const
 {
 // 	fprintf( stdout, "F%d.dat\t%d\t%d\t%d\t%d\t'%s'\t'%s'\n",
-	fprintf( stdout, "F%4d.dat\t%d\t%d\t%c\t%d\t%d\t%d\t%X\t%X\t'%s'\t'%s'\t'%s'\n",
+	fprintf( stdout, "F%4d.dat\t%d\t%d\t%c\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%X\t%X\t'%s'\t'%s'\t'%s'\n",
 		readUnsignedChar( record, 2),  // F#.dat
 		readChar( record, 7 ), // fields bit set
 		readChar( record, 6 ), // dat fields count per record
 		readChar( record, 60 ), // time frame 'D'
 		// never saw these floats
 		floatToIntDate_YYY(readFloat_IEEE( record, 64 )), // first date YYY but seems to be wrong
+		(int)readFloat_IEEE( record, 68 ),
 		floatToIntDate_YYY(readFloat_IEEE( record, 72 )), // last date YYY
+		(int)readFloat_IEEE( record, 76 ),
+		(int)readFloat_IEEE( record, 80 ),
+		(int)readFloat_IEEE( record, 84 ),
 		readInt( record, 126 ), // first date YYYY
 // 		readFloat( record, 131 ),
 // 		readFloat( record, 135 ),
