@@ -409,16 +409,27 @@ bool EMasterFile::checkHeader() const
 	
 	printHeader();
 	
-	assert( readUnsignedChar(buf, 0) == countRecords() );
-	assert( readChar(buf, 1) == '\x00' );
-	assert( readUnsignedChar(buf, 2) == countRecords() );
-	assert( readChar(buf, 3) == '\x00' );
+	// note, first 53 bytes seems to be identical to MASTER
+	//  #0,  1b, unsigned char, count records (dat files)
+	//           must be >0 (error #1023)
+	//  #1,  1b, char, always '\0' (~ error #1023)
+	//  #2,  1b, unsigned char, max record number (dat file number)
+	//           must be >0 (error #1024)
+	//  #3,  1b, char, always '\0' (~ error #1024)
+	//  #4, 45b, char*, always '\0' ?
+	// #49,  4b, int, serial number
+	// #53,139b, char*, seems to be vendor specific
+	
+	unsigned char cntRec = readUnsignedChar(buf, 0);
+	assert( cntRec == countRecords() && cntRec > 0 );
+	assert( buf[1] == '\0' );
+	unsigned char maxRec = readUnsignedChar(buf, 2);
+	assert( maxRec >= cntRec && maxRec > 0 );
+	assert( buf[3] == '\0' );
 	for( int i=4; i<49; i++ ) {
-		assert( readChar(buf, i) == '\x00' );
+		assert( buf[i] == '\0' );
 	}
-	for( int i=49; i<52; i++ ) {
-		// unknown
-	}
+	
 	return true;
 }
 
