@@ -289,7 +289,7 @@ bool MasterFile::checkRecord( unsigned char r ) const
 	// #25,  4b: float(ms basic), first date, valid (error #1012)
 	// #29,  4b: float(ms basic), last date, valid (error #1013)
 	// #33,  1b: char, periodicity, must be 'I', 'D', 'W', 'M' (error #1014)
-	// #34,  2b: short, intraday time frame between 0 and 60 minutes
+	// #34,  2b: unsigned short, intraday time frame between 0 and 60 minutes
 	//           (error #1015)
 	// #36, 14b: char*, symbol, space padded,
 	//           not always (or never?) zero terminated
@@ -302,7 +302,7 @@ bool MasterFile::checkRecord( unsigned char r ) const
 	
 	assert( readUnsignedShort( record, 1 ) == 101 );
 	assert( record[3] == 4 * record[4] );
-	assert( record[4] >= 5 && record[4] <= 7 );
+	assert( record[4] >= 5 && record[4] <= 8 );
 	assert( record[5] == '\0' );
 	assert( record[6] == '\0' );
 	
@@ -310,9 +310,10 @@ bool MasterFile::checkRecord( unsigned char r ) const
 	int date1 = floatToIntDate_YYY( readFloat( record, 25 ) );
 	int date2 = floatToIntDate_YYY( readFloat( record, 29 ) );
 	assert( date1 <= date2 );
-	assert( record[33] == 'D' );
+	assert( record[33] == 'D' || record[33] == 'I' );
 	unsigned short intrTimeFrame = readUnsignedShort( record, 34 );
-	assert( intrTimeFrame == 0 );
+	assert( intrTimeFrame == 0
+		|| (record[33] == 'I' && intrTimeFrame > 0 && intrTimeFrame <= 60) );
 	
 	assert( record[50] == ' ' || record[50] == '\0' );
 	assert( record[51] == ' ' || record[51] == '*' || record[51] == '\0' );
@@ -480,13 +481,14 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	//  #32, 16b: char*, short name, always zero terminated? (error #1034)
 	//  #48, 12b: char*, always zero? (error #1036 and error #1037)
 	//  #60,  1b: char, periodicity, must be 'I', 'D', 'W', 'M' (error #1038)
-	//  #61,  3b: char*, always zero? (error #1039)
+	//  #61,  1b: char, always zero (error #1039)
+	//  #62,  2b: short, intraday time frame between 0 and 60 minutes (error #1040)
 	
 	
 	unsigned short version = readUnsignedShort( record, 0 );
 	assert( version == 0 || version == 0x3636 );
 	assert( record[3]== '\0' && record[4]== '\0' && record[5]== '\0' );
-	assert( record[6] >=5 && record[6] <= 7);
+	assert( record[6] >=5 && record[6] <= 8);
 	assert( record[6] == count_bits(readUnsignedChar(record, 7)) );
 	assert( record[8] == '\0' );
 	assert( record[9] == ' ' || record[9] == '*' );
@@ -499,10 +501,11 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	for( int i = 48; i<60; i++ ) {
 		assert( record[i] == '\0' );
 	}
-	assert( record[60] == 'D' );
-	for( int i = 61; i<64; i++ ) {
-		assert( readChar( record, i ) == '\x00' );
-	}
+	assert( record[60] == 'D' || record[60] == 'I' );
+	assert( record[61] == '\0' );
+	unsigned short intrTimeFrame = readUnsignedShort( record, 62 );
+	assert( intrTimeFrame == 0
+		|| (record[60] == 'I' && intrTimeFrame > 0 && intrTimeFrame <= 60) );
 	
 	
 	// char 64 - 67 first date
