@@ -463,21 +463,48 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	const char *record = buf + (record_length * r);
 	printRecord( record );
 	
-	char b_0 = readChar( record, 0);
-	char b_1 = readChar( record, 1);
-	unsigned char b_2 = readChar( record, 2); // F#.dat
-	// char 3 - 5 always zero
-	char b_6 = readChar( record, 6); // record count?
-	char b_7 = readChar( record, 7); // fields bit set?
-	// char 8 always zero
-	// char 9 always a space
-	// char 10 always zero
-	// char 11 - 26 symbol?
-	// char 27 - 31 always zero
-	// char 32 - 47 name?
-	// char 48 - 59 always zero
-	char b_60 = readChar( record, 60); // time frame 'D'
-	// char 61 - 63 always zero
+	//   #0,  2b: unsigned short, version number, valid (error #1026)
+	//   #2,  1b: unsigned char, dat file number, valid (error #1027)
+	//   #3,  1b: char, security type always '\0' (error #1028)
+	//   #4,  1b: char, security type always '\0' (~error #1028)
+	//   #5,  1b: char, security type always '\0' (~error #1028)
+	//   #6,  1b: unsigned char, data field count
+	//            must be 4, 5, 6, 7 or 8 (error #1029)
+	//   #7,  1b: unsigned char, data field bitset
+	//   #8,  1b: char, data fields always '\0' (error #1030)
+	//   #9,  1b: char, chart flag, always ' ' or '*' (error #1031)
+	//  #10,  1b: char, vendor code always '\0' (error #1032)
+	//  #11, 14b: char*, symbol, always zero terminated?
+	//            only alphanumeric characters (error #1033)
+	//  #25,  6b: char*, always zero? (error #1034)
+	//  #32, 16b: char*, short name, always zero terminated? (error #1034)
+	//  #48, 12b: char*, always zero? (error #1036 and error #1037)
+	//  #60,  1b: char, periodicity, must be 'I', 'D', 'W', 'M' (error #1038)
+	//  #61,  3b: char*, always zero? (error #1039)
+	
+	
+	unsigned short version = readUnsignedShort( record, 0 );
+	assert( version == 0 || version == 0x3636 );
+	assert( record[3]== '\0' && record[4]== '\0' && record[5]== '\0' );
+	assert( record[6] >=5 && record[6] <= 7);
+	assert( record[6] == count_bits(readUnsignedChar(record, 7)) );
+	assert( record[8] == '\0' );
+	assert( record[9] == ' ' || record[9] == '*' );
+	assert( record[10] == '\0' );
+	// if byte 25 is always zero then strlen(symbol) <= 14
+	for( int i = 25; i<32; i++ ) {
+		assert( record[i] == '\0' );
+	}
+	// if byte 48 is always zero then strlen(name) <= 16
+	for( int i = 48; i<60; i++ ) {
+		assert( record[i] == '\0' );
+	}
+	assert( record[60] == 'D' );
+	for( int i = 61; i<64; i++ ) {
+		assert( readChar( record, i ) == '\x00' );
+	}
+	
+	
 	// char 64 - 67 first date
 	// char 68 - 71 always zero
 	// char 72 - 75 last date
@@ -487,27 +514,6 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	// char 139 - 191 long name?
 	char b_191 = readChar( record, 191); // last byte always zero
 	
-// 	assert( b_0 == '\x36' || b_0 == '\x00' );
-// 	assert( b_1 == b_0 );
-	assert( b_2 > 0 && b_2 <= countRecords() );
-	for( int i = 3; i<=5; i++ ) {
-		assert( readChar( record, i ) == '\x00' );
-	}
-	assert( b_6 == '\x07' );
-	assert( b_7 == '\x7f' );
-	assert( readChar( record, 8) == '\x00' );
-	assert( readChar( record, 9) == '\x20' );
-	assert( readChar( record, 10) == '\x00' );
-	for( int i = 27; i<=31; i++ ) {
-		assert( readChar( record, i ) == '\x00' );
-	}
-	for( int i = 48; i<=59; i++ ) {
-		assert( readChar( record, i ) == '\x00' );
-	}
-	assert( b_60 == 'D' );
-	for( int i = 61; i<=63; i++ ) {
-		assert( readChar( record, i ) == '\x00' );
-	}
 	for( int i = 68; i<=71; i++ ) {
 		assert( readChar( record, i ) == '\x00' );
 	}
