@@ -13,20 +13,22 @@ inline unsigned char count_bits( unsigned int fields )
 	return c;
 }
 
-
-inline int trim_end( char *dst, const char *src )
+/**
+ * copy src to dst string without trailing spaces,
+ * src does not need to be zero terminated, dst will be zero terminated so size of
+ * dst must be len + 1
+ */
+inline int trim_end( char *dst, const char *src, int len )
 {
-	char *cp = dst;
-	char *lst = dst;
-	while( *src != '\0' ) {
-		*cp++ = *src;
-		if( *src != ' ' ) {
-			lst = cp;
+	int last = -1;
+	for( int i=0; i<len && src[i]!='\0'; i++  ) {
+		dst[i] = src[i];
+		if( src[i] != ' ' ) {
+			last = i;
 		}
-		src++;
 	}
-	*lst = '\0';
-	return lst - dst;
+	dst[last+1] = '\0';
+	return last+1;
 }
 
 
