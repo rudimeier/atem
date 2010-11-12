@@ -872,7 +872,7 @@ void FDat::print( const char* header ) const
 
 
 // to be printed when field does not exist
-#define DEFAULT_FLOAT 0.0
+#define DEFAULT_FLOAT -0.0
 
 int FDat::record_to_string( const char *record, char *s ) const
 {

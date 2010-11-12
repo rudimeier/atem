@@ -21,11 +21,11 @@ enum ms_master_field {
 enum ms_data_field {
 	// data fields
 	D_DAT = 01,
-	D_OPE = 02,
-	D_HIG = 04,
-	D_LOW = 010,
-	D_CLO = 020,
-	D_VOL = 040,
+	D_HIG = 02,
+	D_LOW = 04,
+	D_CLO = 010,
+	D_VOL = 020,
+	D_OPE = 040,
 	D_OPI = 0100,
 	D_TIM = 0200
 };
