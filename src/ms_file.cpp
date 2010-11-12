@@ -265,32 +265,43 @@ bool MasterFile::checkRecord( unsigned char r ) const
 	assert( r > 0 );
 	const char *record = buf + (record_length * r);
 	printRecord( record );
-	assert( readUnsignedChar( record, 0) > 0 ); // F#.dat
-	assert( readChar( record, 1 ) == '\x65' );
-	assert( readChar( record, 2 ) == '\x00' );
-	assert( readChar( record, 3 ) == '\x1c' ); // record length
-	assert( readChar( record, 4 ) == '\x07' ); // record count
-	assert( readChar( record, 5 ) == '\x00' );
-	assert( readChar( record, 6 ) == '\x00' );
-	for( int i=7; i < 23; i++ ) {
-		//just a string "issue name"
-	}
-	assert( record[23] == '\0' );
-	assert( record[24] == '\0' );
-	for( int i=25; i < 29; i++ ) {
-		//just a date
-	}
-	for( int i=29; i < 33; i++ ) {
-		//just a date
-	}
-	assert( record[33] == 'D' ); // time frame
-	for( int i=34; i < 36; i++ ) {
-		//just a intraday time frame
-	}
-	for( int i=36; i < 52; i++ ) {
-		//just a string "symbol", space padded?
-	}
-	assert( readChar( record, 52 ) == '\0' );
+	
+	//  #0,  1b, unsigned char, dat file number
+	//  #1,  2b, short, file type, always 101 (error #1005)
+	//  #3,  1b, unsigned char, record length
+	//           must be 4 times record count (error #1006)
+	//  #4,  1b, unsigned char, record count
+	//           must be 4, 5, 6, 7 or 8 (error #1007)
+	//  #5,  1b: char, always '\0' (error #1008)
+	//  #6,  1b: char, always '\0' (error #1009)
+	//  #7, 16b: char*, security name
+	//           only alphanumeric characters (error #1010)
+	// #23,  2b: short, always 0 (error #1011)
+	// #25,  4b: date ...
+	// #29,  4b: date ...
+	// #33,  1b: char, periodicity, must be 'I', 'D', 'W', 'M' (error #1014)
+	// #34,  2b: short, intraday time frame between 0 and 60 minutes
+	//           (error #1015)
+	// #36, 14b: char*, symbol, space padded,
+	//           not always (or never?) zero terminated
+	//           only alphanumeric characters (error #1016)
+	// #50,  1b: char, always a space ' ' (error #1017)
+	// #51,  1b: char, chart flag, always ' ' or '*' (error #1018)
+	// #52,  1b: char, always '\0' (error #1019)
+	
+	assert( readUnsignedShort( record, 1 ) == 101 );
+	assert( record[3] == 4 * record[4] );
+	assert( record[4] >= 5 && record[4] <= 7 );
+	assert( record[5] == '\0' );
+	assert( record[6] == '\0' );
+	
+	assert( readUnsignedShort( record, 23 ) == 0 );
+
+	assert( record[33] == 'D' );
+	
+	assert( record[50] == ' ' );
+	assert( record[51] == ' ' || record[51] == '*' );
+	assert( record[52] == '\0' );
 	
 	
 	return true;
