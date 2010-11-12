@@ -934,9 +934,9 @@ int FDat::record_to_string( const char *record, char *s ) const
 	}
 	if( print_bitset & D_TIM ) {
 		if( field_bitset & D_TIM ) {
-			// TODO never seen a time field, we would print it here at this
-			// position but probably it is the last float in the record
-			assert(false);
+			s += ltoa( s, (int) readFloat(record, offset) );
+			offset += 4;
+			*s++ = print_sep;
 		}
 		// NOTE the only field we don't print if not exists
 	}
@@ -974,9 +974,9 @@ int FDat::record_to_string( const char *record, char *s ) const
 	}
 	if( print_bitset & D_TIM ) {
 		if( field_bitset & D_TIM ) {
-			// TODO never seen a time field, we would print it here at this
-			// position but probably it is the last float in the record
-			assert(false);
+			s += sprintf( s, "%d", (int) readFloat(record, offset) );
+			offset += 4;
+			*s++ = print_sep;
 		}
 		// NOTE the only field we don't print if not exists
 	}
