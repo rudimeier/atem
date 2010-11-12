@@ -936,11 +936,11 @@ int FDat::record_to_string( const char *record, char *s ) const
 	}
 
 	if( print_bitset & D_DAT ) {
-		s += ltoa( s, floatToIntDate_YYY(date) );
+		s += itodatestr( s, floatToIntDate_YYY(date) );
 		*s++ = print_sep;
 	}
 	if( print_bitset & D_TIM ) {
-		s += ltoa( s, (int) time );
+		s += itotimestr( s, (int) time );
 		*s++ = print_sep;
 	}
 	pinfo->prec = 5;
