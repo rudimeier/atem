@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 
 #include "util.h"
@@ -13,7 +14,7 @@ static struct rudi_printf_info _pinfo;
 
 struct rudi_printf_info*  init_print_info()
 {
-	_pinfo.prec = 6;
+	_pinfo.prec = 5;
 	_pinfo.width = 0;
 	_pinfo.spec = 'f';
 	_pinfo.space = 0;
@@ -943,14 +944,20 @@ int FDat::record_to_string( const char *record, char *s ) const
 		s += itotimestr( s, (int) time );
 		*s++ = print_sep;
 	}
-	pinfo->prec = 5;
+	
 	PRINT_FIELD( D_OPE, open );
 	PRINT_FIELD( D_HIG, high );
 	PRINT_FIELD( D_LOW, low );
 	PRINT_FIELD( D_CLO, close );
-	pinfo->prec = 0;
-	PRINT_FIELD( D_VOL, volume );
-	PRINT_FIELD( D_OPI, openint );
+	
+	if( print_bitset & D_VOL ) {
+		s += itoa( s, roundf(volume) );
+		*s++ = print_sep;
+	}
+	if( print_bitset & D_OPI ) {
+		s += itoa( s, roundf(openint) );
+		*s++ = print_sep;
+	}
 	
 #undef PRINT_FIELD
 #else
