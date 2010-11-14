@@ -74,10 +74,8 @@ int glibc_ltoa( char *s, long n )
 }
 
 
-int compare( long start, long count )
+int compare( long start, long end )
 {
-	long end = start + count;
-	
 	char s1[BUF_LEN];
 	char s2[BUF_LEN];
 	
@@ -86,30 +84,33 @@ int compare( long start, long count )
 		s1[j] = s2[j] = 'a';
 	}
 	
-	long i;
-	for( i = start; i<end; i++ ) {
+	long i = start;
+	do {
 		
 		int len1 = CMP_FUNC_1( s1, i );
 		int len2 = CMP_FUNC_2( s2, i );
 		
 		if( len1 != len2 || strncmp(s1, s2, len1 ) ) {
 			s1[len1] = s2[len2] = '\0';
-			fprintf( stdout, "error: _%s_(%d) != _%s_(%d)\n", s1, len1, s2, len2 );
+			fprintf( stderr, "error: _%s_(%d) != _%s_(%d)\n", s1, len1, s2, len2 );
 			return 1;
 		}
 		if( i % 0xfffff == 0) {
 			s1[len1] = s2[len2] = '\0';
 			fprintf( stdout, "%lX, %s\n", i, s1 );
 		}
-	}
+		if( i == end ) {
+			break;
+		}
+		i++;
+	} while(1);
+	
 	return 0;
 }
 
 
-int bench( long start, long count )
+int bench( long start, long end )
 {
-	long end = start + count;
-	
 	char s2[BUF_LEN];
 	
 	int j;
@@ -117,9 +118,8 @@ int bench( long start, long count )
 		s2[j] = 'a';
 	}
 	
-	long i;
-	for( i = start; i<end; i++ ) {
-		
+	long i = start;
+	do{
 		int len2 = BENCH_FUNC( s2, i );
 		s2[len2] = '\n';
 		s2[len2+1] = '\0';
@@ -127,7 +127,12 @@ int bench( long start, long count )
 		fputs( s2, stdout);
 		// write seems so be slower here
 		// write( 1, s2, len2+1 );
-	}
+		if( i == end ) {
+			break;
+		}
+		i++;
+	} while(1);
+	
 	return 0;
 }
 
@@ -135,11 +140,13 @@ int bench( long start, long count )
 
 int main(int argc, char *argv[])
 {
-	long start = INT_MIN;
-	long count = (long)INT_MAX - (long)INT_MIN;
-	
 	init_print_info();
-	return bench( start, count );
+	
+	long start = - (long)UINT_MAX;
+	long end   = UINT_MAX;
+	printf("test from %ld to %ld\n", start, end);
+	
+	return compare( start, end );
 // 	double  f = NAN;
 // 	char ccc[512];
 // 	rudi_printf_fp( ccc, &pinfo, f );
