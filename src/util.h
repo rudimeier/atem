@@ -33,7 +33,10 @@ inline int trim_end( char *dst, const char *src, int len )
 
 
 /**
- * ltoa:  convert n to characters in s
+ * convert n to characters in s
+ * s will NOT be zero terminated
+ * this is a simple implementation that works for complete long int range
+ * about 2-5 times faster than sprintf
  */
 extern int ltoa( char *s, long n );
 
