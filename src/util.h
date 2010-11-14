@@ -40,6 +40,8 @@ inline int trim_end( char *dst, const char *src, int len )
  */
 extern int ltoa( char *s, long n );
 
+extern int ltoa2( char *s, long n );
+
 extern int itodatestr( char *s, unsigned int n );
 
 extern int itotimestr( char *s, unsigned int n );
