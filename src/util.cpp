@@ -110,7 +110,7 @@ int ftoa( char *s, float f )
 
 
 
-
+// actually I can't see different speed of both these versions
 #if ! defined I_MALC_ATOI
 struct bla
 {

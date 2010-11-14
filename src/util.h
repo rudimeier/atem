@@ -44,6 +44,15 @@ extern int itodatestr( char *s, unsigned int n );
 
 extern int itotimestr( char *s, unsigned int n );
 
+
+/**
+ * convert n to characters in s
+ * s will NOT be zero terminated
+ * this is a very fast implementation that works NOT for all long int's but
+ * for the range [-9999999999, 9999999999] which includes [INT_MIN, INT_MAX]
+ * and even [-UINT_MAX, UINT_MAX]
+ * about 2 times faster than ltoa
+ */
 extern int itoa( char *s, long n );
 
 extern int ftoa( char *s, float f );
