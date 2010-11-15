@@ -8,6 +8,9 @@
 #include <float.h>
 
 
+#define BUF_LEN 64
+
+
 // #define TEST_ITOA
 #define TEST_FTOA
 
@@ -17,9 +20,9 @@ static struct rudi_printf_info pinfo;
 
 void init_print_info()
 {
-	pinfo.prec = 6;
+	pinfo.prec = 10;
 	pinfo.width = 0;
-	pinfo.spec = 'g';
+	pinfo.spec = 'f';
 	pinfo.space = 0;
 	pinfo.left = 0;
 	pinfo.showsign = 0;
@@ -56,12 +59,42 @@ int compare2()
 }
 
 
+int bench2( unsigned int mant1, unsigned int mant2,
+	unsigned int expnt1, unsigned int expnt2 )
+{
+	typedef union {
+		unsigned int I;
+		float F;
+	} funi;
+	
+	char s[BUF_LEN];
+	for( int j= 0; j<BUF_LEN; j++ ) {
+		s[j] = 'a';
+	}
+	
+	for( unsigned int e = expnt1; e <= expnt2; e++ ) {
+		unsigned int float_I = e << 23;
+// 		float_I |= 0x80000000; //sign
+		for( unsigned int i=mant1; i<=mant2; i++ ) {
+			unsigned int float_i = float_I | i;
+			float f = *( (float*) (&float_i) );
+			
+			int len = rudi_printf_fp( s, &pinfo, f);
+			s[len] = '\n';
+			s[len+1] = '\0';
+			
+			fputs( s, stdout);
+		}
+	}
+}
+
+
+
 
 #define CMP_FUNC_1 glibc_ltoa
 #define CMP_FUNC_2 ltoa
 #define BENCH_FUNC CMP_FUNC_2
 
-#define BUF_LEN 32
 
 
 int glibc_itoa( char *s, long n )
@@ -160,7 +193,7 @@ int main(int argc, char *argv[])
 {
 	init_print_info();
 	
-	compare2();
+	bench2( 0, 0x7fffff, 255, 255 );
 }
 
 #endif
