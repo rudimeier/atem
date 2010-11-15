@@ -55,6 +55,7 @@ extern int itotimestr( char *s, unsigned int n );
 extern int itoa( char *s, int n );
 
 extern int ftoa( char *s, float f );
+char *ftoa2(float f, int *status);
 
 
 
