@@ -115,10 +115,10 @@ int ftoa( char *s, float f )
 //---------------------------------------------------------------
 // itoas() - iMalc version updated ver. 0.8
 //---------------------------------------------------------------
-int itoa( char *s, long snum )
+int itoa( char *s, int snum )
 {
 	char *ps = s;
-	unsigned long num1 = snum, num2, num3, div;
+	unsigned int num1 = snum, num2, num3, div;
 	if (snum < 0) {
 		*ps++ = '-';
 		num1 = -snum;
@@ -164,7 +164,7 @@ L2:
 	num1 -= div*10;
 L1:
 	*ps++ = '0' + (char)(num1);
-	*ps = '\0';
+	
 	return ps - s;
 }
 
@@ -269,7 +269,7 @@ L2:
 	num1 -= div*10;
 L1:
 	*ps++ = '0' + (char)(num1);
-	*ps = '\0';
+	
 	return ps - s;
 
 }
