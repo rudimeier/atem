@@ -8,6 +8,9 @@
 #include <float.h>
 
 
+// #define TEST_ITOA
+#define TEST_FTOA
+
 
 
 static struct rudi_printf_info pinfo;
@@ -137,19 +140,27 @@ int bench( long start, long end )
 }
 
 
+#if defined TEST_ITOA
 
 int main(int argc, char *argv[])
 {
-	init_print_info();
-	
 	long start = - (long)UINT_MAX;
 	long end   = UINT_MAX;
 	printf("test from %ld to %ld\n", start, end);
 	
 	return compare( start, end );
-// 	double  f = NAN;
-// 	char ccc[512];
-// 	rudi_printf_fp( ccc, &pinfo, f );
-// 	fprintf( stdout, "MY  : %s \n", ccc );
-// 	fprintf( stdout, "ORIG: %.6f \n", f );
 }
+
+#endif
+
+
+#if defined TEST_FTOA
+
+int main(int argc, char *argv[])
+{
+	init_print_info();
+	
+	compare2();
+}
+
+#endif
