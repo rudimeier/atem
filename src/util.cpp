@@ -112,80 +112,6 @@ int ftoa( char *s, float f )
 
 
 
-// actually I can't see different speed of both these versions
-#if ! defined I_MALC_ATOI
-struct bla
-{
-	unsigned int div;
-	unsigned int rem;
-};
-
-// seems it's slower when we inline it manually
-static inline struct bla div1000(unsigned int a, unsigned int b)
-{
-	register unsigned int c = a / b;
-	register unsigned int d = a % b;
-	struct bla ret = {c ,d };
-	return ret;
-}
-
-#define MOD_500( _num, _tens ) \
-	l2 = div1000( _num, _tens ); \
-	*ps++ = '0' + (char)l2.div; \
-	_num = l2.rem 
-
-
-int itoa( char *s, long snum )
-{
-	struct bla l2;
-	char *ps = s;
-	unsigned long num1 = snum, num2, num3;
-	if (snum < 0) {
-		*ps++ = '-';
-		num1 = -snum;
-	}
-	if (num1 < 10000) {
-		if (num1 < 10) goto L1;
-		if (num1 < 100) goto L2;
-		if (num1 < 1000) goto L3;
-	} else {
-		num2 = num1 / 10000;
-		num1 -= num2 * 10000;
-		if (num2 < 10000) {
-			if (num2 < 10) goto L5;
-			if (num2 < 100) goto L6;
-			if (num2 < 1000) goto L7;
-		} else {
-			num3 = num2 / 10000;
-			num2 -= num3 * 10000;
-			if (num3 >= 10) {
-				MOD_500( num3, 10);
-			}
-			*ps++ = '0' + (char)(num3);
-		}
-		MOD_500( num2, 1000);
-L7:
-		MOD_500( num2, 100);
-L6:
-		MOD_500( num2, 10);
-L5:
-		*ps++ = '0' + (char)(num2);
-    }
-	
-	MOD_500( num1, 1000);
-L3:
-	MOD_500( num1, 100);
-L2:
-	MOD_500( num1, 10);
-	
-L1:
-	*ps++ = '0' + (char)(num1);
-	*ps = '\0';
-	return ps - s;
-}
-
-#else
-
 //---------------------------------------------------------------
 // itoas() - iMalc version updated ver. 0.8
 //---------------------------------------------------------------
@@ -243,7 +169,6 @@ L1:
 }
 
 
-#endif
 
 
 int ltoa2( char *s, long snum )
