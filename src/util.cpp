@@ -280,7 +280,7 @@ L1:
 
 
 typedef union {
-	long L;
+	int L;
 	float F;
 } LF_t;
 
