@@ -278,7 +278,7 @@ L1:
 
 
 #define _FTOA_TOO_LARGE 1;
-#define _FTOA_TOO_SMALL 1;
+#define _FTOA_TOO_SMALL 2;
 
 
 typedef union {
@@ -288,13 +288,12 @@ typedef union {
 
 
 
-char *ftoa2(float f, int *status)
+int ftoa2( char *outbuf, float f, int *status )
 {
 	long mantissa, int_part, frac_part;
 	short exp2;
 	LF_t x;
 	char *p;
-	static char outbuf[15];
 	
 	*status = 0;
 	if (f == 0.0) {
@@ -302,7 +301,7 @@ char *ftoa2(float f, int *status)
 		outbuf[1] = '.';
 		outbuf[2] = '0';
 		outbuf[3] = 0;
-		return outbuf;
+		return 3;
 	}
 	x.F = f;
 	
@@ -312,9 +311,11 @@ char *ftoa2(float f, int *status)
 	int_part = 0;
 	
 	if (exp2 >= 31) {
+		*outbuf = '\0';
 		*status = _FTOA_TOO_LARGE;
 		return 0;
 	} else if (exp2 < -23) {
+		*outbuf = '\0';
 		*status = _FTOA_TOO_SMALL;
 		return 0;
 	} else if (exp2 >= 23) {
@@ -361,7 +362,7 @@ char *ftoa2(float f, int *status)
 	}
 	*p = 0;
 	
-	return outbuf;
+	return p - outbuf;
  }
 
 
