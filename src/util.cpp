@@ -287,7 +287,7 @@ typedef union {
 
 int ftoa2( char *outbuf, float f )
 {
-	long mantissa, int_part, frac_part;
+	unsigned int mantissa, int_part, frac_part;
 	short exp2;
 	LF_t x;
 	char *p;
@@ -295,35 +295,30 @@ int ftoa2( char *outbuf, float f )
 	x.F = f;
 	p = outbuf;
 	
-	if( x.L < 0  ) {
-		*p++ = '-';
-	}
-	
-	if (x.F == 0.0) {
-		*p++ = '0';
-		*p++ = '.';
-		*p++ = '0';
-		goto END;
-	}
-	
 	exp2 = (unsigned char)(x.L >> 23) - 127;
 	mantissa = (x.L & 0xFFFFFF) | 0x800000;
 	frac_part = 0;
 	int_part = 0;
 	
-	if (exp2 >= 31) {
-		outbuf[0] = 'l';
-		outbuf[1] = 'a';
-		outbuf[2] = 'r';
-		outbuf[3] = '\0';
-		return 3;
-	} else if (exp2 < -23) {
-		outbuf[0] = 's';
-		outbuf[1] = 'm';
-		outbuf[2] = 'l';
-		outbuf[3] = '\0';
-		return 3;
-	} else if (exp2 >= 23) {
+	
+	if( x.L < 0  ) {
+		*p++ = '-';
+	}
+	
+	if (x.F == 0.0 || exp2 < -23 ) {
+		*p++ = '0';
+		*p++ = '.';
+		*p++ = '0';
+		goto END;
+	} else if (exp2 >= 31) {
+		/* |f| >= 2^31 > INT_MAX */
+		*p++ = 'i';
+		*p++ = 'n';
+		*p++ = 'f';
+		goto END;
+	}
+	
+	if (exp2 >= 23) {
 		int_part = mantissa << (exp2 - 23);
 	} else if (exp2 >= 0) {
 		int_part = mantissa >> (23 - exp2);
@@ -335,7 +330,7 @@ int ftoa2( char *outbuf, float f )
 	if (int_part == 0) {
 		*p++ = '0';
 	} else {
-		p += ltoa(p, int_part);
+		p += itoa(p, int_part);
 	}
 	*p++ = '.';
  
