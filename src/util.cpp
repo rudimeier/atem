@@ -355,10 +355,6 @@ int ftoa2( char *outbuf, float f )
 			*p++ = (frac_part >> 24) + '0';
 			frac_part &= 0xFFFFFF;
 		}
-		/* delete ending zeroes */
-		for (--p; p[0] == '0' && p[-1] != '.'; --p) {
-		}
-		++p;
 	}
 	*p = 0;
 	
