@@ -344,7 +344,7 @@ int ftoa2( char *outbuf, float f )
 	} else {
 		char m, max;
 		
-		max = sizeof (outbuf) - (p - outbuf) - 1;
+		max = 15 - (p - outbuf) - 1;
 		if (max > 7)
 		max = 7;
 		/* print BCD */
