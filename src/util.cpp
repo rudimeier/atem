@@ -317,7 +317,7 @@ int ftoa2( char *outbuf, float f )
 		outbuf[1] = 'm';
 		outbuf[2] = 'l';
 		outbuf[3] = '\0';
-		return 0;
+		return 3;
 	} else if (exp2 >= 23) {
 		int_part = mantissa << (exp2 - 23);
 	} else if (exp2 >= 0) {
