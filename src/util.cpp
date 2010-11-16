@@ -292,14 +292,19 @@ int ftoa2( char *outbuf, float f )
 	LF_t x;
 	char *p;
 	
-	if (f == 0.0) {
-		outbuf[0] = '0';
-		outbuf[1] = '.';
-		outbuf[2] = '0';
-		outbuf[3] = '\0';
-		return 3;
-	}
 	x.F = f;
+	p = outbuf;
+	
+	if( x.L < 0  ) {
+		*p++ = '-';
+	}
+	
+	if (x.F == 0.0) {
+		*p++ = '0';
+		*p++ = '.';
+		*p++ = '0';
+		goto END;
+	}
 	
 	exp2 = (unsigned char)(x.L >> 23) - 127;
 	mantissa = (x.L & 0xFFFFFF) | 0x800000;
@@ -327,11 +332,6 @@ int ftoa2( char *outbuf, float f )
 		frac_part = (mantissa & 0xFFFFFF) >> -(exp2 + 1);
 	}
 	
-	p = outbuf;
-	
-	if (x.L < 0) {
-		*p++ = '-';
-	}
 	if (int_part == 0) {
 		*p++ = '0';
 	} else {
@@ -356,8 +356,9 @@ int ftoa2( char *outbuf, float f )
 			frac_part &= 0xFFFFFF;
 		}
 	}
-	*p = 0;
 	
+END:
+	*p = 0;
 	return p - outbuf;
  }
 
