@@ -287,7 +287,9 @@ typedef union {
 
 int ftoa2( char *outbuf, float f )
 {
-	unsigned int mantissa, int_part, frac_part;
+	unsigned long mantissa, int_part, frac_part;
+	int safe_shift;
+	unsigned long safe_mask;
 	short exp2;
 	LF_t x;
 	char *p;
@@ -318,14 +320,21 @@ int ftoa2( char *outbuf, float f )
 		goto END;
 	}
 	
+	safe_shift = -(exp2 + 1);
+	safe_mask = 0xFFFFFFFFFFFFFFFF >>(64 - 24 - safe_shift);
+	printf("%d, %lX\n", safe_shift, safe_mask);
+	printf("mant: %lX >> %d\n", mantissa, 0);
+	
 	if (exp2 >= 23) {
 		int_part = mantissa << (exp2 - 23);
 	} else if (exp2 >= 0) {
 		int_part = mantissa >> (23 - exp2);
-		frac_part = (mantissa << (exp2 + 1)) & 0xFFFFFF;
+		frac_part = (mantissa) & safe_mask;
 	} else /* if (exp2 < 0) */ {
-		frac_part = (mantissa & 0xFFFFFF) >> -(exp2 + 1);
+		frac_part = (mantissa & 0xFFFFFF);
 	}
+	
+	printf("frac: %lX\n", frac_part);
 	
 	if (int_part == 0) {
 		*p++ = '0';
@@ -339,16 +348,16 @@ int ftoa2( char *outbuf, float f )
 	} else {
 		char m, max;
 		
-		max = 15 - (p - outbuf) - 1;
-		if (max > 7)
-		max = 7;
+// 		max = 15 - (p - outbuf) - 1;
+// 		if (max > 7)
+		max = 20;
 		/* print BCD */
 		for (m = 0; m < max; m++) {
 			/* frac_part *= 10; */
 			frac_part = (frac_part << 3) + (frac_part << 1); 
 			
-			*p++ = (frac_part >> 24) + '0';
-			frac_part &= 0xFFFFFF;
+			*p++ = (frac_part >> (24 + safe_shift)) + '0';
+			frac_part &= safe_mask;
 		}
 	}
 	
