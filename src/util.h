@@ -56,6 +56,7 @@ extern int itoa( char *s, int n );
 
 extern int ftoa( char *s, float f );
 extern int ftoa2(char *s, float f );
+extern int ftoa_prec_f0(char *s, float f );
 
 
 
