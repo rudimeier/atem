@@ -322,8 +322,6 @@ int ftoa2( char *outbuf, float f )
 	
 	safe_shift = -(exp2 + 1);
 	safe_mask = 0xFFFFFFFFFFFFFFFF >>(64 - 24 - safe_shift);
-	printf("%d, %lX\n", safe_shift, safe_mask);
-	printf("mant: %lX >> %d\n", mantissa, 0);
 	
 	if (exp2 >= 23) {
 		int_part = mantissa << (exp2 - 23);
@@ -333,8 +331,6 @@ int ftoa2( char *outbuf, float f )
 	} else /* if (exp2 < 0) */ {
 		frac_part = (mantissa & 0xFFFFFF);
 	}
-	
-	printf("frac: %lX\n", frac_part);
 	
 	if (int_part == 0) {
 		*p++ = '0';
