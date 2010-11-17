@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 
 /**
@@ -278,6 +279,7 @@ L1:
 
 
 
+#define PRECISION 20
 
 typedef union {
 	int L;
@@ -287,7 +289,91 @@ typedef union {
 
 int ftoa2( char *outbuf, float f )
 {
-	unsigned int mantissa, int_part, frac_part;
+	unsigned long mantissa, int_part, frac_part;
+	int safe_shift;
+	unsigned long safe_mask;
+	short exp2;
+	LF_t x;
+	char *p;
+	
+	x.F = f;
+	p = outbuf;
+	
+	exp2 = (unsigned char)(x.L >> 23) - 127;
+	mantissa = (x.L & 0xFFFFFF) | 0x800000;
+	frac_part = 0;
+	int_part = 0;
+	
+	
+	if( x.L < 0  ) {
+		*p++ = '-';
+	}
+	
+	if (x.F == 0.0 || exp2 < -23 ) {
+		// print 0.000... like "%._f" does
+		memset( p, '0', PRECISION + 1 + 1);
+		p[1] = '.';
+		p += PRECISION + 1 + 1;
+		goto END;
+	} else if (exp2 >= 31) {
+		/* |f| >= 2^31 > INT_MAX */
+		*p++ = 'i';
+		*p++ = 'n';
+		*p++ = 'f';
+		goto END;
+	}
+	
+	safe_shift = -(exp2 + 1);
+	safe_mask = 0xFFFFFFFFFFFFFFFF >>(64 - 24 - safe_shift);
+	
+	if (exp2 >= 23) {
+		int_part = mantissa << (exp2 - 23);
+	} else if (exp2 >= 0) {
+		int_part = mantissa >> (23 - exp2);
+		frac_part = (mantissa) & safe_mask;
+	} else /* if (exp2 < 0) */ {
+		frac_part = (mantissa & 0xFFFFFF);
+	}
+	
+	if (int_part == 0) {
+		*p++ = '0';
+	} else {
+		p += itoa(p, int_part);
+	}
+	*p++ = '.';
+ 
+	if (frac_part == 0) {
+		// print _.000... like "%._f" does
+		memset( p, '0', PRECISION );
+		p += PRECISION;
+	} else {
+		char m;
+		
+		/* print BCD */
+		for (m = 0; m < PRECISION; m++) {
+			/* frac_part *= 10; */
+			frac_part = (frac_part << 3) + (frac_part << 1); 
+			
+			*p++ = (frac_part >> (24 + safe_shift)) + '0';
+			frac_part &= safe_mask;
+		}
+	}
+	
+END:
+	*p = 0;
+	return p - outbuf;
+}
+
+#undef PRECISION
+
+
+
+
+int ftoa_prec_f0( char *outbuf, float f )
+{
+	unsigned long mantissa, int_part, frac_part;
+	int safe_shift;
+	unsigned long safe_mask;
 	short exp2;
 	LF_t x;
 	char *p;
@@ -307,8 +393,6 @@ int ftoa2( char *outbuf, float f )
 	
 	if (x.F == 0.0 || exp2 < -23 ) {
 		*p++ = '0';
-		*p++ = '.';
-		*p++ = '0';
 		goto END;
 	} else if (exp2 >= 31) {
 		/* |f| >= 2^31 > INT_MAX */
@@ -318,13 +402,28 @@ int ftoa2( char *outbuf, float f )
 		goto END;
 	}
 	
+	safe_shift = -(exp2 + 1);
+	safe_mask = 0xFFFFFFFFFFFFFFFF >>(64 - 24 - safe_shift);
+	
 	if (exp2 >= 23) {
 		int_part = mantissa << (exp2 - 23);
 	} else if (exp2 >= 0) {
 		int_part = mantissa >> (23 - exp2);
-		frac_part = (mantissa << (exp2 + 1)) & 0xFFFFFF;
+		frac_part = (mantissa) & safe_mask;
 	} else /* if (exp2 < 0) */ {
-		frac_part = (mantissa & 0xFFFFFF) >> -(exp2 + 1);
+		frac_part = (mantissa & 0xFFFFFF);
+	}
+	
+	if (frac_part != 0) {
+		/* frac_part *= 10; */
+		frac_part = (frac_part << 3) + (frac_part << 1);
+		char c = (frac_part >> (24 + safe_shift)) + '0';
+		frac_part &= safe_mask;
+		if( c >= '5' ) {
+			if( frac_part != 0 || (int_part & 1) ) {
+				int_part++;
+			}
+		}
 	}
 	
 	if (int_part == 0) {
@@ -332,30 +431,9 @@ int ftoa2( char *outbuf, float f )
 	} else {
 		p += itoa(p, int_part);
 	}
-	*p++ = '.';
- 
-	if (frac_part == 0) {
-		*p++ = '0';
-	} else {
-		char m, max;
-		
-		max = 15 - (p - outbuf) - 1;
-		if (max > 7)
-		max = 7;
-		/* print BCD */
-		for (m = 0; m < max; m++) {
-			/* frac_part *= 10; */
-			frac_part = (frac_part << 3) + (frac_part << 1); 
-			
-			*p++ = (frac_part >> 24) + '0';
-			frac_part &= 0xFFFFFF;
-		}
-	}
 	
 END:
 	*p = 0;
 	return p - outbuf;
- }
-
-
+}
 

@@ -8,7 +8,7 @@
 #include <float.h>
 
 
-#define BUF_LEN 64
+#define BUF_LEN 512
 
 
 // #define TEST_ITOA
@@ -20,7 +20,7 @@ static struct rudi_printf_info pinfo;
 
 void init_print_info()
 {
-	pinfo.prec = 10;
+	pinfo.prec = 20;
 	pinfo.width = 0;
 	pinfo.spec = 'f';
 	pinfo.space = 0;
@@ -67,25 +67,34 @@ int bench2( unsigned int mant1, unsigned int mant2,
 		float F;
 	} funi;
 	
-	char s[BUF_LEN];
+	char buf[BUF_LEN];
 	for( int j= 0; j<BUF_LEN; j++ ) {
-		s[j] = 'a';
+		buf[j] = 'a';
 	}
 	
 	for( unsigned int e = expnt1; e <= expnt2; e++ ) {
+		printf("EXPNT %u\n", e);
 		unsigned int float_I = e << 23;
 // 		float_I |= 0x80000000; //sign
 		for( unsigned int i=mant1; i<=mant2; i++ ) {
+			char *s = buf;
 			unsigned int float_i = float_I | i;
 			float f = *( (float*) (&float_i) );
 			
-			int len = rudi_printf_fp( s, &pinfo, f);
-			s[len] = '\n';
-			s[len+1] = '\0';
+#if 0
+			s += ftoa2(s, f);
+			*s++ = '\n';
+#else
+			s += rudi_printf_fp(s, &pinfo, f);
+			*s++ = '\n';
 			
-			fputs( s, stdout);
+#endif
+			*s = '\0';
+			
+			fputs( buf, stdout);
 		}
 	}
+	return 0;
 }
 
 
@@ -97,7 +106,7 @@ int bench2( unsigned int mant1, unsigned int mant2,
 
 
 
-int glibc_itoa( char *s, long n )
+int glibc_itoa( char *s, int n )
 {
 	int len = sprintf( s, "%d", n );
 	return len;
@@ -193,7 +202,8 @@ int main(int argc, char *argv[])
 {
 	init_print_info();
 	
-	bench2( 0, 0x7fffff, 255, 255 );
+	bench2(0 , 0x7fffff, 127-4, 127+13 );
+	return 0;
 }
 
 #endif
