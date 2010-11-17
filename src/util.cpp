@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 
 /**
@@ -278,6 +279,7 @@ L1:
 
 
 
+#define PRECISION 20
 
 typedef union {
 	int L;
@@ -308,9 +310,10 @@ int ftoa2( char *outbuf, float f )
 	}
 	
 	if (x.F == 0.0 || exp2 < -23 ) {
-		*p++ = '0';
-		*p++ = '.';
-		*p++ = '0';
+		// print 0.000... like "%._f" does
+		memset( p, '0', PRECISION + 1 + 1);
+		p[1] = '.';
+		p += PRECISION + 1 + 1;
 		goto END;
 	} else if (exp2 >= 31) {
 		/* |f| >= 2^31 > INT_MAX */
@@ -340,15 +343,14 @@ int ftoa2( char *outbuf, float f )
 	*p++ = '.';
  
 	if (frac_part == 0) {
-		*p++ = '0';
+		// print _.000... like "%._f" does
+		memset( p, '0', PRECISION );
+		p += PRECISION;
 	} else {
-		char m, max;
+		char m;
 		
-// 		max = 15 - (p - outbuf) - 1;
-// 		if (max > 7)
-		max = 20;
 		/* print BCD */
-		for (m = 0; m < max; m++) {
+		for (m = 0; m < PRECISION; m++) {
 			/* frac_part *= 10; */
 			frac_part = (frac_part << 3) + (frac_part << 1); 
 			
@@ -360,7 +362,7 @@ int ftoa2( char *outbuf, float f )
 END:
 	*p = 0;
 	return p - outbuf;
- }
+}
 
-
+#undef PRECISION
 
