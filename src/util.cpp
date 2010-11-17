@@ -323,7 +323,7 @@ int ftoa2( char *outbuf, float f )
 		int_part = mantissa << (exp2 - 23);
 	} else if (exp2 >= 0) {
 		int_part = mantissa >> (23 - exp2);
-		frac_part = ((unsigned long)mantissa << (32 + exp2 + 1)) & 0xFFFFFFFFFFFFFF;
+		frac_part = (mantissa << (exp2 + 1)) & 0xFFFFFF;
 	} else /* if (exp2 < 0) */ {
 		frac_part = (unsigned long)mantissa << (32 + exp2 + 1);
 	}
