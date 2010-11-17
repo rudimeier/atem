@@ -288,6 +288,7 @@ typedef union {
 int ftoa2( char *outbuf, float f )
 {
 	unsigned int mantissa, int_part, frac_part;
+	unsigned long fuck = 0;
 	short exp2;
 	LF_t x;
 	char *p;
@@ -325,6 +326,11 @@ int ftoa2( char *outbuf, float f )
 		frac_part = (mantissa << (exp2 + 1)) & 0xFFFFFF;
 	} else /* if (exp2 < 0) */ {
 		frac_part = (mantissa & 0xFFFFFF) >> -(exp2 + 1);
+		fuck = mantissa;
+		fuck = fuck << 32;
+		fuck = fuck >> -(exp2 + 1);
+// 		unsigned int fruck = fuck >> 32;
+// 		assert( frac_part == fruck );
 	}
 	
 	if (int_part == 0) {
@@ -339,16 +345,26 @@ int ftoa2( char *outbuf, float f )
 	} else {
 		char m, max;
 		
-		max = 15 - (p - outbuf) - 1;
-		if (max > 7)
-		max = 7;
+// 		max = 15 - (p - outbuf) - 1;
+// 		if (max > 7)
+		max = 10;
 		/* print BCD */
 		for (m = 0; m < max; m++) {
 			/* frac_part *= 10; */
+#if 0
 			frac_part = (frac_part << 3) + (frac_part << 1); 
 			
 			*p++ = (frac_part >> 24) + '0';
 			frac_part &= 0xFFFFFF;
+#else
+ 			fuck = 10 *fuck;
+			unsigned int fruck = fuck >> 32;
+			
+			
+			*p++ = (fruck >> 24) + '0';
+			fuck &= 0xFFFFFFFFFFFFFF;
+#endif
+
 		}
 	}
 	
