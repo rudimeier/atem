@@ -269,7 +269,7 @@ L1:
 #endif
 
 #if defined PRECISION_IS_SIGNIFICANT
-	#define _INC_PREC_SIGNIFICANT_ ((p - first_signigicant) - 1)
+	#define _INC_PREC_SIGNIFICANT_ ((p - outbuf) + (x.L < 0 ? 1 : 0) - 1)
 #else
 	#define _INC_PREC_SIGNIFICANT_ 0
 #endif
@@ -302,9 +302,6 @@ int ftoa( char *outbuf, float f )
 	if( x.L < 0  ) {
 		*p++ = '-';
 	}
-#if defined PRECISION_IS_SIGNIFICANT
-	char *first_signigicant = p;
-#endif
 	
 	if (x.F == 0.0 || exp2 < -23 ) {
 #if ! defined DEL_TRAIL_NULL
@@ -352,9 +349,10 @@ int ftoa( char *outbuf, float f )
 	} else {
 		*p++ = '.';
 		
-		/* print BCD, calculating one more digit than needed because rounding */
-		char max = PRECISION - _INC_PREC_SIGNIFICANT_ + _INC_PREC_ROUND_;
-		
+		/* print BCD, calculating digits of frac_part (one more digit is needed
+		   when rounding, less digits are needed when then precision should be
+		   significant*/
+		const char max = PRECISION - _INC_PREC_SIGNIFICANT_ + _INC_PREC_ROUND_;
 		for (char m = 0; m < max; m++) {
 			/* frac_part *= 10; */
 			frac_part = (frac_part << 3) + (frac_part << 1); 
