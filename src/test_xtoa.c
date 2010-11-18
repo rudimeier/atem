@@ -20,7 +20,7 @@ static struct rudi_printf_info pinfo;
 
 void init_print_info()
 {
-	pinfo.prec = 20;
+	pinfo.prec = 5;
 	pinfo.width = 0;
 	pinfo.spec = 'f';
 	pinfo.space = 0;

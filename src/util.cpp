@@ -279,7 +279,7 @@ L1:
 
 
 
-#define PRECISION 20
+#define PRECISION 5
 
 typedef union {
 	int L;
