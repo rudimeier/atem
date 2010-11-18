@@ -87,29 +87,6 @@ int itotimestr( char *s, unsigned int n )
 }
 
 
-int ftoa( char *s, float f )
-{
-	char *buf = s;
-	if( f < 0 ) {
-		f = -f;
-		*buf++ = '-';
-	}
-	
-	float a;
-	float b = modff(f, &a );
-	
-	int b_ = (b * 1000000);
-	if( b_ % 10 >= 5 ) {
-		b_ = b_ / 10 + 1;
-	} else {
-		b_ /= 10;
-	}
-	buf += ltoa( buf, a );
-	int d = ltoa( buf, 100000 + b_ );
-	*buf = '.';
-	return buf + d - s;
-}
-
 
 
 
