@@ -931,7 +931,7 @@ int FDat::record_to_string( const char *record, char *s ) const
 #if defined FAST_PRINTING
 #define PRINT_FIELD( _field_, _var_ ) \
 	if( print_bitset & _field_) { \
-		s += ftoa2( s, _var_ ); \
+		s += ftoa( s, _var_ ); \
 		*s++ = print_sep; \
 	}
 

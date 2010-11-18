@@ -281,7 +281,7 @@ typedef union {
 } LF_t;
 
 
-int ftoa2( char *outbuf, float f )
+int ftoa( char *outbuf, float f )
 {
 	unsigned long mantissa, int_part, frac_part;
 	int safe_shift;

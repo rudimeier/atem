@@ -81,8 +81,8 @@ int bench2( unsigned int mant1, unsigned int mant2,
 			unsigned int float_i = float_I | i;
 			float f = *( (float*) (&float_i) );
 			
-#if 0
-			s += ftoa2(s, f);
+#if 1
+			s += ftoa(s, f);
 			*s++ = '\n';
 #else
 			s += rudi_printf_fp(s, &pinfo, f);
