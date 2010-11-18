@@ -279,7 +279,7 @@ L1:
 
 
 
-#define PRECISION 5
+#define PRECISION 6
 #define DEL_TRAIL_NULL
 
 typedef union {
@@ -309,6 +309,7 @@ int ftoa2( char *outbuf, float f )
 	if( x.L < 0  ) {
 		*p++ = '-';
 	}
+	char *first_signigicant = p;
 	
 	if (x.F == 0.0 || exp2 < -23 ) {
 #if ! defined DEL_TRAIL_NULL
@@ -358,10 +359,12 @@ int ftoa2( char *outbuf, float f )
 		
 		/* print BCD, calculating one more digit than needed because rounding */
 #if ! defined NO_ROUNDING
-		for (char m = 0; m < PRECISION + 1; m++) {
+		char max = PRECISION - (p - first_signigicant) + 1 + 1;
 #else
-		for (char m = 0; m < PRECISION; m++) {
+		char max = PRECISION - (p - first_signigicant) + 1;
 #endif
+		
+		for (char m = 0; m < max; m++) {
 			/* frac_part *= 10; */
 			frac_part = (frac_part << 3) + (frac_part << 1); 
 			
