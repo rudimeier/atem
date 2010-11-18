@@ -280,6 +280,7 @@ L1:
 
 
 #define PRECISION 5
+#define DEL_TRAIL_NULL
 
 typedef union {
 	int L;
@@ -310,10 +311,14 @@ int ftoa2( char *outbuf, float f )
 	}
 	
 	if (x.F == 0.0 || exp2 < -23 ) {
+#if ! defined DEL_TRAIL_NULL
 		// print 0.000... like "%._f" does
 		memset( p, '0', PRECISION + 1 + 1);
 		p[1] = '.';
 		p += PRECISION + 1 + 1;
+#else
+		*p++ = '0';
+#endif
 		goto END;
 	} else if (exp2 >= 31) {
 		/* |f| >= 2^31 > INT_MAX */
@@ -340,20 +345,22 @@ int ftoa2( char *outbuf, float f )
 	} else {
 		p += itoa(p, int_part);
 	}
-	*p++ = '.';
  
 	if (frac_part == 0) {
+#if ! defined DEL_TRAIL_NULL
 		// print _.000... like "%._f" does
+		*p++ = '.';
 		memset( p, '0', PRECISION );
 		p += PRECISION;
+#endif
 	} else {
-		char m;
+		*p++ = '.';
 		
 		/* print BCD, calculating one more digit than needed because rounding */
 #if ! defined NO_ROUNDING
-		for (m = 0; m < PRECISION+1; m++) {
+		for (char m = 0; m < PRECISION + 1; m++) {
 #else
-		for (m = 0; m < PRECISION; m++) {
+		for (char m = 0; m < PRECISION; m++) {
 #endif
 			/* frac_part *= 10; */
 			frac_part = (frac_part << 3) + (frac_part << 1); 
@@ -390,6 +397,13 @@ int ftoa2( char *outbuf, float f )
 					}
 				}
 			}
+		}
+#endif
+#if defined DEL_TRAIL_NULL
+		for (; p[-1] == '0'; --p) {
+		}
+		if( p[-1] == '.' ) {
+			p--;
 		}
 #endif
 	}
