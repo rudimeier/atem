@@ -280,7 +280,23 @@ L1:
 
 
 #define PRECISION 6
+#define DO_ROUNDING
 #define DEL_TRAIL_NULL
+#define PRECISION_IS_SIGNIFICANT
+
+
+#if defined DO_ROUNDING
+	#define _INC_PREC_ROUND_ 1
+#else
+	#define _INC_PREC_ROUND_ 0
+#endif
+
+#if defined PRECISION_IS_SIGNIFICANT
+	#define _INC_PREC_SIGNIFICANT_ ((p - first_signigicant) - 1)
+#else
+	#define _INC_PREC_SIGNIFICANT_ 0
+#endif
+
 
 typedef union {
 	int L;
@@ -309,7 +325,9 @@ int ftoa2( char *outbuf, float f )
 	if( x.L < 0  ) {
 		*p++ = '-';
 	}
+#if defined PRECISION_IS_SIGNIFICANT
 	char *first_signigicant = p;
+#endif
 	
 	if (x.F == 0.0 || exp2 < -23 ) {
 #if ! defined DEL_TRAIL_NULL
@@ -358,11 +376,7 @@ int ftoa2( char *outbuf, float f )
 		*p++ = '.';
 		
 		/* print BCD, calculating one more digit than needed because rounding */
-#if ! defined NO_ROUNDING
-		char max = PRECISION - (p - first_signigicant) + 1 + 1;
-#else
-		char max = PRECISION - (p - first_signigicant) + 1;
-#endif
+		char max = PRECISION - _INC_PREC_SIGNIFICANT_ + _INC_PREC_ROUND_;
 		
 		for (char m = 0; m < max; m++) {
 			/* frac_part *= 10; */
@@ -371,7 +385,7 @@ int ftoa2( char *outbuf, float f )
 			*p++ = (frac_part >> (24 + safe_shift)) + '0';
 			frac_part &= safe_mask;
 		}
-#if ! defined NO_ROUNDING
+#if defined DO_ROUNDING
 		// rounding, works only for PRECISION > 1
 		p--;
 		if(  *p >= '5' ) {
@@ -417,6 +431,8 @@ END:
 }
 
 #undef PRECISION
+#undef _INC_PREC_ROUND_
+#undef _INC_PREC_SIGNIFICANT_
 
 
 
