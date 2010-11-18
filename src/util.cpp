@@ -350,13 +350,18 @@ int ftoa2( char *outbuf, float f )
 		char m;
 		
 		/* print BCD, calculating one more digit than needed because rounding */
+#if ! defined NO_ROUNDING
 		for (m = 0; m < PRECISION+1; m++) {
+#else
+		for (m = 0; m < PRECISION; m++) {
+#endif
 			/* frac_part *= 10; */
 			frac_part = (frac_part << 3) + (frac_part << 1); 
 			
 			*p++ = (frac_part >> (24 + safe_shift)) + '0';
 			frac_part &= safe_mask;
 		}
+#if ! defined NO_ROUNDING
 		// rounding, works only for PRECISION > 1
 		p--;
 		if(  *p >= '5' ) {
@@ -386,7 +391,7 @@ int ftoa2( char *outbuf, float f )
 				}
 			}
 		}
-
+#endif
 	}
 	
 END:
