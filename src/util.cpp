@@ -258,7 +258,8 @@ L1:
 
 #define PRECISION 6
 #define DO_ROUNDING
-#define DEL_TRAIL_NULL
+#define NO_TRAIL_NULL
+/* PRECISION_IS_SIGNIFICANT whithout NO_TRAIL_NULL is not supported */
 #define PRECISION_IS_SIGNIFICANT
 
 
@@ -304,13 +305,13 @@ int ftoa( char *outbuf, float f )
 	}
 	
 	if (x.F == 0.0 || exp2 < -23 ) {
-#if ! defined DEL_TRAIL_NULL
+#if defined NO_TRAIL_NULL
+		*p++ = '0';
+#else
 		// print 0.000... like "%._f" does
 		memset( p, '0', PRECISION + 1 + 1);
 		p[1] = '.';
 		p += PRECISION + 1 + 1;
-#else
-		*p++ = '0';
 #endif
 		goto END;
 	} else if (exp2 >= 31) {
@@ -339,14 +340,7 @@ int ftoa( char *outbuf, float f )
 		p += itoa(p, int_part);
 	}
  
-	if (frac_part == 0) {
-#if ! defined DEL_TRAIL_NULL
-		// print _.000... like "%._f" does
-		*p++ = '.';
-		memset( p, '0', PRECISION );
-		p += PRECISION;
-#endif
-	} else {
+	if (frac_part != 0) {
 		*p++ = '.';
 		
 		/* print BCD, calculating digits of frac_part (one more digit is needed
@@ -391,14 +385,20 @@ int ftoa( char *outbuf, float f )
 			}
 		}
 #endif
-#if defined DEL_TRAIL_NULL
+#if defined NO_TRAIL_NULL
 		for (; p[-1] == '0'; --p) {
 		}
 		if( p[-1] == '.' ) {
 			p--;
 		}
+#else
+	} else {
+		// print _.000... like "%._f" does
+		*p++ = '.';
+		memset( p, '0', PRECISION );
+		p += PRECISION;
 #endif
-	}
+	} /*  if (frac_part != 0) */
 	
 END:
 	*p = 0;
