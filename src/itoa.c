@@ -1,12 +1,12 @@
-
+#include <stdint.h>
 
 //---------------------------------------------------------------
 // itoas() - iMalc version updated ver. 0.8
 //---------------------------------------------------------------
-int itoa_int32( char *s, int snum )
+int itoa_int32( char *s, int32_t snum )
 {
 	char *ps = s;
-	unsigned int num1 = snum, num2, num3, div;
+	uint32_t num1 = snum, num2, num3, div;
 	if (snum < 0) {
 		*ps++ = '-';
 		num1 = -snum;
@@ -58,10 +58,11 @@ L1:
 
 
 
-int itoa_int64( char *s, long snum )
+
+int itoa_int64( char *s, int64_t snum )
 {
 	char *ps = s;
-	unsigned long num1 = snum, num2, num3, num4, num5, div;
+	uint64_t num1 = snum, num2, num3, num4, num5, div;
 	
 	if (snum < 0) {
 		*ps++ = '-';
