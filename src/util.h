@@ -2,6 +2,8 @@
 #define ATEM_UTILS_H
 
 
+#define itoa itoa_int32
+#define ltoa itoa_int64
 
 
 inline unsigned char count_bits( unsigned int fields )
