@@ -64,18 +64,6 @@ int itotimestr( char *s, unsigned int n )
 #define PRECISION_IS_SIGNIFICANT
 
 
-#if defined DO_ROUNDING
-	#define _INC_PREC_ROUND_ 1
-#else
-	#define _INC_PREC_ROUND_ 0
-#endif
-
-#if defined PRECISION_IS_SIGNIFICANT
-	#define _INC_PREC_SIGNIFICANT_ ((p - outbuf) + (x.L < 0 ? 1 : 0) - 1)
-#else
-	#define _INC_PREC_SIGNIFICANT_ 0
-#endif
-
 
 typedef union {
 	int L;
@@ -149,7 +137,14 @@ int ftoa( char *outbuf, float f )
 		/* print BCD, calculating digits of frac_part (one more digit is needed
 		   when rounding, less digits are needed when then precision should be
 		   significant*/
-		const char max = PRECISION - _INC_PREC_SIGNIFICANT_ + _INC_PREC_ROUND_;
+		char max = PRECISION;
+#ifdef PRECISION_IS_SIGNIFICANT
+		int cnt_dig = ((p - outbuf) + (x.L < 0 ? 1 : 0) - 1);
+		max -= (cnt_dig < max) ? cnt_dig : 0;
+#endif
+#if defined DO_ROUNDING
+		max++;
+#endif
 		for (char m = 0; m < max; m++) {
 			/* frac_part *= 10; */
 			frac_part = (frac_part << 3) + (frac_part << 1); 
@@ -158,32 +153,44 @@ int ftoa( char *outbuf, float f )
 			frac_part &= safe_mask;
 		}
 #if defined DO_ROUNDING
-		// rounding, works only for PRECISION > 1
+		
+		int round_int = 0;
 		p--;
+		
 		if(  *p >= '5' ) {
 			char *w = p-1;
-			if( frac_part != 0 || (*w & 1) ) {
-				// round up
-				while( *w == '9' ) {
-					*w-- = '0';
-				}
-				if( *w != '.' ) {
-					*w += 1;
-				} else {
-					// we have to round up int_part too
-					w--;
-					while( *w == '9' && w >= outbuf && *w != '-' ) {
+			if( *w != '.' ) {
+				if( frac_part != 0 || (*w & 1) ) {
+					// round up
+					while( *w == '9' ) {
 						*w-- = '0';
 					}
-					if( w >= outbuf &&  *w != '-' ) {
+					if( *w != '.' ) {
 						*w += 1;
 					} else {
-						// int_part has one digit more now
-						w++;
-						p++;
-						memmove( w+1, w, p-w  );
-						*w = '1';
+						round_int = 1;
 					}
+				}
+			} else {
+				if( frac_part != 0 || ( (int_part & 1)) ) {
+					round_int = 1;
+				}
+			}
+			
+			if( round_int ) {
+				// we have to round up int_part too
+				w--;
+				while( *w == '9' && w >= outbuf && *w != '-' ) {
+					*w-- = '0';
+				}
+				if( w >= outbuf &&  *w != '-' ) {
+					*w += 1;
+				} else {
+					// int_part has one digit more now
+					w++;
+					p++;
+					memmove( w+1, w, p-w  );
+					*w = '1';
 				}
 			}
 		}
@@ -209,8 +216,6 @@ END:
 }
 
 #undef PRECISION
-#undef _INC_PREC_ROUND_
-#undef _INC_PREC_SIGNIFICANT_
 
 
 
