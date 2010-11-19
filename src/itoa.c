@@ -1,8 +1,60 @@
 #include <stdint.h>
 
-//---------------------------------------------------------------
-// itoas() - iMalc version updated ver. 0.8
-//---------------------------------------------------------------
+
+/**
+ * reverse:  reverse first l chars of string s in place
+ */
+void reverse( char *s, int l )
+{
+	int i, j;
+	char c;
+	
+	for (i = 0, j = l-1; i<j; i++, j--) {
+		c = s[i];
+		s[i] = s[j];
+		s[j] = c;
+	}
+}
+
+/**
+ * convert n to characters in s
+ * s will NOT be zero terminated, return strlen of s
+ * this is a simple implementation that works for complete long int range
+ * architecture independent
+ * about 2 times faster than sprintf (in range [INT_MIN/10 - INT_MAX/10])
+ */
+int ltoa_simple( char *s, long num )
+{
+	char *begin = s;
+	char *rev = s;
+	unsigned long n = num;
+	
+	if( num < 0 ) {
+		 // forget about the sign, don't reverse it later
+		n = -num;
+		*s++ = '-';
+		rev++;
+	}
+	
+	do {       /* generate digits in reverse order */
+		*s++ = (n % 10) + '0';   /* get next digit */
+	} while ((n /= 10) > 0);     /* delete it */
+	
+	reverse( rev, s - rev);
+	
+	return s - begin;
+}
+
+
+
+
+/**
+ * convert n to characters in s
+ * s will NOT be zero terminated, return strlen of s
+ * about 3 times faster than sprintf (in range [INT_MIN/10 - INT_MAX/10])
+ * (original function found on http://cboard.cprogramming.com
+ * itoas() iMalc version updated ver. 0.8)
+ */
 int itoa_int32( char *s, int32_t snum )
 {
 	char *ps = s;

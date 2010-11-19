@@ -8,43 +8,7 @@
 #include "itoa.c"
 
 
-/**
- * reverse:  reverse first l chars of string s in place
- */
-void reverse( char *s, int l )
-{
-	int i, j;
-	char c;
-	
-	for (i = 0, j = l-1; i<j; i++, j--) {
-		c = s[i];
-		s[i] = s[j];
-		s[j] = c;
-	}
-}
 
-
-int ltoa_simple( char *s, long num )
-{
-	char *begin = s;
-	char *rev = s;
-	unsigned long n = num;
-	
-	if( num < 0 ) {
-		 // forget about the sign, don't reverse it later
-		n = -num;
-		*s++ = '-';
-		rev++;
-	}
-	
-	do {       /* generate digits in reverse order */
-		*s++ = (n % 10) + '0';   /* get next digit */
-	} while ((n /= 10) > 0);     /* delete it */
-	
-	reverse( rev, s - rev);
-	
-	return s - begin;
-}
 
 
 int itodatestr( char *s, unsigned int n )
