@@ -35,12 +35,18 @@ inline int trim_end( char *dst, const char *src, int len )
 /**
  * convert n to characters in s
  * s will NOT be zero terminated
- * this is a simple implementation that works for complete long int range
- * about 2-5 times faster than sprintf
+ * this is a fast implementation that works for complete long int range
+ * about 3 times faster than sprintf (in range [INT_MIN/10 - NT_MAX/10])
  */
 extern int ltoa( char *s, long n );
 
-extern int ltoa2( char *s, long n );
+/**
+ * convert n to characters in s
+ * s will NOT be zero terminated
+ * this is a simple implementation that works for complete long int range
+ * about 2 times faster than sprintf (in range [INT_MIN/10 - NT_MAX/10])
+ */
+extern int ltoa_simple( char *s, long n );
 
 extern int itodatestr( char *s, unsigned int n );
 
@@ -50,7 +56,7 @@ extern int itotimestr( char *s, unsigned int n );
 /**
  * convert n to characters in s
  * s will NOT be zero terminated
- * fast implementation (about 6.5 times faster than sprintf)
+ * slightly faster than ltoa
  */
 extern int itoa( char *s, int n );
 

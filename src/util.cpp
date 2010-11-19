@@ -21,7 +21,7 @@ void reverse( char *s, int l )
 }
 
 
-int ltoa( char *s, long num )
+int ltoa_simple( char *s, long num )
 {
 	char *begin = s;
 	char *rev = s;
@@ -148,7 +148,7 @@ L1:
 
 
 
-int ltoa2( char *s, long snum )
+int ltoa( char *s, long snum )
 {
 	char *ps = s;
 	unsigned long num1 = snum, num2, num3, num4, num5, div;
