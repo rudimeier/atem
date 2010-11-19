@@ -190,12 +190,16 @@ int ltoa2( char *s, long snum )
 					if (num5 < 10000) {
 						if (num5 < 10) goto L17;
 						if (num5 < 100) goto L18;
+#if defined FOR_UNSIGNED_LONGINT
 						if (num5 < 1000) goto L19;
-					} else {
 					}
+					
 					*ps++ = '0' + (char)(div = (num5*8389UL)>>23);
 					num5 -= div*1000;
 L19:
+#else
+					}
+#endif
 					*ps++ = '0' + (char)(div = (num5*5243UL)>>19);
 					num5 -= div*100;
 L18:
