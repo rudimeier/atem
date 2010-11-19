@@ -105,7 +105,11 @@ int ftoa( char *outbuf, float f )
 		*p++ = '-';
 	}
 	
-	if (x.F == 0.0 || exp2 < -23 ) {
+	/* Our algorithm works only on exponents >= -36 because safe_mask must
+	   start with at least 4 zero bits. So we quickly print 0.0 here. (We could
+	   do this even for bigger exponents dependently on PRECISION but would be
+	   a useless optimization.) BTW the case f == 0.0 is also handled here. */
+	if ( exp2 < -36 ) {
 #if defined NO_TRAIL_NULL
 		*p++ = '0';
 #else
