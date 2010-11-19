@@ -21,23 +21,22 @@ void reverse( char *s, int l )
 }
 
 
-int ltoa( char *s, long n )
+int ltoa( char *s, long num )
 {
 	char *begin = s;
 	char *rev = s;
+	unsigned long n = num;
 	
-	if( n < 0 ) {
+	if( num < 0 ) {
 		 // forget about the sign, don't reverse it later
+		n = -num;
 		*s++ = '-';
 		rev++;
-	} else {
-		// make n negative, this way because |LONG_MIN| > |LONG_MAX|
-		n = -n;
 	}
 	
 	do {       /* generate digits in reverse order */
-		*s++ = -(n % 10) + '0';   /* get next digit */
-	} while ((n /= 10) < 0);     /* delete it */
+		*s++ = (n % 10) + '0';   /* get next digit */
+	} while ((n /= 10) > 0);     /* delete it */
 	
 	reverse( rev, s - rev);
 	
