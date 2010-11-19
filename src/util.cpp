@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <limits.h>
 
 #include "itoa.c"
 
@@ -114,18 +115,16 @@ int ftoa( char *outbuf, float f )
 		p += PRECISION + 1 + 1;
 #endif
 		goto END;
-	} else if (exp2 >= 31) {
-		/* |f| >= 2^31 > INT_MAX */
-		*p++ = 'i';
-		*p++ = 'n';
-		*p++ = 'f';
-		goto END;
 	}
 	
 	safe_shift = -(exp2 + 1);
 	safe_mask = 0xFFFFFFFFFFFFFFFF >>(64 - 24 - safe_shift);
 	
-	if (exp2 >= 23) {
+	if (exp2 >= 64) {
+		/* |f| >= 2^64 > ULONG_MAX */
+		/* NaNs and +-INF are also handled here*/
+		int_part = ULONG_MAX;
+	} else if (exp2 >= 23) {
 		int_part = mantissa << (exp2 - 23);
 	} else if (exp2 >= 0) {
 		int_part = mantissa >> (23 - exp2);
@@ -137,7 +136,7 @@ int ftoa( char *outbuf, float f )
 	if (int_part == 0) {
 		*p++ = '0';
 	} else {
-		p += itoa(p, int_part);
+		p += itoa_uint64(p, int_part);
 	}
  
 	if (frac_part != 0) {
