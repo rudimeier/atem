@@ -68,21 +68,6 @@ int itotimestr( char *s, unsigned int n )
 	}
 	
 #if defined FAST_PRINTING
-#if 0
-	s[7] = (n % 10) + '0';
-	n /= 10;
-	s[6] = (n % 10) + '0';
-	n /= 10;
-	s[5] = ':';
-	s[4] = (n % 10) + '0';
-	n /= 10;
-	s[3] = (n % 10) + '0';
-	n /= 10;
-	s[2] = ':';
-	s[1] = (n % 10) + '0';
-	n /= 10;
-	s[0] = (n % 10) + '0';
-#else
 	uint32_t num2, div;
 	
 	num2 = (n*8389UL)>>23;
@@ -105,7 +90,6 @@ int itotimestr( char *s, unsigned int n )
 	s[6] = '0' + (char)(div = (n*6554UL)>>16);
 	n -= div*10;
 	s[7] = '0' + (char)(n);
-#endif
 #else
 	sprintf( s, "%06u", n );
 	s[7] = s[5];
