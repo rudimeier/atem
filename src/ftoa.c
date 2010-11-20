@@ -2,11 +2,11 @@
 
 
 
-#define PRECISION 6
+#define PRECISION 5
 #define DO_ROUNDING
-#define NO_TRAIL_NULL
+// #define NO_TRAIL_NULL
 /* PRECISION_IS_SIGNIFICANT whithout NO_TRAIL_NULL is not supported */
-#define PRECISION_IS_SIGNIFICANT
+// #define PRECISION_IS_SIGNIFICANT
 
 
 
