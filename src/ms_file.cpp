@@ -960,7 +960,7 @@ int FDat::record_to_string( const char *record, char *s ) const
 #else
 #define PRINT_FIELD( _field_, _var_ ) \
 	if( print_bitset & _field_) { \
-		s += sprintf( s, fmt, readFloat( record, offset ) ); \
+		s += sprintf( s, fmt, _var_ ); \
 		*s++ = print_sep; \
 	}
 	const char * fmt;
