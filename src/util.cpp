@@ -70,24 +70,24 @@ int itotimestr( char *s, unsigned int n )
 #if defined FAST_PRINTING
 	uint32_t num2, div;
 	
-	num2 = (n*8389UL)>>23;
+	num2 = n / 1000;
 	n -= num2 * 1000;
 	
-	s[0] = '0' + (char)(div = (num2*5243UL)>>19);
+	s[0] = '0' + (char)(div = (num2*5243)>>19);
 	num2 -= div*100;
 	
-	s[1] = '0' + (char)(div = (num2*6554UL)>>16);
+	s[1] = '0' + (char)(div = (num2*6554)>>16);
 	num2 -= div*10;
 	
 	s[2] = ':';
 	
 	s[3] = '0' + (char)(num2);
-	s[4] = '0' + (char)(div = (n*5243UL)>>19);
+	s[4] = '0' + (char)(div = (n*5243)>>19);
 	n -= div*100;
 	
 	s[5] = ':';
 	
-	s[6] = '0' + (char)(div = (n*6554UL)>>16);
+	s[6] = '0' + (char)(div = (n*6554)>>16);
 	n -= div*10;
 	s[7] = '0' + (char)(n);
 #else
