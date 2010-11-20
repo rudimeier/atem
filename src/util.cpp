@@ -28,27 +28,36 @@ int ftoa_prec_f0(char *s, float f )
 
 int itodatestr( char *s, unsigned int n )
 {
+	if( n <= 0 || n >= 100000000 ) {
+		memcpy(s, "0000-00-00", 8);
+		return 8;
+	}
+	
 #if defined FAST_PRINTING
-	s[9] = (n % 10) + '0';
-	n /= 10;
-	s[8] = (n % 10) + '0';
-	n /= 10;
-	s[7] = '-';
-	s[6] = (n % 10) + '0';
-	n /= 10;
-	s[5] = (n % 10) + '0';
-	n /= 10;
+	uint32_t num1 = n, num2, div;
+	
+	num2 = num1 / 10000;
+	num1 -= num2 * 10000;
+	
+	s[0] = '0' + (char)(div = (num2*8389)>>23);
+	num2 -= div*1000;
+	s[1] = '0' + (char)(div = (num2*5243)>>19);
+	num2 -= div*100;
+	s[2] = '0' + (char)(div = (num2*6554)>>16);
+	num2 -= div*10;
+	s[3] = '0' + (char)(num2);
 	s[4] = '-';
-	s[3] = (n % 10) + '0';
-	n /= 10;
-	s[2] = (n % 10) + '0';
-	n /= 10;
-	s[1] = (n % 10) + '0';
-	n /= 10;
-	s[0] = (n % 10) + '0';
+	
+	s[5] = '0' + (char)(div = (num1*8389)>>23);
+	num1 -= div*1000;
+	s[6] = '0' + (char)(div = (num1*5243)>>19);
+	num1 -= div*100;
+	s[7] = '-';
+	s[8] = '0' + (char)(div = (num1*6554)>>16);
+	num1 -= div*10;
+	s[9] = '0' + (char)(num1);
 #else
-	sprintf( s, "%08u",
-		(n % 100000000) );
+	sprintf( s, "%08u", n );
 	s[9] = s[7];
 	s[8] = s[6];
 	s[7] = '-';
