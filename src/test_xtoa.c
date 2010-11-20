@@ -74,18 +74,19 @@ int bench2( unsigned int mant1, unsigned int mant2,
 	
 	for( unsigned int e = expnt1; e <= expnt2; e++ ) {
 		printf("EXPNT %u\n", e);
-		unsigned int float_I = e << 23;
-// 		float_I |= 0x80000000; //sign
+		funi fe;
+		fe.I = e << 23;
+// 		funi.I |= 0x80000000; //sign
 		for( unsigned int i=mant1; i<=mant2; i++ ) {
 			char *s = buf;
-			unsigned int float_i = float_I | i;
-			float f = *( (float*) (&float_i) );
+			funi fi;
+			fi.I = fe.I | i;
 			
 #if 1
-			s += ftoa(s, f);
+			s += ftoa(s, fi.F);
 			*s++ = '\n';
 #else
-			s += rudi_printf_fp(s, &pinfo, f);
+			s += rudi_printf_fp(s, &pinfo, fi.F);
 			*s++ = '\n';
 			
 #endif
