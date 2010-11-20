@@ -62,6 +62,11 @@ int itodatestr( char *s, unsigned int n )
 
 int itotimestr( char *s, unsigned int n )
 {
+	if( n <= 0 || n >= 1000000 ) {
+		memcpy(s, "00:00:00", 8);
+		return 8;
+	}
+	
 #if defined FAST_PRINTING
 #if 0
 	s[7] = (n % 10) + '0';
@@ -80,7 +85,6 @@ int itotimestr( char *s, unsigned int n )
 #else
 	uint32_t num2, div;
 	
-
 	num2 = (n*8389UL)>>23;
 	n -= num2 * 1000;
 	
@@ -103,8 +107,7 @@ int itotimestr( char *s, unsigned int n )
 	s[7] = '0' + (char)(n);
 #endif
 #else
-	sprintf( s, "%06u",
-		(n % 1000000) );
+	sprintf( s, "%06u", n );
 	s[7] = s[5];
 	s[6] = s[4];
 	s[5] = ':';
