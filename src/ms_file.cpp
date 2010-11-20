@@ -918,6 +918,22 @@ void FDat::print( const char* header ) const
 	}
 
 
+#if ! defined FAST_PRINTING
+
+#define itodatestr( _s_, _f_ ) \
+	sprintf( _s_, "%d", _f_ );
+
+#define itotimestr( _s_, _f_ ) \
+	sprintf( _s_, "%d", _f_ );
+
+#define ftoa( _s_, _f_ ) \
+	sprintf( _s_, "%.5f", _f_ )
+
+#define ftoa_prec_f0( _s_, _f_ ) \
+	sprintf( _s_, "%.0f", _f_ )
+
+#endif
+
 
 int FDat::record_to_string( const char *record, char *s ) const
 {
@@ -936,9 +952,6 @@ int FDat::record_to_string( const char *record, char *s ) const
 	READ_FIELD( volume, D_VOL );
 	READ_FIELD( openint, D_OPI );
 	
-	
-#if defined FAST_PRINTING
-	
 	PRINT_FIELD( itodatestr, D_DAT, floatToIntDate_YYY(date) );
 	PRINT_FIELD( itotimestr, D_TIM, (int) time );
 	PRINT_FIELD( ftoa, D_OPE, open );
@@ -947,34 +960,6 @@ int FDat::record_to_string( const char *record, char *s ) const
 	PRINT_FIELD( ftoa, D_CLO, close );
 	PRINT_FIELD( ftoa_prec_f0, D_VOL, volume );
 	PRINT_FIELD( ftoa_prec_f0, D_OPI, openint );
-	
-#undef PRINT_FIELD
-#else
-#define PRINT_FIELD( _field_, _var_ ) \
-	if( print_bitset & _field_) { \
-		s += sprintf( s, fmt, _var_ ); \
-		*s++ = print_sep; \
-	}
-	const char * fmt;
-	
-	if( print_bitset & D_DAT ) {
-		s += sprintf( s, "%d", floatToIntDate_YYY(date) );
-		*s++ = print_sep;
-	}
-	if( print_bitset & D_TIM ) {
-		s += sprintf( s, "%d", (int) time );
-		*s++ = print_sep;
-	}
-	fmt = "%.5f";
-	PRINT_FIELD( D_OPE, open );
-	PRINT_FIELD( D_HIG, high);
-	PRINT_FIELD( D_LOW, low );
-	PRINT_FIELD( D_CLO, close );
-	fmt = "%.0f";
-	PRINT_FIELD( D_VOL, volume );
-	PRINT_FIELD( D_OPI, openint );
-#undef PRINT_FIELD
-#endif // FAST_PRINTING
 	
 	if( s != begin ) {
 		*(--s) = '\0';
