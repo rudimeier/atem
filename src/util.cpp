@@ -80,22 +80,20 @@ int itotimestr( char *s, unsigned int n )
 #else
 	char *ps = s;
 	uint32_t num1 = n, num2, div;
-	if ( n >= 1000000) {
-		assert(0);
-	}
 	
+	memcpy(ps, "00:00:00", 8);
 	
 	if (num1 < 1000) {
-		if (num1 < 10) { strcpy(ps, "00:00:0"); ps+=7; goto L1;}
-		if (num1 < 100) { strcpy(ps, "00:00:"); ps+=6; goto L2;}
-		strcpy(ps, "00:0"); ps+=4;
+		if (num1 < 10) {ps+=7; goto L1;}
+		if (num1 < 100) {ps+=6; goto L2;}
+		ps+=4;
 	} else {
 		num2 = (num1*8389UL)>>23;
 		num1 -= num2 * 1000;
-		if (num2 < 10000) {
-			if (num1 < 10) { strcpy(ps, "00:"); ps+=3; goto L4;}
-			if (num2 < 100) { strcpy(ps, "0");ps+=1;  goto L5;}
-		}
+		
+		if (num2 < 10) {ps+=3; goto L4;}
+		if (num2 < 100) {ps+=1;  goto L5;}
+		
 		*ps++ = '0' + (char)(div = (num2*5243UL)>>19);
 		num2 -= div*100;
 L5:
