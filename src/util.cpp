@@ -46,10 +46,17 @@ int itodatestr( char *s, unsigned int n )
 	s[1] = (n % 10) + '0';
 	n /= 10;
 	s[0] = (n % 10) + '0';
-	return 10;
 #else
-	return sprintf( s, "%d", n );
+	sprintf( s, "%08u",
+		(n % 100000000) );
+	s[9] = s[7];
+	s[8] = s[6];
+	s[7] = '-';
+	s[6] = s[5];
+	s[5] = s[4];
+	s[4] = '-';
 #endif
+	return 10;
 }
 
 
@@ -69,10 +76,17 @@ int itotimestr( char *s, unsigned int n )
 	s[1] = (n % 10) + '0';
 	n /= 10;
 	s[0] = (n % 10) + '0';
-	return 8;
 #else
-	return sprintf( s, "%d", n );
+	sprintf( s, "%06u",
+		(n % 1000000) );
+	s[7] = s[5];
+	s[6] = s[4];
+	s[5] = ':';
+	s[4] = s[3];
+	s[3] = s[2];
+	s[2] = ':';
 #endif
+	return 8;
 }
 
 
