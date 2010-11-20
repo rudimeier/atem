@@ -78,41 +78,29 @@ int itotimestr( char *s, unsigned int n )
 	n /= 10;
 	s[0] = (n % 10) + '0';
 #else
-	char *ps = s;
-	uint32_t num1 = n, num2, div;
+	uint32_t num2, div;
 	
-	memcpy(ps, "00:00:00", 8);
+
+	num2 = (n*8389UL)>>23;
+	n -= num2 * 1000;
 	
-	if (num1 < 1000) {
-		if (num1 < 10) {ps+=7; goto L1;}
-		if (num1 < 100) {ps+=6; goto L2;}
-		ps+=4;
-	} else {
-		num2 = (num1*8389UL)>>23;
-		num1 -= num2 * 1000;
-		
-		if (num2 < 10) {ps+=3; goto L4;}
-		if (num2 < 100) {ps+=1;  goto L5;}
-		
-		*ps++ = '0' + (char)(div = (num2*5243UL)>>19);
-		num2 -= div*100;
-L5:
-		*ps++ = '0' + (char)(div = (num2*6554UL)>>16);
-		num2 -= div*10;
-		*ps++ = ':';
-L4:
-		*ps++ = '0' + (char)(num2);
-	}
-	*ps++ = '0' + (char)(div = (num1*5243UL)>>19);
-	num1 -= div*100;
-	*ps++ = ':';
-L2:
-	*ps++ = '0' + (char)(div = (num1*6554UL)>>16);
-	num1 -= div*10;
-L1:
-	*ps++ = '0' + (char)(num1);
+	s[0] = '0' + (char)(div = (num2*5243UL)>>19);
+	num2 -= div*100;
 	
-	return ps - s;
+	s[1] = '0' + (char)(div = (num2*6554UL)>>16);
+	num2 -= div*10;
+	
+	s[2] = ':';
+	
+	s[3] = '0' + (char)(num2);
+	s[4] = '0' + (char)(div = (n*5243UL)>>19);
+	n -= div*100;
+	
+	s[5] = ':';
+	
+	s[6] = '0' + (char)(div = (n*6554UL)>>16);
+	n -= div*10;
+	s[7] = '0' + (char)(n);
 #endif
 #else
 	sprintf( s, "%06u",
