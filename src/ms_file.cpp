@@ -918,23 +918,6 @@ void FDat::print( const char* header ) const
 	}
 
 
-#if ! defined FAST_PRINTING
-
-#define itodatestr( _s_, _f_ ) \
-	sprintf( _s_, "%d", _f_ );
-
-#define itotimestr( _s_, _f_ ) \
-	sprintf( _s_, "%d", _f_ );
-
-#define ftoa( _s_, _f_ ) \
-	sprintf( _s_, "%.5f", _f_ )
-
-#define ftoa_prec_f0( _s_, _f_ ) \
-	sprintf( _s_, "%.0f", _f_ )
-
-#endif
-
-
 int FDat::record_to_string( const char *record, char *s ) const
 {
 	int offset = 0;

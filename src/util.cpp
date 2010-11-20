@@ -7,14 +7,28 @@
 #include <limits.h>
 
 #include "itoa.c"
-#include "ftoa.c"
 
+#if defined FAST_PRINTING
+	#include "ftoa.c"
+#else
+
+int ftoa(char *s, float f )
+{
+	return sprintf( s, "%.5f", f );
+}
+int ftoa_prec_f0(char *s, float f )
+{
+	return sprintf( s, "%.0f", f );
+}
+
+#endif
 
 
 
 
 int itodatestr( char *s, unsigned int n )
 {
+#if defined FAST_PRINTING
 	s[9] = (n % 10) + '0';
 	n /= 10;
 	s[8] = (n % 10) + '0';
@@ -33,11 +47,15 @@ int itodatestr( char *s, unsigned int n )
 	n /= 10;
 	s[0] = (n % 10) + '0';
 	return 10;
+#else
+	return sprintf( s, "%d", n );
+#endif
 }
 
 
 int itotimestr( char *s, unsigned int n )
 {
+#if defined FAST_PRINTING
 	s[7] = (n % 10) + '0';
 	n /= 10;
 	s[6] = (n % 10) + '0';
@@ -52,6 +70,9 @@ int itotimestr( char *s, unsigned int n )
 	n /= 10;
 	s[0] = (n % 10) + '0';
 	return 8;
+#else
+	return sprintf( s, "%d", n );
+#endif
 }
 
 
