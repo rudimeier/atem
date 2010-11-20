@@ -165,7 +165,7 @@ END:
 
 
 
-int ftoa_prec_f0( char *outbuf, float f )
+int ftoa_prec_f0_old( char *outbuf, float f )
 {
 	unsigned long mantissa, int_part, frac_part;
 	int safe_shift;
@@ -231,6 +231,57 @@ END:
 	*p = 0;
 	return p - outbuf;
 }
+
+
+
+
+int ftoa_prec_f0( char *outbuf, float f )
+{
+	int safe_shift;
+	unsigned long safe_mask, int_part, frac_part;
+	char *p = outbuf;
+	LF_t x;
+	x.F = f;
+	
+	short exp2 = (unsigned char)(x.L >> 23) - 127;
+	unsigned long mantissa = (x.L & 0xFFFFFF) | 0x800000;
+	
+	if (exp2 < -1 || (exp2 == -1 && mantissa == 0x800000) ) {
+		/*  |f| <= 0.5  */
+		*p++ = '0';
+		goto END;
+	}
+	
+// 		printf("%f, %lx\n",f, mantissa );
+	assert( exp2>=-1 );
+	
+	
+	if (exp2 >= 64) {
+		/* |f| >= 2^64 > ULONG_MAX */
+		/* NaNs and +-INF are also handled here*/
+		int_part = ULONG_MAX;
+		frac_part = 0;
+	} else if (exp2 >= 23) {
+		int_part = mantissa << (exp2 - 23);
+		frac_part = 0;
+	} else {
+		int_part = mantissa >> (23 - exp2);
+		frac_part = (mantissa << (exp2 + 1)) & 0xFFFFFF;
+// 		printf("%f, %d, %ld, %lX\n",f, exp2, int_part, frac_part );
+		if( frac_part >= 0x800000 ) {
+			if( frac_part != 0x800000 || ( int_part & 1 ) ) {
+				int_part++;
+			}
+		}
+	}
+	assert( int_part != 0 );
+	p += itoa_uint64(p, int_part);
+	
+END:
+	*p = 0;
+	return p - outbuf;
+}
+
 
 
 
