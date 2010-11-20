@@ -174,9 +174,6 @@ class FDat
 		
 		static char print_sep;
 		static unsigned int print_bitset;
-#if ! defined FAST_PRINTING
-		static char sprintf_format[64];
-#endif
 		
 		const unsigned char field_bitset;
 		const unsigned int record_length;

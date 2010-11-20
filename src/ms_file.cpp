@@ -7,26 +7,7 @@
 
 #include "util.h"
 
-#if defined FAST_PRINTING
 
-static struct rudi_printf_info _pinfo;
-
-struct rudi_printf_info*  init_print_info()
-{
-	_pinfo.prec = 5;
-	_pinfo.width = 0;
-	_pinfo.spec = 'f';
-	_pinfo.space = 0;
-	_pinfo.left = 0;
-	_pinfo.showsign = 0;
-	_pinfo.pad = ' ';
-	return &_pinfo;
-}
-
-static struct rudi_printf_info *pinfo = init_print_info();
-
-
-#endif
 
 
 int mr_record_to_string( char *dest, const struct master_record* mr,
@@ -848,22 +829,12 @@ FDat::FDat( const char *_buf, int _size, unsigned char fields ) :
 
 char FDat::print_sep = '\t';
 unsigned int FDat::print_bitset = 0xff;
-#if ! defined FAST_PRINTING
-char FDat::sprintf_format[64] = "%d\t%.5f\t%.5f\t%.5f\t%.5f\t%.0f\t%.0f\n";
-#endif
 
 
 void FDat::initPrinter( char sep, unsigned int bitset )
 {
 	print_sep = sep;
 	print_bitset = bitset;
-	
-#if ! defined FAST_PRINTING
-	// TODO implement constructing sprintf_format
-	sprintf_format[2] = sprintf_format[7] = sprintf_format[12]
-		= sprintf_format[17] = sprintf_format[22] = sprintf_format[27]
-		= sep;
-#endif
 }
 
 
