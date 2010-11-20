@@ -904,11 +904,20 @@ void FDat::print( const char* header ) const
 
 // to be printed when field does not exist
 #define DEFAULT_FLOAT -0.0
+
 #define READ_FIELD( _dst_, _field_) \
 	if( field_bitset & _field_ ) { \
 		 _dst_ = readFloat(record, offset); \
 		offset += 4; \
 	}
+
+#define PRINT_FIELD( _func_, _field_, _var_ ) \
+	if( print_bitset & _field_) { \
+		s += _func_( s, _var_ ); \
+		*s++ = print_sep; \
+	}
+
+
 
 int FDat::record_to_string( const char *record, char *s ) const
 {
@@ -929,32 +938,15 @@ int FDat::record_to_string( const char *record, char *s ) const
 	
 	
 #if defined FAST_PRINTING
-#define PRINT_FIELD( _field_, _var_ ) \
-	if( print_bitset & _field_) { \
-		s += ftoa( s, _var_ ); \
-		*s++ = print_sep; \
-	}
-
-#define PRINT_FIELD_AS_INT( _field_, _var_ ) \
-	if( print_bitset & _field_) { \
-		s += ftoa_prec_f0( s, _var_ ); \
-		*s++ = print_sep; \
-	}
-
-	if( print_bitset & D_DAT ) {
-		s += itodatestr( s, floatToIntDate_YYY(date) );
-		*s++ = print_sep;
-	}
-	if( print_bitset & D_TIM ) {
-		s += itotimestr( s, (int) time );
-		*s++ = print_sep;
-	}
-	PRINT_FIELD( D_OPE, open );
-	PRINT_FIELD( D_HIG, high );
-	PRINT_FIELD( D_LOW, low );
-	PRINT_FIELD( D_CLO, close );
-	PRINT_FIELD_AS_INT( D_VOL, volume );
-	PRINT_FIELD_AS_INT( D_OPI, openint );
+	
+	PRINT_FIELD( itodatestr, D_DAT, floatToIntDate_YYY(date) );
+	PRINT_FIELD( itotimestr, D_TIM, (int) time );
+	PRINT_FIELD( ftoa, D_OPE, open );
+	PRINT_FIELD( ftoa, D_HIG, high );
+	PRINT_FIELD( ftoa, D_LOW, low );
+	PRINT_FIELD( ftoa, D_CLO, close );
+	PRINT_FIELD( ftoa_prec_f0, D_VOL, volume );
+	PRINT_FIELD( ftoa_prec_f0, D_OPI, openint );
 	
 #undef PRINT_FIELD
 #else
