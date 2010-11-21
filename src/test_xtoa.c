@@ -11,23 +11,8 @@
 #define BUF_LEN 512
 
 
-// #define TEST_ITOA
-#define TEST_FTOA
-
-
-
-static struct rudi_printf_info pinfo;
-
-void init_print_info()
-{
-	pinfo.prec = 5;
-	pinfo.width = 0;
-	pinfo.spec = 'f';
-	pinfo.space = 0;
-	pinfo.left = 0;
-	pinfo.showsign = 0;
-	pinfo.pad = ' ';
-}
+#define TEST_ITOA
+// #define TEST_FTOA
 
 
 
@@ -44,8 +29,8 @@ int compare2()
 		
 		double f = *( (float*) (&i) );
 		
-		sprintf( s1, "%.6g", f );
-		rudi_printf_fp( s2, &pinfo, f);
+		sprintf( s1, "%.5f", f );
+		ftoa( s2, f);
 		
 		if( strcmp(s1, s2/*, l - 1*/) ) {
 			fprintf( stdout, "error(%d): %.18g  %s != %s\n", i, f, s1, s2 );
@@ -201,8 +186,6 @@ int main(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-	init_print_info();
-	
 	bench2(0 , 0x7fffff, 127-4, 127+13 );
 	return 0;
 }
