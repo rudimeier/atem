@@ -103,6 +103,25 @@ float readFloat_IEEE(const char *c, int offset)
 
 float readFloat(const char *c, int offset)
 {
+#if 1
+	union {
+		unsigned int L;
+		float F;
+	} x;
+	
+	const unsigned int msf = *( (unsigned int*)(c + offset) );
+	
+	const unsigned int ms_e = 0xff000000 & msf;
+	if( ms_e == 0x00000000 ) {
+		return 0.0;
+	}
+	unsigned int ieee_s = (0x00800000 & msf) << 8;
+	unsigned int ieee_e = ((ms_e - 0x02000000) & 0xff000000) >> 1;
+	unsigned int ieee_m = 0x007fffff & msf;
+	
+	x.L = ieee_e | ieee_s | ieee_m;
+	return x.F;
+#else
 	const float *src4 = (const float*) (c+offset);
 	float retVal;
 	float *dest4 = &retVal;
@@ -156,6 +175,7 @@ float readFloat(const char *c, int offset)
 	ieee[0] = msbin[0];
 
 	return retVal;
+#endif
 }
 
 
