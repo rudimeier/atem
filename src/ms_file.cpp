@@ -9,6 +9,17 @@
 
 
 
+/**
+ * copy src to dst string, return strlen
+ */
+inline int strcpy_len( char *dest, const char *src )
+{
+	int len = strlen( src );
+	memcpy( dest, src, len );
+	return len;
+}
+
+
 
 int mr_record_to_string( char *dest, const struct master_record* mr,
 	unsigned short prnt_master_fields, char sep )
