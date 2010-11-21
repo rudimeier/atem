@@ -25,18 +25,13 @@ int mr_record_to_string( char *dest, const struct master_record* mr,
 	unsigned short prnt_master_fields, char sep )
 {
 	char * cp = dest;
-	int tmp;
 	
 	if( prnt_master_fields & M_SYM ) {
-		tmp = strlen(mr->c_symbol);
-		memcpy( cp, mr->c_symbol, tmp );
-		cp += tmp;
+		cp += strcpy_len( cp, mr->c_symbol );
 		*cp++ = sep;
 	}
 	if( prnt_master_fields & M_NAM ) {
-		tmp = strlen(mr->c_long_name);
-		memcpy( cp, mr->c_long_name, tmp );
-		cp += tmp;
+		cp += strcpy_len( cp, mr->c_long_name);
 		*cp++ = sep;
 	}
 	if( prnt_master_fields & M_PER ) {
@@ -56,9 +51,7 @@ int mr_record_to_string( char *dest, const struct master_record* mr,
 		*cp++ = sep;
 	}
 	if( prnt_master_fields & M_FIL ) {
-		tmp = strlen(mr->file_name);
-		memcpy( cp, mr->file_name, tmp );
-		cp += tmp;
+		cp += strcpy_len( cp, mr->file_name);
 		*cp++ = sep;
 	}
 	if( prnt_master_fields & M_FLD ) {
