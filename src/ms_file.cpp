@@ -19,6 +19,17 @@ inline int strcpy_len( char *dest, const char *src )
 	return len;
 }
 
+/**
+ * copy a char to dst string, return strlen
+ */
+inline int cpychar( char *dest, char c )
+{
+	*dest = c;
+	return 1;
+}
+
+
+
 
 
 int mr_record_to_string( char *dest, const struct master_record* mr,
