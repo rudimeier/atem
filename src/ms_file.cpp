@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 
 
 #include "util.h"
@@ -105,11 +106,11 @@ float readFloat(const char *c, int offset)
 {
 #if 1
 	union {
-		unsigned int L;
+		uint32_t L;
 		float F;
 	} x;
 	
-	const unsigned int msf = *( (unsigned int*)(c + offset) );
+	const uint32_t msf = *( (uint32_t*)(c + offset) );
 	
 	/* regardless of endianness, that's how these floats look like
 	  MBF:  eeeeeeeeSmmmmmmmmmmmmmmmmmmmmmmm
@@ -119,13 +120,13 @@ float readFloat(const char *c, int offset)
 	  point before the assumed bit, while IEEE places the decimal point
 	  after the assumed bit"
 	  -> so ieee_exp = ms_exp - 2 */
-	const unsigned int ms_e = 0xff000000 & msf;
+	const uint32_t ms_e = 0xff000000 & msf;
 	if( ms_e == 0x00000000 ) {
 		/* "any msbin w/ exponent of zero = zero" */
 		return 0.0;
 	}
 	
-	unsigned int ieee_s = (0x00800000 & msf) << 8;
+	uint32_t ieee_s = (0x00800000 & msf) << 8;
 	
 	/* Adding -2 to MS exponent. We set zero when ms_e is 1 because it would
 	   overflow. The orignal MS code lets overflow it (type unsigned char!)
@@ -133,8 +134,8 @@ float readFloat(const char *c, int offset)
 	   dependent on mantissa.
 	   Note when ms_e is 2 the resulting IEEE mantissa is subnormal - don't
 	   know if MS and IEEE mantissa are compatible in this case. */
-	unsigned int ieee_e = ( (ms_e - 0x02000000) & 0xff000000) >> 1;
-	unsigned int ieee_m = 0x007fffff & msf;
+	uint32_t ieee_e = ( (ms_e - 0x02000000) & 0xff000000) >> 1;
+	uint32_t ieee_m = 0x007fffff & msf;
 	
 	x.L = ieee_e | ieee_s | ieee_m;
 	return x.F;
