@@ -31,52 +31,28 @@ inline int cpychar( char *dest, char c )
 
 
 
+#define PRINT_FIELD( _func_, _field_, _var_ ) \
+	if( prnt_master_fields & _field_) { \
+		cp += _func_( cp, _var_ ); \
+		*cp++ = sep; \
+	}
+
 
 int mr_record_to_string( char *dest, const struct master_record* mr,
 	unsigned short prnt_master_fields, char sep )
 {
 	char * cp = dest;
 	
-	if( prnt_master_fields & M_SYM ) {
-		cp += strcpy_len( cp, mr->c_symbol );
-		*cp++ = sep;
-	}
-	if( prnt_master_fields & M_NAM ) {
-		cp += strcpy_len( cp, mr->c_long_name);
-		*cp++ = sep;
-	}
-	if( prnt_master_fields & M_PER ) {
-		*cp++ = mr->barsize;
-		*cp++ = sep;
-	}
-	if( prnt_master_fields & M_DT1 ) {
-		cp += ltoa( cp, mr->from_date );
-		*cp++ = sep;
-	}
-	if( prnt_master_fields & M_DT2 ) {
-		cp += ltoa( cp, mr->to_date );
-		*cp++ = sep;
-	}
-	if( prnt_master_fields & M_FNO ) {
-		cp += ltoa( cp, mr->file_number );
-		*cp++ = sep;
-	}
-	if( prnt_master_fields & M_FIL ) {
-		cp += strcpy_len( cp, mr->file_name);
-		*cp++ = sep;
-	}
-	if( prnt_master_fields & M_FLD ) {
-		cp += ltoa( cp, mr->field_bitset );
-		*cp++ = sep;
-	}
-	if( prnt_master_fields & M_RNO ) {
-		cp += ltoa( cp, mr->record_number );
-		*cp++ = sep;
-	}
-	if( prnt_master_fields & M_KND ) {
-		*cp++ = mr->kind;
-		*cp++ = sep;
-	}
+	PRINT_FIELD( strcpy_len, M_SYM, mr->c_symbol );
+	PRINT_FIELD( strcpy_len, M_NAM, mr->c_long_name );
+	PRINT_FIELD( cpychar, M_PER, mr->barsize );
+	PRINT_FIELD( ltoa, M_DT1, mr->from_date );
+	PRINT_FIELD( ltoa, M_DT2, mr->to_date );
+	PRINT_FIELD( ltoa, M_FNO, mr->file_number );
+	PRINT_FIELD( strcpy_len, M_FIL, mr->file_name );
+	PRINT_FIELD( ltoa, M_FLD, mr->field_bitset );
+	PRINT_FIELD( ltoa, M_RNO, mr->record_number );
+	PRINT_FIELD( cpychar, M_KND, mr->kind );
 	
 	// remove last separator if exists
 	if( cp != dest ) {
@@ -87,6 +63,8 @@ int mr_record_to_string( char *dest, const struct master_record* mr,
 	assert( (cp - dest) < MAX_SIZE_MR_STRING );
 	return cp - dest;
 }
+
+#undef PRINT_FIELD
 
 
 
