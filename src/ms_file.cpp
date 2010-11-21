@@ -111,12 +111,29 @@ float readFloat(const char *c, int offset)
 	
 	const unsigned int msf = *( (unsigned int*)(c + offset) );
 	
+	/* regardless of endianness, that's how these floats look like
+	  MBF:  eeeeeeeeSmmmmmmmmmmmmmmmmmmmmmmm
+	  IEE:  Seeeeeeeemmmmmmmmmmmmmmmmmmmmmmm
+	
+	  "MBF is bias 128 and IEEE is bias 127. ALSO, MBF places the decimal
+	  point before the assumed bit, while IEEE places the decimal point
+	  after the assumed bit"
+	  -> so ieee_exp = ms_exp - 2 */
 	const unsigned int ms_e = 0xff000000 & msf;
 	if( ms_e == 0x00000000 ) {
+		/* "any msbin w/ exponent of zero = zero" */
 		return 0.0;
 	}
+	
 	unsigned int ieee_s = (0x00800000 & msf) << 8;
-	unsigned int ieee_e = ((ms_e - 0x02000000) & 0xff000000) >> 1;
+	
+	/* Adding -2 to MS exponent. We set zero when ms_e is 1 because it would
+	   overflow. The orignal MS code lets overflow it (type unsigned char!)
+	   i.e. _probably_ they set exponent to 0xFF which is an IEEE NaN or INF
+	   dependent on mantissa.
+	   Note when ms_e is 2 the resulting IEEE mantissa is subnormal - don't
+	   know if MS and IEEE mantissa are compatible in this case. */
+	unsigned int ieee_e = ( (ms_e - 0x02000000) & 0xff000000) >> 1;
 	unsigned int ieee_m = 0x007fffff & msf;
 	
 	x.L = ieee_e | ieee_s | ieee_m;
