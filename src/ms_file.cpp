@@ -46,8 +46,8 @@ int mr_record_to_string( char *dest, const struct master_record* mr,
 	PRINT_FIELD( strcpy_len, M_SYM, mr->c_symbol );
 	PRINT_FIELD( strcpy_len, M_NAM, mr->c_long_name );
 	PRINT_FIELD( cpychar, M_PER, mr->barsize );
-	PRINT_FIELD( ltoa, M_DT1, mr->from_date );
-	PRINT_FIELD( ltoa, M_DT2, mr->to_date );
+	PRINT_FIELD( itodatestr, M_DT1, mr->from_date );
+	PRINT_FIELD( itodatestr, M_DT2, mr->to_date );
 	PRINT_FIELD( itoa, M_FNO, mr->file_number );
 	PRINT_FIELD( strcpy_len, M_FIL, mr->file_name );
 	PRINT_FIELD( itoa, M_FLD, mr->field_bitset );
