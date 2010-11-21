@@ -6,11 +6,20 @@
 #include <assert.h>
 #include <limits.h>
 
-#include "itoa.c"
 
 #if defined FAST_PRINTING
+	#include "itoa.c"
 	#include "ftoa.c"
 #else
+
+int itoa( char *s, int n )
+{
+	return sprintf( s, "%d", n );
+}
+int ltoa( char *s, long n )
+{
+	return sprintf( s, "%ld", n );
+}
 
 int ftoa(char *s, float f )
 {
