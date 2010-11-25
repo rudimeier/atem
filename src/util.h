@@ -1,6 +1,7 @@
 #ifndef ATEM_UTILS_H
 #define ATEM_UTILS_H
 
+#include "config.h"
 
 
 
