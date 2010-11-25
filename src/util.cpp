@@ -6,8 +6,12 @@
 #include <assert.h>
 #include <limits.h>
 
+#include "config.h"
+
 
 #if defined FAST_PRINTING
+	#define itoa_int32 itoa
+	#define itoa_int64 ltoa
 	#include "itoa.c"
 	#include "ftoa.c"
 #else
