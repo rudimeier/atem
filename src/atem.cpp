@@ -2,12 +2,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include "config.h"
 #include "metastock.h"
-
-
-#define VERSION_MAJOR 0
-#define VERSION_MINOR 2
-#define VERSION_RELEASE 0
 
 
 
@@ -33,8 +29,8 @@ static void displayArgs( poptContext con, poptCallbackReason /*foo*/,
 	if (key->shortName == 'h') {
 		poptPrintHelp(con, stdout, 0);
 	} else if (key->shortName == 'V') {
-		fprintf(stdout, "atem - metastock reverse (%d.%d.%d)\n",
-			VERSION_MAJOR, VERSION_MINOR, VERSION_RELEASE);
+		fprintf(stdout, PACKAGE_NAME " - metastock reverse "
+			"(" PACKAGE_VERSION ")\n");
 	} else {
 		poptPrintUsage(con, stdout, 0);
 	}
