@@ -1,7 +1,6 @@
 #ifndef ATEM_UTILS_H
 #define ATEM_UTILS_H
 
-#include "config.h"
 
 
 
@@ -33,10 +32,6 @@ inline int trim_end( char *dst, const char *src, int len )
 }
 
 
-#if defined FAST_PRINTING
-	#define itoa itoa_int32
-	#define ltoa itoa_int64
-#endif
 
 extern int itoa( char *s, int n );
 extern int ltoa( char *s, long n );
