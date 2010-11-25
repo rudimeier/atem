@@ -7,6 +7,7 @@ AC_CONFIG_SRCDIR([src/])
 AM_INIT_AUTOMAKE([foreign])
 
 ## compiler check
+CXXFLAGS="-O3 -g -Wall -W -DFAST_PRINTING"
 AC_PROG_CXX
 
 ## output
