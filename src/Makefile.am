@@ -25,8 +25,12 @@ atem_LDFLAGS = $(AM_LDFLAGS)
 ## Create preprocessor output (debugging purposes only)
 .c.i:
 	$(COMPILE) -E -o $@ $<
+.cpp.i:
+	$(COMPILE) -E -o $@ $<
 
 ## Create assembler output (debugging purposes only)
 .c.s:
+	$(COMPILE) -S -c $(cflags) $<
+.cpp.s:
 	$(COMPILE) -S -c $(cflags) $<
 
