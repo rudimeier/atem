@@ -1,6 +1,8 @@
 # general excludes
 *~
 *.o
+*.i
+*.s
 *.o.dt
 *.cfg
 *.log
@@ -40,6 +42,11 @@ configure
 depcomp
 install-sh
 missing
+config.h
 config.h.in
+config.status
 build
 =build
+.deps
+stamp-h1
+
