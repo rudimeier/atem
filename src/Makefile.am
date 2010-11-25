@@ -3,25 +3,25 @@ AM_LDFLAGS =
 
 headerdir = $(includedir)/atem
 
-bin_PROGRAMS =
-noinst_PROGRAMS =
-lib_LTLIBRARIES =
-header_HEADERS =
-noinst_HEADERS =
-noinst_LIBRARIES =
 
+bin_PROGRAMS =
 bin_PROGRAMS += atem
 atem_SOURCES =
 atem_SOURCES += atem.cpp
 atem_SOURCES += metastock.cpp
 atem_SOURCES += ms_file.cpp
 atem_SOURCES += util.cpp
+noinst_HEADERS =
 noinst_HEADERS += metastock.h ms_file.h util.h
 noinst_HEADERS += ftoa.c
 noinst_HEADERS += itoa.c
 atem_LDADD = -lpopt
 atem_CPPFLAGS = $(AM_CPPFLAGS)
 atem_LDFLAGS = $(AM_LDFLAGS)
+
+CLEANFILES =
+CLEANFILES += *.s
+CLEANFILES += *.i
 
 # 
 # Help the developers get nice post-processed source files
