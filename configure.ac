@@ -1,4 +1,4 @@
-AC_PREREQ([2.64])
+AC_PREREQ([2.61])
 AC_INIT([atem], [0.1], [http://www.ga-group.nl/])
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_HEADER([src/config.h])
