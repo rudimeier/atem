@@ -567,10 +567,6 @@ int EMasterFile::getRecord( master_record *mr, unsigned short rnum ) const
 	}
 	
 	mr->from_date = floatToIntDate_YYY(readFloat_IEEE(record, 64));
-	// equis got this record invalid sometimes
-	int from_date_2 = readInt(record, 126);
-	assert( mr->from_date == from_date_2 || from_date_2 == 19000101 );
-	
 	mr->to_date = floatToIntDate_YYY(readFloat_IEEE(record, 72));
 	if( mr->from_date > mr->to_date ) {
 		//HACK premium data have year like 128 (+1900) but should be 28 (+1900)
