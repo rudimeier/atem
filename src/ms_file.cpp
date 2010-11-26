@@ -559,9 +559,9 @@ int EMasterFile::getRecord( master_record *mr, unsigned short rnum ) const
 	mr->field_bitset= readUnsignedChar( record, 7 );
 	assert( count_bits(mr->field_bitset) == readUnsignedChar( record, 6 ) );
 	mr->barsize= readChar( record, 60 );
-	trim_end( mr->c_symbol, record + 11, 14 );
+	trim_end( mr->c_symbol, record + 11, MAX_LEN_MR_SYMBOL );
 	
-	if( trim_end( mr->c_long_name, record + 139, 52 ) == 0 ) {
+	if( trim_end( mr->c_long_name, record + 139, MAX_LEN_MR_LNAME ) == 0 ) {
 		// long name is empty - using short name
 		trim_end( mr->c_long_name, record + 32, 16 );
 	}
@@ -767,8 +767,8 @@ int XMasterFile::getRecord( master_record *mr, unsigned short rnum ) const
 	mr->file_number = readUnsignedShort( record, 65 );
 	mr->field_bitset = readUnsignedChar( record, 70 );
 	mr->barsize = readChar( record, 62 );
-	trim_end( mr->c_symbol, record + 1, 14 );
-	trim_end( mr->c_long_name, record + 16, 45 );
+	trim_end( mr->c_symbol, record + 1, MAX_LEN_MR_SYMBOL );
+	trim_end( mr->c_long_name, record + 16, MAX_LEN_MR_LNAME );
 	mr->from_date = readInt( record, 108 );
 	mr->to_date = readInt( record, 116 );
 	return 0;
