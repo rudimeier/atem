@@ -687,16 +687,20 @@ bool XMasterFile::checkRecord( int r ) const
 	//  #67,  3b: char[3], ??, always '0' ?
 	//  #70,  1b: unsigned char, data field bitset
 	//  #71,  9b: char[9], ??, always '0' ?
-
-	// char 80 - 83 start date
-	// char 84 - 86 short start date ???
-	// char 87 - 103 always '\x00'
-	// char 104 - 107 first date
-	// char 108 - 111 last date
-	// char 112 - 115 always '\x00'
-	// char 116 - 119 last date
-	// char 120 - 149 always '\x00'
-	
+	//  #80,  4b: ??
+	//            equis/premium  looks like int 19800317, 19990430 or 0
+	//  #84,  4b: ??
+	//            equis/premium first 3 bytes equal #80
+	//  #87, 17b: char[17], ??, always '0' ?
+	// #104,  4b: int, collection date ??, valid (error #1121)
+	// #108   4b: int, first date, valid (error #1122)
+	// #112,  4b: ??, first time, valid (error #1123)
+	// #116   4b: int, last date, valid (error #1124)
+	// #120,  4b: ??, last time, valid (error #1125)
+	// #124, 26b: char[29], ??, always '0' ?
+	//
+	// note, the unknown fields from #71 on may contain "composite stuff",
+	// whatever it is
 	
 	assert( readChar( record, 0) == '\x01' );
 	assert( readChar( record, 15) == '\x00' );
@@ -709,19 +713,19 @@ bool XMasterFile::checkRecord( int r ) const
 		|| (per == 'I' && intrTimeFrame > 0 && intrTimeFrame <= 60) );
 	
 	for( int i = 67; i<70; i++ ) {
-		assert( readChar( record, i ) == '\x00' );
+		assert( readChar( record, i ) == '\0' );
 	}
 	for( int i = 71; i<80; i++ ) {
-		assert( readChar( record, i ) == '\x00' );
+		assert( readChar( record, i ) == '\0' );
 	}
-	for( int i = 87; i<=103; i++ ) {
-		assert( readChar( record, i ) == '\x00' );
+	for( int i = 87; i<104; i++ ) {
+		assert( readChar( record, i ) == '\0' );
 	}
-	for( int i = 112; i<=115; i++ ) {
-		assert( readChar( record, i ) == '\x00' );
+	for( int i = 112; i<116; i++ ) {
+		assert( readChar( record, i ) == '\0' );
 	}
-	for( int i = 120; i<=149; i++ ) {
-		assert( readChar( record, i ) == '\x00' );
+	for( int i = 124; i<150; i++ ) {
+		assert( readChar( record, i ) == '\0' );
 	}
 	
 	return true;
