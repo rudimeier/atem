@@ -256,6 +256,7 @@ bool Metastock::readFile( const char *file_name , char *buf, int *len ) const
 
 void Metastock::parseMasters()
 {
+#if 1
 	{
 		EMasterFile emf( ba_emaster, emaster_len );
 		int cntE = emf.countRecords();
@@ -266,17 +267,19 @@ void Metastock::parseMasters()
 			emf.getRecord( mr, i );
 		}
 	}
-	
+#else
 	{
 		// NOTE this is just a check EMaster vs. Master
 		MasterFile mf( ba_master, master_len );
 		int cntM = mf.countRecords();
 		for( int i = 1; i<=cntM; i++ ) {
-			const master_record *mr = &mr_list[ mf.fileNumber(i) ];
-			assert( mr->record_number != 0 );
+			master_record *mr = &mr_list[ mf.fileNumber(i) ];
+			assert( mr->record_number == 0 );
+			mr_len++;
 			mf.getRecord( mr, i );
 		}
 	}
+#endif
 	
 	if( hasXMaster() ) {
 		XMasterFile xmf( ba_xmaster, xmaster_len );

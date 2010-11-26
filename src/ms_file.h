@@ -74,7 +74,7 @@ class MasterFile
 		
 		bool check() const;
 		unsigned char countRecords() const;
-		int getRecord( const master_record *, unsigned short rnum ) const;
+		int getRecord( master_record *, unsigned short rnum ) const;
 		int fileNumber( int record ) const;
 		int dataLength( int record ) const;
 		

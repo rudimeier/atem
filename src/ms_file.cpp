@@ -300,6 +300,7 @@ unsigned char MasterFile::countRecords() const
 }
 
 
+#if 0
 int MasterFile::getRecord( const master_record *mr, unsigned short rnum ) const
 {
 	char tmp[64];
@@ -317,6 +318,30 @@ int MasterFile::getRecord( const master_record *mr, unsigned short rnum ) const
 	tmp_len = trim_end( tmp, record + 7, 16);
 	assert( strncmp( mr->c_long_name, tmp, tmp_len ) == 0 );
 	
+	return 0;
+}
+#endif
+
+
+int MasterFile::getRecord( master_record *mr, unsigned short rnum ) const
+{
+	const char *record = buf + (record_length * rnum);
+	mr->record_number = rnum;
+	mr->kind = 'M';
+	mr->file_number = readUnsignedChar( record, 0 );
+	mr->field_bitset= (unsigned char)0xff >> (8 - readUnsignedChar( record, 4 ));
+	assert( count_bits(mr->field_bitset) * 4 == readChar( record, 3 ) );
+	assert( count_bits(mr->field_bitset) == readChar( record, 4 ) );
+	mr->barsize= readChar( record, 60 );
+	trim_end( mr->c_symbol, record + 36, 14);
+	trim_end( mr->c_long_name, record + 7, 16);
+	
+	mr->from_date = floatToIntDate_YYY(readFloat(record, 25));
+	mr->to_date = floatToIntDate_YYY(readFloat(record, 29));
+	if( mr->from_date > mr->to_date ) {
+		//HACK premium data have year like 128 (+1900) but should be 28 (+1900)
+		mr->from_date -= 1000000;
+	}
 	return 0;
 }
 
