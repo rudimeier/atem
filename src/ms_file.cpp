@@ -673,20 +673,21 @@ bool XMasterFile::checkRecord( int r ) const
 	const char *record = buf + (record_length * r);
 	printRecord( record );
 	
-	// char 0 always '\x01'?
-	// char 1 - 14 symbol?
-	// char 15 always zero
-	// char 16 - ? name
-	// char 61 always '\x00'
-	// char 62 time frame
-	// char 63 always '\x00'
-	// char 64 always '\x00'
-	// char 65 - 66 F#.mwd
-	// char 67 always '\x00'
-	// char 68 always '\x00'
-	// char 69 always '\x00'
-	// char 70 fields bit set, always '\x7f' or '\x3f'
-	// char 71 - 79 always '\x00'
+	//   #0,  1b: char, record type always '\x01' (error #1107)
+	//   #1, 14b: char*, symbol, always zero terminated?
+	//            only alphanumeric characters (error #1108)
+	//  #15,  1b: char, always zero?
+	//  #16, 45b: char*, name, always zero terminated?
+	//            only alphanumeric characters (error #1109)
+	//  #61,  1b: char, always zero (error #1110)
+	//  #62,  1b: char, periodicity, must be 'I', 'D', 'W', 'M' (error #1111)
+	//  #63,  2b: short, intraday time frame between 0 and 60 minutes
+	//            (error #1112)
+	//  #65,  2b: unsigned short, dat file number, <=2000 (error #1113)
+	//  #67,  3b: char[3], ??, always '0' ?
+	//  #70,  1b: unsigned char, data field bitset
+	//  #71,  9b: char[9], ??, always '0' ?
+
 	// char 80 - 83 start date
 	// char 84 - 86 short start date ???
 	// char 87 - 103 always '\x00'
@@ -700,17 +701,19 @@ bool XMasterFile::checkRecord( int r ) const
 	assert( readChar( record, 0) == '\x01' );
 	assert( readChar( record, 15) == '\x00' );
 	assert( readChar( record, 61) == '\x00' );
-	assert( readChar( record, 62) == 'D' );
-	assert( readChar( record, 63) == '\x00' );
-	assert( readChar( record, 64) == '\x00' );
-	assert( readChar( record, 67) == '\x00' );
-	assert( readChar( record, 68) == '\x00' );
-	assert( readChar( record, 69) == '\x00' );
-	assert( readChar( record, 70) == '\x7f' || readChar( record, 70) == '\x3f' );
-	for( int i = 71; i<=79; i++ ) {
+	
+	char per = record[62];
+	assert( per == 'D' || per == 'I' );
+	unsigned short intrTimeFrame = readUnsignedShort( record, 63 );
+	assert( intrTimeFrame == 0
+		|| (per == 'I' && intrTimeFrame > 0 && intrTimeFrame <= 60) );
+	
+	for( int i = 67; i<70; i++ ) {
 		assert( readChar( record, i ) == '\x00' );
 	}
-	assert( readChar( record, 70) == '\x7f' || readChar( record, 70) == '\x3f' );
+	for( int i = 71; i<80; i++ ) {
+		assert( readChar( record, i ) == '\x00' );
+	}
 	for( int i = 87; i<=103; i++ ) {
 		assert( readChar( record, i ) == '\x00' );
 	}
@@ -720,7 +723,6 @@ bool XMasterFile::checkRecord( int r ) const
 	for( int i = 120; i<=149; i++ ) {
 		assert( readChar( record, i ) == '\x00' );
 	}
-// 	assert( b_46 == '\x7f' );
 	
 	return true;
 }
