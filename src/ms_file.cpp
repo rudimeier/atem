@@ -452,7 +452,7 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	//            ticker stuff, see error #1047 - #1054
 	// #126,  4b: int, first date again as integer, equal to #64 or invalid 19000101
 	// #130,  9b: char* assume always zero
-	// #139, 52b: char*, long name
+	// #139, 52b: char*, long name, when set it should start like short name
 	// #191,  1b: char, last byte zero
 	
 	unsigned short version = readUnsignedShort( record, 0 );
@@ -507,6 +507,11 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	for( int i = 130; i<=138; i++ ) {
 		assert( record[i] == '\0' );
 	}
+	
+	if( strlen(record + 139) > 0 ) {
+		assert( strncmp(record + 32, record + 139, strlen(record + 32)) == 0 );
+	}
+	
 	assert( record[191] == '\0' );
 	
 	return true;
@@ -554,12 +559,11 @@ int EMasterFile::getRecord( master_record *mr, unsigned short rnum ) const
 	mr->field_bitset= readUnsignedChar( record, 7 );
 	assert( count_bits(mr->field_bitset) == readUnsignedChar( record, 6 ) );
 	mr->barsize= readChar( record, 60 );
-	strcpy( mr->c_symbol, record + 11 );
-	if( strlen(record + 139) > 0 ) {
-		assert( strncmp( record + 32, record + 139, strlen(record + 32) ) == 0 );
-		strcpy( mr->c_long_name, record + 139 );
-	} else {
-		strcpy( mr->c_long_name, record + 32 );
+	trim_end( mr->c_symbol, record + 11, 14 );
+	
+	if( trim_end( mr->c_long_name, record + 139, 52 ) == 0 ) {
+		// long name is empty - using short name
+		trim_end( mr->c_long_name, record + 32, 16 );
 	}
 	
 	mr->from_date = floatToIntDate_YYY(readFloat_IEEE(record, 64));
@@ -763,8 +767,8 @@ int XMasterFile::getRecord( master_record *mr, unsigned short rnum ) const
 	mr->file_number = readUnsignedShort( record, 65 );
 	mr->field_bitset = readUnsignedChar( record, 70 );
 	mr->barsize = readChar( record, 62 );
-	strcpy( mr->c_symbol, record + 1 );
-	strcpy( mr->c_long_name, record + 16 );
+	trim_end( mr->c_symbol, record + 1, 14 );
+	trim_end( mr->c_long_name, record + 16, 45 );
 	mr->from_date = readInt( record, 108 );
 	mr->to_date = readInt( record, 116 );
 	return 0;
