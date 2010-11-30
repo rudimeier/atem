@@ -294,9 +294,17 @@ void MasterFile::printRecord( const char *record ) const
 }
 
 
-unsigned char MasterFile::countRecords() const
+int MasterFile::countRecords() const
 {
-	return readChar( buf, 0 );
+	if( (size < record_length) || (size % record_length != 0) ) {
+		return -1;
+	}
+	assert( buf != NULL );
+	if( readUnsignedChar( buf, 0 ) != (size / record_length - 1) ) {
+		return -1;
+	}
+	
+	return readUnsignedChar( buf, 0 );
 }
 
 
@@ -569,9 +577,18 @@ void EMasterFile::printRecord( const char *record ) const
 }
 
 
-unsigned char EMasterFile::countRecords() const
+int EMasterFile::countRecords() const
 {
-	return readChar( buf, 0 );
+	if( (size < record_length) || (size % record_length != 0) ) {
+		return -1;
+	}
+	assert( buf != NULL );
+	if( readUnsignedChar( buf, 0 ) != (size / record_length - 1) ) {
+		return -1;
+	}
+	
+	return readUnsignedChar( buf, 0 );
+}
 }
 
 
@@ -774,8 +791,16 @@ void XMasterFile::printRecord( const char *record ) const
 }
 
 
-unsigned short XMasterFile::countRecords() const
+int XMasterFile::countRecords() const
 {
+	if( (size < record_length) || (size % record_length != 0) ) {
+		return -1;
+	}
+	assert( buf != NULL );
+	if( readUnsignedShort( buf, 10 ) != (size / record_length - 1) ) {
+		return -1;
+	}
+	
 	return readUnsignedShort( buf, 10 );
 }
 

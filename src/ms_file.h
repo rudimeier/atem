@@ -73,7 +73,7 @@ class MasterFile
 		static bool checkRecord( const char* buf, int record  );
 		
 		bool check() const;
-		unsigned char countRecords() const;
+		int countRecords() const;
 		int getRecord( master_record *, unsigned short rnum ) const;
 		int fileNumber( int record ) const;
 		int dataLength( int record ) const;
@@ -87,7 +87,7 @@ class MasterFile
 		void printRecord( const char *record ) const;
 		
 		
-		static const unsigned int record_length = 53;
+		static const int record_length = 53;
 		
 		const char * const buf;
 		const int size;
@@ -105,7 +105,7 @@ class EMasterFile
 		static bool checkRecord( const char* buf, int record  );
 		
 		bool check() const;
-		unsigned char countRecords() const;
+		int countRecords() const;
 		int getRecord( master_record *, unsigned short rnum ) const;
 		int fileNumber( int record ) const;
 		int dataLength( int record ) const;
@@ -119,7 +119,7 @@ class EMasterFile
 		void printRecord( const char *record ) const;
 		
 		
-		static const unsigned int record_length = 192;
+		static const int record_length = 192;
 		
 		const char * const buf;
 		const int size;
@@ -137,7 +137,7 @@ class XMasterFile
 		static bool checkRecord( const char* buf, int record  );
 		
 		bool check() const;
-		unsigned short countRecords() const;
+		int countRecords() const;
 		int getRecord( master_record *, unsigned short rnum ) const;
 		int fileNumber( int record ) const;
 		int dataLength( int record ) const;
@@ -151,7 +151,7 @@ class XMasterFile
 		void printRecord( const char *record ) const;
 		
 		
-		static const unsigned int record_length = 150;
+		static const int record_length = 150;
 		
 		const char * const buf;
 		const int size;
