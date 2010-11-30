@@ -256,34 +256,41 @@ bool Metastock::readFile( const char *file_name , char *buf, int *len ) const
 
 void Metastock::parseMasters()
 {
-#if 1
-	{
-		EMasterFile emf( ba_emaster, emaster_len );
-		int cntE = emf.countRecords();
-		for( int i = 1; i<=cntE; i++ ) {
-			master_record *mr = &mr_list[ emf.fileNumber(i) ];
-			assert( mr->record_number == 0 );
-			mr_len++;
-			emf.getRecord( mr, i );
-		}
-	}
-#else
-	{
-		// NOTE this is just a check EMaster vs. Master
-		MasterFile mf( ba_master, master_len );
-		int cntM = mf.countRecords();
+	MasterFile mf( ba_master, master_len );
+	EMasterFile emf( ba_emaster, emaster_len );
+	XMasterFile xmf( ba_xmaster, xmaster_len );
+	int cntM = mf.countRecords();
+	int cntE = emf.countRecords();
+	int cntX = xmf.countRecords();
+	
+	if( cntM > 0 ) {
+		/* we prefer to use Master because EMaster is often broken */
 		for( int i = 1; i<=cntM; i++ ) {
 			master_record *mr = &mr_list[ mf.fileNumber(i) ];
 			assert( mr->record_number == 0 );
 			mr_len++;
 			mf.getRecord( mr, i );
 		}
-	}
-#endif
+		if( cntE == cntM ) {
+			/* EMaster seems to be usable - fill up long names */
+			for( int i = 1; i<=cntE; i++ ) {
+				master_record *mr = &mr_list[ emf.fileNumber(i) ];
+				assert( mr->record_number != 0 );
+				emf.getLongName( mr, i );
+			}
+		}
+	} else if ( cntE > 0 ) {
+		/* Master is broken - use EMaster */
+		for( int i = 1; i<=cntE; i++ ) {
+			master_record *mr = &mr_list[ emf.fileNumber(i) ];
+			assert( mr->record_number == 0 );
+			mr_len++;
+			emf.getRecord( mr, i );
+		}
+	} /* else neither Master or EMaster is valid */
 	
-	if( hasXMaster() ) {
-		XMasterFile xmf( ba_xmaster, xmaster_len );
-		int cntX = xmf.countRecords();
+	if( cntX > 0 ) {
+		/* XMaster is optional */
 		for( int i = 1; i<=cntX; i++ ) {
 			master_record *mr = &mr_list[ xmf.fileNumber(i) ];
 			assert( mr->record_number == 0 );
