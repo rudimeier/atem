@@ -180,8 +180,6 @@ int main(int argc, const char *argv[])
 	if( dumpxmasterp == 1 ) {
 		if( ms.hasXMaster() ) {
 			ms.dumpXMaster();
-		} else {
-			fprintf( stderr, "warning: %s\n", "no XMASTER found" );
 		}
 	}
 	

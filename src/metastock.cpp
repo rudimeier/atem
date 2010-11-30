@@ -302,8 +302,7 @@ bool Metastock::readMasters()
 			return false;
 		}
 	} else {
-		setError("Master file not found");
-		return false;
+		printWarn("Master file not found");
 	}
 	
 	if( emaster_name != NULL ) {
@@ -312,8 +311,7 @@ bool Metastock::readMasters()
 			return false;
 		}
 	}else {
-		setError("EMaster file not found");
-		return false;
+		printWarn("EMaster file not found");
 	}
 	
 	if( xmaster_name != NULL ) {
@@ -323,6 +321,7 @@ bool Metastock::readMasters()
 		}
 	} else {
 		// xmaster is optional, but we could check for existing f#.mwd >255
+		printWarn("XMaster file not found");
 	}
 	
 	return true;
