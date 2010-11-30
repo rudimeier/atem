@@ -589,6 +589,22 @@ int EMasterFile::countRecords() const
 	
 	return readUnsignedChar( buf, 0 );
 }
+
+
+int EMasterFile::getLongName( master_record *mr, unsigned short rnum ) const
+{
+	const char *record = buf + (record_length * rnum);
+	assert( mr->record_number == rnum );
+	
+	char lname[ MAX_LEN_MR_LNAME + 1 ];
+	int len_lname = trim_end( lname, record + 139, MAX_LEN_MR_LNAME );
+	if( len_lname > 0 ) {
+		assert( strncmp(mr->c_long_name, lname, strlen(mr->c_long_name)) == 0 );
+		strcpy( mr->c_long_name, lname );
+		mr->kind = 'E';
+	}
+	
+	return 0;
 }
 
 

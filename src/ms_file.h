@@ -106,6 +106,7 @@ class EMasterFile
 		
 		bool check() const;
 		int countRecords() const;
+		int getLongName( master_record *, unsigned short rnum ) const;
 		int getRecord( master_record *, unsigned short rnum ) const;
 		int fileNumber( int record ) const;
 		int dataLength( int record ) const;
