@@ -28,6 +28,7 @@ class Metastock
 		const char* lastError() const;
 		
 	private:
+		void printWarn( const char* e1, const char* e2 = "" ) const;
 		void setError( const char* e1, const char* e2 = "" ) const;
 		bool findFiles();
 		bool readFile( const char *file_name , char *buf, int *len ) const;

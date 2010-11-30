@@ -335,6 +335,16 @@ const char* Metastock::lastError() const
 }
 
 
+void Metastock::printWarn( const char* e1, const char* e2 ) const
+{
+	if( e2 == NULL || *e2 == '\0' ) {
+		fprintf( stderr, "warning: %s\n", e1);
+	} else {
+		fprintf( stderr, "warning: %s: %s\n", e1, e2 );
+	}
+}
+
+
 void Metastock::setError( const char* e1, const char* e2 ) const
 {
 	if( e2 == NULL || *e2 == '\0' ) {
