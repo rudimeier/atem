@@ -17,7 +17,7 @@ class Metastock
 		bool setOutputFormat(  char sep, int fmt_data, int fmt_symbols );
 		bool setPrintDateFrom( const char *date );
 		
-		void parseMasters();
+		bool parseMasters();
 		void dumpMaster() const;
 		void dumpEMaster() const;
 		void dumpXMaster() const;

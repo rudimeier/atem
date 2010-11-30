@@ -197,7 +197,9 @@ bool Metastock::setDir( const char* d )
 	if( !readMasters() ){
 		return false;
 	}
-	parseMasters();
+	if( !parseMasters() ) {
+		return false;
+	}
 	
 	return true;
 }
@@ -254,7 +256,7 @@ bool Metastock::readFile( const char *file_name , char *buf, int *len ) const
 }
 
 
-void Metastock::parseMasters()
+bool Metastock::parseMasters()
 {
 	MasterFile mf( ba_master, master_len );
 	EMasterFile emf( ba_emaster, emaster_len );
@@ -262,6 +264,11 @@ void Metastock::parseMasters()
 	int cntM = mf.countRecords();
 	int cntE = emf.countRecords();
 	int cntX = xmf.countRecords();
+	
+	if( cntM <= 0 && cntE <= 0 && cntX <= 0 ) {
+		setError( "all *Master files invalid" );
+		return false;
+	}
 	
 	if( cntM > 0 ) {
 		/* we prefer to use Master because EMaster is often broken */
@@ -298,11 +305,18 @@ void Metastock::parseMasters()
 			xmf.getRecord( mr, i );
 		}
 	}
+	
+	return true;
 }
 
 
 bool Metastock::readMasters()
 {
+	if( !master_name && !emaster_name && !xmaster_name ) {
+		setError( "no *Master files found" );
+		return false;
+	}
+	
 	if( master_name != NULL ) {
 		ba_master = (char*) malloc( MAX_FILE_LENGTH ); //TODO
 		if( !readFile( master_name, ba_master, &master_len ) ) {
