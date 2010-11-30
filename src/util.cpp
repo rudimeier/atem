@@ -42,8 +42,8 @@ int ftoa_prec_f0(char *s, float f )
 int itodatestr( char *s, unsigned int n )
 {
 	if( n <= 0 || n >= 100000000 ) {
-		memcpy(s, "0000-00-00", 8);
-		return 8;
+		memcpy(s, "0000-00-00", 10);
+		return 10;
 	}
 	
 #if defined FAST_PRINTING
