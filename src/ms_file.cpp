@@ -308,29 +308,6 @@ int MasterFile::countRecords() const
 }
 
 
-#if 0
-int MasterFile::getRecord( const master_record *mr, unsigned short rnum ) const
-{
-	char tmp[64];
-	int tmp_len;
-	
-	const char *record = buf + (record_length * rnum);
-	assert( mr->record_number == rnum );
-	assert( mr->kind == 'E' );
-	assert( mr->file_number == readUnsignedChar( record, 0 ) );
-	assert( count_bits(mr->field_bitset) * 4 == readChar( record, 3 ) );
-	assert( count_bits(mr->field_bitset) == readChar( record, 4 ) );
-	
-	trim_end( tmp, record + 36, 14);
-	assert( strcmp( mr->c_symbol, tmp ) == 0 );
-	tmp_len = trim_end( tmp, record + 7, 16);
-	assert( strncmp( mr->c_long_name, tmp, tmp_len ) == 0 );
-	
-	return 0;
-}
-#endif
-
-
 int MasterFile::getRecord( master_record *mr, unsigned short rnum ) const
 {
 	const char *record = buf + (record_length * rnum);
