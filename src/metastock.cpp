@@ -90,7 +90,13 @@ void FileBuf::setName( const char* file_name )
 
 void FileBuf::readFile( int fildes )
 {
-	buf_len = read( fildes, buf, MAX_FILE_LENGTH );
+	char *cp = buf;
+	int tmp_len;
+	do {
+		tmp_len = read( fildes, cp, 512 );
+		cp += tmp_len;
+	} while( tmp_len > 0 );
+	buf_len = cp - buf;
 }
 
 
