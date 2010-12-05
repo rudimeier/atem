@@ -2,6 +2,8 @@
 #define METASTOCK_H
 
 struct master_record;
+class FileBuf;
+
 
 #define ERROR_LENGTH 256
 
@@ -47,9 +49,10 @@ class Metastock
 		
 		
 		char *ms_dir;
-		char *master_name;
-		char *emaster_name;
-		char *xmaster_name;
+		FileBuf *master_file;
+		FileBuf *emaster_file;
+		FileBuf *xmaster_file;
+		
 		int max_dat_num;
 		int mr_len;
 		master_record *mr_list;

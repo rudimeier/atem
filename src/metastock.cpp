@@ -62,9 +62,9 @@ unsigned short Metastock::prnt_data_mr_fields = 0;
 Metastock::Metastock() :
 	print_date_from(0),
 	ms_dir(NULL),
-	master_name(NULL),
-	emaster_name(NULL),
-	xmaster_name(NULL),
+	master_file( new FileBuf() ),
+	emaster_file( new FileBuf() ),
+	xmaster_file( new FileBuf() ),
 	ba_master( NULL ),
 	master_len(0),
 	ba_emaster( NULL ),
@@ -100,9 +100,9 @@ Metastock::~Metastock()
 	free( mr_skip_list );
 	free( mr_list );
 	
-	free( xmaster_name );
-	free( emaster_name );
-	free( master_name );
+	delete( xmaster_file );
+	delete( emaster_file );
+	delete( master_file );
 	free( ms_dir );
 }
 
@@ -111,8 +111,7 @@ Metastock::~Metastock()
 
 #define CHECK_MASTER( _dst_, _gen_name_ ) \
 	if( strcasecmp(_gen_name_, node->fts_name) == 0 ) { \
-		assert( _dst_ == NULL ); \
-		_dst_ = (char*) malloc( node->fts_namelen + 1 ); \
+		assert( *_dst_ == 0 ); \
 		strcpy( _dst_, node->fts_name   ); \
 	}
 
@@ -142,9 +141,9 @@ bool Metastock::findFiles()
 					add_mr_list_datfile( number, node->fts_name );
 				}
 			} else {
-				CHECK_MASTER( master_name, "MASTER" );
-				CHECK_MASTER( emaster_name, "EMASTER" );
-				CHECK_MASTER( xmaster_name, "XMASTER" );
+				CHECK_MASTER( master_file->name, "MASTER" );
+				CHECK_MASTER( emaster_file->name, "EMASTER" );
+				CHECK_MASTER( xmaster_file->name, "XMASTER" );
 			}
 		}
 	}
@@ -167,8 +166,7 @@ bool Metastock::findFiles()
 
 #define CHECK_MASTER( _dst_, _gen_name_ ) \
 	if( strcasecmp(_gen_name_, dirp->d_name) == 0 ) { \
-		assert( _dst_ == NULL ); \
-		_dst_ = (char*) malloc( strlen(dirp->d_name) + 1 ); \
+		assert( *_dst_ == 0 ); \
 		strcpy( _dst_, dirp->d_name ); \
 	}
 
@@ -194,9 +192,9 @@ bool Metastock::findFiles()
 				add_mr_list_datfile( number, dirp->d_name );
 			}
 		} else {
-			CHECK_MASTER( master_name, "MASTER" );
-			CHECK_MASTER( emaster_name, "EMASTER" );
-			CHECK_MASTER( xmaster_name, "XMASTER" );
+			CHECK_MASTER( master_file->name, "MASTER" );
+			CHECK_MASTER( emaster_file->name, "EMASTER" );
+			CHECK_MASTER( xmaster_file->name, "XMASTER" );
 		}
 	}
 	
@@ -339,32 +337,32 @@ bool Metastock::parseMasters()
 
 bool Metastock::readMasters()
 {
-	if( !master_name && !emaster_name && !xmaster_name ) {
+	if( !*master_file->name && !*emaster_file->name && !*xmaster_file->name ) {
 		setError( "no *Master files found" );
 		return false;
 	}
 	
-	if( master_name != NULL ) {
+	if( *master_file->name ) {
 		ba_master = (char*) malloc( MAX_FILE_LENGTH ); //TODO
-		if( !readFile( master_name, ba_master, &master_len ) ) {
+		if( !readFile( master_file->name, ba_master, &master_len ) ) {
 			return false;
 		}
 	} else {
 		printWarn("Master file not found");
 	}
 	
-	if( emaster_name != NULL ) {
+	if( *emaster_file->name ) {
 		ba_emaster = (char*) malloc( MAX_FILE_LENGTH ); //TODO
-		if( !readFile( emaster_name, ba_emaster, &emaster_len ) ) {
+		if( !readFile( emaster_file->name, ba_emaster, &emaster_len ) ) {
 			return false;
 		}
 	}else {
 		printWarn("EMaster file not found");
 	}
 	
-	if( xmaster_name != NULL ) {
+	if( *xmaster_file->name ) {
 		ba_xmaster = (char*) malloc( MAX_FILE_LENGTH ); //TODO
-		if( !readFile( xmaster_name, ba_xmaster,  &xmaster_len ) ) {
+		if( !readFile( xmaster_file->name, ba_xmaster,  &xmaster_len ) ) {
 			return false;
 		}
 	} else {
@@ -660,5 +658,5 @@ bool Metastock::dumpData( unsigned short n, unsigned char fields, const char *pf
 
 bool Metastock::hasXMaster() const
 {
-	return( xmaster_name != NULL  );
+	return( *xmaster_file->name != 0  );
 }
