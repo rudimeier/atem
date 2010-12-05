@@ -25,8 +25,6 @@
 
 
 
-#define MAX_FILE_LENGTH (1024*1024)
-
 
 class FileBuf
 {
@@ -44,6 +42,8 @@ class FileBuf
 		void readFile( int fildes );
 		
 	private:
+		void resize( int size );
+		
 		char name[11];
 		char *buf;
 		int buf_len;
@@ -51,9 +51,9 @@ class FileBuf
 };
 
 FileBuf::FileBuf() :
-	buf( (char*) malloc( MAX_FILE_LENGTH ) ),
+	buf( NULL ),
 	buf_len(0),
-	buf_size(MAX_FILE_LENGTH)
+	buf_size(0)
 {
 	*name = 0;
 }
@@ -85,18 +85,31 @@ int FileBuf::len() const
 
 void FileBuf::setName( const char* file_name )
 {
+	buf_len = 0;
 	strcpy( name, file_name );
 }
 
 void FileBuf::readFile( int fildes )
 {
 	char *cp = buf;
+	buf_len = 0;
 	int tmp_len;
 	do {
+		if( buf_len + 512 > buf_size ) {
+			resize( buf_size + 512 );
+			cp = buf + buf_len;
+		}
 		tmp_len = read( fildes, cp, 512 );
+		buf_len += tmp_len;
 		cp += tmp_len;
 	} while( tmp_len > 0 );
-	buf_len = cp - buf;
+}
+
+
+void FileBuf::resize( int size )
+{
+	buf = (char*) realloc( buf, size );
+	buf_size = size;
 }
 
 
