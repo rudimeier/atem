@@ -49,10 +49,10 @@ class Metastock
 		
 		
 		char *ms_dir;
-		FileBuf *master_file;
-		FileBuf *emaster_file;
-		FileBuf *xmaster_file;
-		FileBuf *fdat_file;
+		FileBuf *m_buf;
+		FileBuf *e_buf;
+		FileBuf *x_buf;
+		FileBuf *fdat_buf;
 		
 		int max_dat_num;
 		int mr_len;

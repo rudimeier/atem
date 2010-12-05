@@ -62,10 +62,10 @@ unsigned short Metastock::prnt_data_mr_fields = 0;
 Metastock::Metastock() :
 	print_date_from(0),
 	ms_dir(NULL),
-	master_file( new FileBuf() ),
-	emaster_file( new FileBuf() ),
-	xmaster_file( new FileBuf() ),
-	fdat_file( new FileBuf() )
+	m_buf( new FileBuf() ),
+	e_buf( new FileBuf() ),
+	x_buf( new FileBuf() ),
+	fdat_buf( new FileBuf() )
 {
 	error[0] = '\0';
 /* dat file numbers are unsigned short only */
@@ -89,10 +89,10 @@ Metastock::~Metastock()
 	free( mr_skip_list );
 	free( mr_list );
 	
-	delete( fdat_file );
-	delete( xmaster_file );
-	delete( emaster_file );
-	delete( master_file );
+	delete( fdat_buf );
+	delete( x_buf );
+	delete( e_buf );
+	delete( m_buf );
 	free( ms_dir );
 }
 
@@ -131,9 +131,9 @@ bool Metastock::findFiles()
 					add_mr_list_datfile( number, node->fts_name );
 				}
 			} else {
-				CHECK_MASTER( master_file->name, "MASTER" );
-				CHECK_MASTER( emaster_file->name, "EMASTER" );
-				CHECK_MASTER( xmaster_file->name, "XMASTER" );
+				CHECK_MASTER( m_buf->name, "MASTER" );
+				CHECK_MASTER( e_buf->name, "EMASTER" );
+				CHECK_MASTER( x_buf->name, "XMASTER" );
 			}
 		}
 	}
@@ -182,9 +182,9 @@ bool Metastock::findFiles()
 				add_mr_list_datfile( number, dirp->d_name );
 			}
 		} else {
-			CHECK_MASTER( master_file->name, "MASTER" );
-			CHECK_MASTER( emaster_file->name, "EMASTER" );
-			CHECK_MASTER( xmaster_file->name, "XMASTER" );
+			CHECK_MASTER( m_buf->name, "MASTER" );
+			CHECK_MASTER( e_buf->name, "EMASTER" );
+			CHECK_MASTER( x_buf->name, "XMASTER" );
 		}
 	}
 	
@@ -276,9 +276,9 @@ bool Metastock::readFile( const char *file_name , char *buf, int *len ) const
 
 bool Metastock::parseMasters()
 {
-	MasterFile mf( master_file->buf, master_file->buf_len );
-	EMasterFile emf( emaster_file->buf, emaster_file->buf_len );
-	XMasterFile xmf( xmaster_file->buf, xmaster_file->buf_len );
+	MasterFile mf( m_buf->buf, m_buf->buf_len );
+	EMasterFile emf( e_buf->buf, e_buf->buf_len );
+	XMasterFile xmf( x_buf->buf, x_buf->buf_len );
 	int cntM = mf.countRecords();
 	int cntE = emf.countRecords();
 	int cntX = xmf.countRecords();
@@ -327,29 +327,29 @@ bool Metastock::parseMasters()
 
 bool Metastock::readMasters()
 {
-	if( !*master_file->name && !*emaster_file->name && !*xmaster_file->name ) {
+	if( !*m_buf->name && !*e_buf->name && !*x_buf->name ) {
 		setError( "no *Master files found" );
 		return false;
 	}
 	
-	if( *master_file->name ) {
-		if( !readFile( master_file->name, master_file->buf, &master_file->buf_len ) ) {
+	if( *m_buf->name ) {
+		if( !readFile( m_buf->name, m_buf->buf, &m_buf->buf_len ) ) {
 			return false;
 		}
 	} else {
 		printWarn("Master file not found");
 	}
 	
-	if( *emaster_file->name ) {
-		if( !readFile( emaster_file->name, emaster_file->buf, &emaster_file->buf_len ) ) {
+	if( *e_buf->name ) {
+		if( !readFile( e_buf->name, e_buf->buf, &e_buf->buf_len ) ) {
 			return false;
 		}
 	}else {
 		printWarn("EMaster file not found");
 	}
 	
-	if( *xmaster_file->name ) {
-		if( !readFile( xmaster_file->name, xmaster_file->buf,  &xmaster_file->buf_len ) ) {
+	if( *x_buf->name ) {
+		if( !readFile( x_buf->name, x_buf->buf,  &x_buf->buf_len ) ) {
 			return false;
 		}
 	} else {
@@ -389,21 +389,21 @@ void Metastock::setError( const char* e1, const char* e2 ) const
 
 void Metastock::dumpMaster() const
 {
-	MasterFile mf( master_file->buf, master_file->buf_len );
+	MasterFile mf( m_buf->buf, m_buf->buf_len );
 	mf.check();
 }
 
 
 void Metastock::dumpEMaster() const
 {
-	EMasterFile emf( emaster_file->buf, emaster_file->buf_len );
+	EMasterFile emf( e_buf->buf, e_buf->buf_len );
 	emf.check();
 }
 
 
 void Metastock::dumpXMaster() const
 {
-	XMasterFile xmf( xmaster_file->buf, xmaster_file->buf_len );
+	XMasterFile xmf( x_buf->buf, x_buf->buf_len );
 	xmf.check();
 }
 
@@ -627,11 +627,11 @@ bool Metastock::dumpData( unsigned short n, unsigned char fields, const char *pf
 		return false;
 	}
 	
-	if( ! readFile( fdat_name, fdat_file->buf, &fdat_file->buf_len ) ) {
+	if( ! readFile( fdat_name, fdat_buf->buf, &fdat_buf->buf_len ) ) {
 		return false;
 	}
 	
-	FDat datfile( fdat_file->buf, fdat_file->buf_len, fields );
+	FDat datfile( fdat_buf->buf, fdat_buf->buf_len, fields );
 // 	fprintf( stderr, "#%d: %d x %d bytes\n",
 // 		n, datfile.countRecords(), count_bits(fields) * 4 );
 	
@@ -644,5 +644,5 @@ bool Metastock::dumpData( unsigned short n, unsigned char fields, const char *pf
 
 bool Metastock::hasXMaster() const
 {
-	return( *xmaster_file->name != 0  );
+	return( *x_buf->name != 0  );
 }
