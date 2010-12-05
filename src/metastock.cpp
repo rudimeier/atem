@@ -34,10 +34,13 @@ class FileBuf
 		FileBuf();
 		~FileBuf();
 		
+		int len() const;
 		void readFile( int fildes );
 		
 		char name[11];
 		char buf[MAX_FILE_LENGTH];
+		
+	private:
 		int buf_len;
 		int buf_size;
 };
@@ -51,6 +54,11 @@ FileBuf::FileBuf() :
 
 FileBuf::~FileBuf()
 {
+}
+
+int FileBuf::len() const
+{
+	return buf_len;
 }
 
 void FileBuf::readFile( int fildes )
@@ -285,9 +293,9 @@ bool Metastock::readFile( FileBuf *file_buf ) const
 
 bool Metastock::parseMasters()
 {
-	MasterFile mf( m_buf->buf, m_buf->buf_len );
-	EMasterFile emf( e_buf->buf, e_buf->buf_len );
-	XMasterFile xmf( x_buf->buf, x_buf->buf_len );
+	MasterFile mf( m_buf->buf, m_buf->len() );
+	EMasterFile emf( e_buf->buf, e_buf->len() );
+	XMasterFile xmf( x_buf->buf, x_buf->len() );
 	int cntM = mf.countRecords();
 	int cntE = emf.countRecords();
 	int cntX = xmf.countRecords();
@@ -398,21 +406,21 @@ void Metastock::setError( const char* e1, const char* e2 ) const
 
 void Metastock::dumpMaster() const
 {
-	MasterFile mf( m_buf->buf, m_buf->buf_len );
+	MasterFile mf( m_buf->buf, m_buf->len() );
 	mf.check();
 }
 
 
 void Metastock::dumpEMaster() const
 {
-	EMasterFile emf( e_buf->buf, e_buf->buf_len );
+	EMasterFile emf( e_buf->buf, e_buf->len() );
 	emf.check();
 }
 
 
 void Metastock::dumpXMaster() const
 {
-	XMasterFile xmf( x_buf->buf, x_buf->buf_len );
+	XMasterFile xmf( x_buf->buf, x_buf->len() );
 	xmf.check();
 }
 
@@ -640,7 +648,7 @@ bool Metastock::dumpData( unsigned short n, unsigned char fields, const char *pf
 		return false;
 	}
 	
-	FDat datfile( fdat_buf->buf, fdat_buf->buf_len, fields );
+	FDat datfile( fdat_buf->buf, fdat_buf->len(), fields );
 // 	fprintf( stderr, "#%d: %d x %d bytes\n",
 // 		n, datfile.countRecords(), count_bits(fields) * 4 );
 	
