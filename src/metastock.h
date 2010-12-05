@@ -33,7 +33,7 @@ class Metastock
 		void printWarn( const char* e1, const char* e2 = "" ) const;
 		void setError( const char* e1, const char* e2 = "" ) const;
 		bool findFiles();
-		bool readFile( const char *file_name , char *buf, int *len ) const;
+		bool readFile( FileBuf *file_buf ) const;
 		bool readMasters();
 		void resize_mr_list( int new_len );
 		void add_mr_list_datfile( int datnum, const char* datname );

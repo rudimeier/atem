@@ -252,12 +252,13 @@ bool Metastock::setOutputFormat( char sep, int fmt_data, int fmt_symbols )
 }
 
 
-bool Metastock::readFile( const char *file_name , char *buf, int *len ) const
+bool Metastock::readFile( FileBuf *file_buf ) const
 {
 	// build file name with full path
-	char *file_path = (char*) alloca( strlen(ms_dir) + strlen(file_name) + 1 );
+	char *file_path = (char*) alloca( strlen(ms_dir)
+		+ strlen(file_buf->name) + 1 );
 	strcpy( file_path, ms_dir );
-	strcpy( file_path + strlen(ms_dir), file_name );
+	strcpy( file_path + strlen(ms_dir), file_buf->name );
 	
 	
 	int fd = open( file_path, O_RDONLY );
@@ -265,7 +266,7 @@ bool Metastock::readFile( const char *file_name , char *buf, int *len ) const
 		setError( file_path, strerror(errno) );
 		return false;
 	}
-	*len = read( fd, buf, MAX_FILE_LENGTH );
+	file_buf->buf_len = read( fd, file_buf->buf, MAX_FILE_LENGTH );
 // 	fprintf( stderr, "read %s: %d bytes\n", file_path, *len);
 	close( fd );
 //	assert( ba->size() == rb ); //TODO
@@ -333,7 +334,7 @@ bool Metastock::readMasters()
 	}
 	
 	if( *m_buf->name ) {
-		if( !readFile( m_buf->name, m_buf->buf, &m_buf->buf_len ) ) {
+		if( !readFile( m_buf ) ) {
 			return false;
 		}
 	} else {
@@ -341,7 +342,7 @@ bool Metastock::readMasters()
 	}
 	
 	if( *e_buf->name ) {
-		if( !readFile( e_buf->name, e_buf->buf, &e_buf->buf_len ) ) {
+		if( !readFile( e_buf ) ) {
 			return false;
 		}
 	}else {
@@ -349,7 +350,7 @@ bool Metastock::readMasters()
 	}
 	
 	if( *x_buf->name ) {
-		if( !readFile( x_buf->name, x_buf->buf,  &x_buf->buf_len ) ) {
+		if( !readFile( x_buf ) ) {
 			return false;
 		}
 	} else {
@@ -620,14 +621,14 @@ bool Metastock::dumpData() const
 
 bool Metastock::dumpData( unsigned short n, unsigned char fields, const char *pfx ) const
 {
-	const char *fdat_name = mr_list[n].file_name;
+	strcpy( fdat_buf->name, mr_list[n].file_name);
 	
-	if( *fdat_name == '\0' ) {
+	if( *fdat_buf->name == '\0' ) {
 		setError( "no fdat found" );
 		return false;
 	}
 	
-	if( ! readFile( fdat_name, fdat_buf->buf, &fdat_buf->buf_len ) ) {
+	if( ! readFile( fdat_buf ) ) {
 		return false;
 	}
 	
