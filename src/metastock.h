@@ -33,6 +33,7 @@ class Metastock
 		bool findFiles();
 		bool readFile( const char *file_name , char *buf, int *len ) const;
 		bool readMasters();
+		void add_mr_list_datfile( int datnum, const char* datname );
 		int build_mr_string( char *dst, const master_record *mr ) const;
 		bool dumpData( unsigned short number, unsigned char fields,
 			const char *pfx) const;

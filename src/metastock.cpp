@@ -111,7 +111,7 @@ bool Metastock::findFiles()
 				long int number = strtol( c_number, &end, 10 );
 				assert( number > 0 && number < MAX_MR_LEN && c_number != end );
 				if( strcasecmp(end, ".MWD") == 0 || strcasecmp(end, ".DAT") == 0 ) {
-					strcpy( mr_list[number].file_name, node->fts_name );
+					add_mr_list_datfile( number, node->fts_name );
 				}
 			} else {
 				CHECK_MASTER( master_name, "MASTER" );
@@ -162,10 +162,7 @@ bool Metastock::findFiles()
 			long int number = strtol( c_number, &end, 10 );
 			assert( number > 0 && number < MAX_MR_LEN && c_number != end );
 			if( strcasecmp(end, ".MWD") == 0 || strcasecmp(end, ".DAT") == 0 ) {
-				if( number > max_dat_num ) {
-					max_dat_num = number;
-				}
-				strcpy( mr_list[number].file_name, dirp->d_name );
+				add_mr_list_datfile( number, dirp->d_name );
 			}
 		} else {
 			CHECK_MASTER( master_name, "MASTER" );
@@ -531,6 +528,15 @@ bool Metastock::dumpSymbolInfo() const
 		}
 	}
 	return true;
+}
+
+
+void Metastock::add_mr_list_datfile(  int datnum, const char* datname )
+{
+	if( datnum > max_dat_num ) {
+		max_dat_num = datnum;
+	}
+	strcpy( mr_list[datnum].file_name, datname );
 }
 
 
