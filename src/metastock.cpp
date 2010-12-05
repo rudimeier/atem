@@ -27,6 +27,32 @@
 
 #define MAX_FILE_LENGTH (1024*1024)
 
+
+class FileBuf
+{
+	public:
+		FileBuf();
+		~FileBuf();
+		
+		char name[11];
+		char buf[MAX_FILE_LENGTH];
+		int buf_len;
+		int buf_size;
+};
+
+FileBuf::FileBuf() :
+	buf_len(0),
+	buf_size(MAX_FILE_LENGTH)
+{
+	*name = 0;
+}
+
+FileBuf::~FileBuf()
+{
+}
+
+
+
 char Metastock::print_sep = '\t';
 unsigned short Metastock::prnt_master_fields = 0;
 unsigned char Metastock::prnt_data_fields = 0;
