@@ -51,7 +51,7 @@ Metastock::Metastock() :
 #define MAX_MR_LEN 4096
 	max_dat_num = 0;
 	mr_len = 0;
-	mr_list = (master_record*) calloc( MAX_MR_LEN, sizeof(master_record) );
+	mr_list = NULL;
 	mr_skip_list = (bool*) calloc( MAX_MR_LEN, sizeof(bool) );
 }
 
@@ -276,7 +276,6 @@ bool Metastock::parseMasters()
 		for( int i = 1; i<=cntM; i++ ) {
 			master_record *mr = &mr_list[ mf.fileNumber(i) ];
 			assert( mr->record_number == 0 );
-			mr_len++;
 			mf.getRecord( mr, i );
 		}
 		if( cntE == cntM ) {
@@ -292,7 +291,6 @@ bool Metastock::parseMasters()
 		for( int i = 1; i<=cntE; i++ ) {
 			master_record *mr = &mr_list[ emf.fileNumber(i) ];
 			assert( mr->record_number == 0 );
-			mr_len++;
 			emf.getRecord( mr, i );
 		}
 	} /* else neither Master or EMaster is valid */
@@ -302,7 +300,6 @@ bool Metastock::parseMasters()
 		for( int i = 1; i<=cntX; i++ ) {
 			master_record *mr = &mr_list[ xmf.fileNumber(i) ];
 			assert( mr->record_number == 0 );
-			mr_len++;
 			xmf.getRecord( mr, i );
 		}
 	}
@@ -517,7 +514,7 @@ bool Metastock::dumpSymbolInfo() const
 {
 	char buf[MAX_SIZE_MR_STRING + 1];
 	
-	for( int i = 1; i<MAX_MR_LEN; i++ ) {
+	for( int i = 1; i<mr_len; i++ ) {
 		if( mr_list[i].record_number != 0 && !mr_skip_list[i] ) {
 			assert( mr_list[i].file_number == i );
 			int len = mr_record_to_string( buf, &mr_list[i],
@@ -535,6 +532,15 @@ void Metastock::add_mr_list_datfile(  int datnum, const char* datname )
 {
 	if( datnum > max_dat_num ) {
 		max_dat_num = datnum;
+	}
+	if( mr_len <= datnum ) {
+		 /* increase length by 128 instead of 1 to avoid some reallocs */
+		int new_len = datnum + 128;
+		mr_list = (master_record*) realloc( mr_list,
+			new_len * sizeof(master_record) );
+		memset( mr_list + mr_len, '\0',
+			(new_len - mr_len) * sizeof(master_record) );
+		mr_len = new_len;
 	}
 	strcpy( mr_list[datnum].file_name, datname );
 }
@@ -568,7 +574,7 @@ bool Metastock::dumpData() const
 {
 	char buf[256];
 	
-	for( int i = 1; i<MAX_MR_LEN; i++ ) {
+	for( int i = 1; i<mr_len; i++ ) {
 		if( mr_list[i].record_number != 0 && !mr_skip_list[i] ) {
 			assert( mr_list[i].file_number == i );
 			int len = mr_record_to_string( buf, &mr_list[i],
