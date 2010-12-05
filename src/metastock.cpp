@@ -53,7 +53,7 @@ Metastock::Metastock() :
 	max_dat_num = 0;
 	mr_len = 0;
 	mr_list = NULL;
-	mr_skip_list = (bool*) calloc( MAX_DAT_NUM + 1, sizeof(bool) );
+	mr_skip_list = NULL;
 }
 
 
@@ -112,7 +112,7 @@ bool Metastock::findFiles()
 				long int number = strtol( c_number, &end, 10 );
 				assert( number > 0 && c_number != end );
 				if( (strcasecmp(end, ".MWD") == 0 || strcasecmp(end, ".DAT") == 0)
-					&& number < MAX_MR_LEN ) {
+					&& number <= MAX_DAT_NUM ) {
 					add_mr_list_datfile( number, node->fts_name );
 				}
 			} else {
@@ -399,11 +399,11 @@ void Metastock::dumpXMaster() const
 
 bool Metastock::incudeFile( unsigned short f ) const
 {
-	for( int i = 1; i<=MAX_DAT_NUM; i++ ) {
+	for( int i = 1; i< mr_len; i++ ) {
 			mr_skip_list[i] = true;
 	}
 	
-	if( f > 0 && f <= MAX_DAT_NUM && mr_list[f].record_number != 0 ) {
+	if( f > 0 && f < mr_len && mr_list[f].record_number != 0 ) {
 		mr_skip_list[f] = false;
 		return true;
 	} else {
@@ -483,7 +483,7 @@ bool Metastock::excludeFiles( const char *stamp ) const
 		return false;
 	}
 	
-	for( int i = 1; i<=MAX_DAT_NUM; i++ ) {
+	for( int i = 1; i<mr_len; i++ ) {
 		if( *mr_list[i].file_name == '\0' || mr_skip_list[i] ) {
 			continue;
 		}
@@ -535,8 +535,14 @@ void Metastock::resize_mr_list( int new_len )
 {
 	mr_list = (master_record*) realloc( mr_list,
 		new_len * sizeof(master_record) );
+	mr_skip_list = (bool*) realloc( mr_skip_list,
+		new_len * sizeof(bool) );
+	
 	memset( mr_list + mr_len, '\0',
 		(new_len - mr_len) * sizeof(master_record) );
+	memset( mr_skip_list + mr_len, '\0',
+		(new_len - mr_len) * sizeof(bool) );
+	
 	mr_len = new_len;
 }
 
