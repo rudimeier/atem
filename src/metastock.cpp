@@ -48,11 +48,12 @@ Metastock::Metastock() :
 	ba_fdat( (char*) malloc( MAX_FILE_LENGTH ) )
 {
 	error[0] = '\0';
-#define MAX_MR_LEN 4096
+/* dat file numbers are unsigned short only */
+#define MAX_DAT_NUM 0xFFFF
 	max_dat_num = 0;
 	mr_len = 0;
 	mr_list = NULL;
-	mr_skip_list = (bool*) calloc( MAX_MR_LEN, sizeof(bool) );
+	mr_skip_list = (bool*) calloc( MAX_DAT_NUM + 1, sizeof(bool) );
 }
 
 
@@ -109,8 +110,9 @@ bool Metastock::findFiles()
 				char *c_number = node->fts_name + 1;
 				char *end;
 				long int number = strtol( c_number, &end, 10 );
-				assert( number > 0 && number < MAX_MR_LEN && c_number != end );
-				if( strcasecmp(end, ".MWD") == 0 || strcasecmp(end, ".DAT") == 0 ) {
+				assert( number > 0 && c_number != end );
+				if( (strcasecmp(end, ".MWD") == 0 || strcasecmp(end, ".DAT") == 0)
+					&& number < MAX_MR_LEN ) {
 					add_mr_list_datfile( number, node->fts_name );
 				}
 			} else {
@@ -160,8 +162,9 @@ bool Metastock::findFiles()
 			char *c_number = dirp->d_name + 1;
 			char *end;
 			long int number = strtol( c_number, &end, 10 );
-			assert( number > 0 && number < MAX_MR_LEN && c_number != end );
-			if( strcasecmp(end, ".MWD") == 0 || strcasecmp(end, ".DAT") == 0 ) {
+			assert( number > 0 && c_number != end );
+			if( (strcasecmp(end, ".MWD") == 0 || strcasecmp(end, ".DAT") == 0)
+					&& number <= MAX_DAT_NUM ) {
 				add_mr_list_datfile( number, dirp->d_name );
 			}
 		} else {
@@ -396,11 +399,11 @@ void Metastock::dumpXMaster() const
 
 bool Metastock::incudeFile( unsigned short f ) const
 {
-	for( int i = 1; i<MAX_MR_LEN; i++ ) {
+	for( int i = 1; i<=MAX_DAT_NUM; i++ ) {
 			mr_skip_list[i] = true;
 	}
 	
-	if( f > 0 && f < MAX_MR_LEN && mr_list[f].record_number != 0 ) {
+	if( f > 0 && f <= MAX_DAT_NUM && mr_list[f].record_number != 0 ) {
 		mr_skip_list[f] = false;
 		return true;
 	} else {
@@ -480,7 +483,7 @@ bool Metastock::excludeFiles( const char *stamp ) const
 		return false;
 	}
 	
-	for( int i = 1; i<MAX_MR_LEN; i++ ) {
+	for( int i = 1; i<=MAX_DAT_NUM; i++ ) {
 		if( *mr_list[i].file_name == '\0' || mr_skip_list[i] ) {
 			continue;
 		}
