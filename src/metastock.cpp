@@ -34,6 +34,8 @@ class FileBuf
 		FileBuf();
 		~FileBuf();
 		
+		void readFile( int fildes );
+		
 		char name[11];
 		char buf[MAX_FILE_LENGTH];
 		int buf_len;
@@ -50,6 +52,12 @@ FileBuf::FileBuf() :
 FileBuf::~FileBuf()
 {
 }
+
+void FileBuf::readFile( int fildes )
+{
+	buf_len = read( fildes, buf, MAX_FILE_LENGTH );
+}
+
 
 
 
@@ -266,7 +274,7 @@ bool Metastock::readFile( FileBuf *file_buf ) const
 		setError( file_path, strerror(errno) );
 		return false;
 	}
-	file_buf->buf_len = read( fd, file_buf->buf, MAX_FILE_LENGTH );
+	file_buf->readFile( fd );
 // 	fprintf( stderr, "read %s: %d bytes\n", file_path, *len);
 	close( fd );
 //	assert( ba->size() == rb ); //TODO
