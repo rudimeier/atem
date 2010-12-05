@@ -52,13 +52,12 @@ class Metastock
 		FileBuf *master_file;
 		FileBuf *emaster_file;
 		FileBuf *xmaster_file;
+		FileBuf *fdat_file;
 		
 		int max_dat_num;
 		int mr_len;
 		master_record *mr_list;
 		bool *mr_skip_list;
-		
-		char *ba_fdat;
 		
 		mutable char error[ERROR_LENGTH];
 };

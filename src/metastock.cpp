@@ -65,7 +65,7 @@ Metastock::Metastock() :
 	master_file( new FileBuf() ),
 	emaster_file( new FileBuf() ),
 	xmaster_file( new FileBuf() ),
-	ba_fdat( (char*) malloc( MAX_FILE_LENGTH ) )
+	fdat_file( new FileBuf() )
 {
 	error[0] = '\0';
 /* dat file numbers are unsigned short only */
@@ -86,11 +86,10 @@ Metastock::Metastock() :
 
 Metastock::~Metastock()
 {
-	free( ba_fdat );
-	
 	free( mr_skip_list );
 	free( mr_list );
 	
+	delete( fdat_file );
 	delete( xmaster_file );
 	delete( emaster_file );
 	delete( master_file );
@@ -628,12 +627,11 @@ bool Metastock::dumpData( unsigned short n, unsigned char fields, const char *pf
 		return false;
 	}
 	
-	int fdat_len = 0;
-	if( ! readFile( fdat_name, ba_fdat, &fdat_len ) ) {
+	if( ! readFile( fdat_name, fdat_file->buf, &fdat_file->buf_len ) ) {
 		return false;
 	}
 	
-	FDat datfile( ba_fdat, fdat_len, fields );
+	FDat datfile( fdat_file->buf, fdat_file->buf_len, fields );
 // 	fprintf( stderr, "#%d: %d x %d bytes\n",
 // 		n, datfile.countRecords(), count_bits(fields) * 4 );
 	
