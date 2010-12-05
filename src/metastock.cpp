@@ -34,13 +34,17 @@ class FileBuf
 		FileBuf();
 		~FileBuf();
 		
+		bool hasName() const;
+		const char* constName() const;
 		const char* constBuf() const;
 		int len() const;
+		
+		void setName( const char* file_name );
+		
 		void readFile( int fildes );
 		
-		char name[11];
-		
 	private:
+		char name[11];
 		char buf[MAX_FILE_LENGTH];
 		int buf_len;
 		int buf_size;
@@ -57,6 +61,16 @@ FileBuf::~FileBuf()
 {
 }
 
+bool FileBuf::hasName() const
+{
+	return (*name != 0);
+}
+
+const char* FileBuf::constName() const
+{
+	return name;
+}
+
 const char* FileBuf::constBuf() const
 {
 	return buf;
@@ -65,6 +79,11 @@ const char* FileBuf::constBuf() const
 int FileBuf::len() const
 {
 	return buf_len;
+}
+
+void FileBuf::setName( const char* file_name )
+{
+	strcpy( name, file_name );
 }
 
 void FileBuf::readFile( int fildes )
@@ -121,10 +140,10 @@ Metastock::~Metastock()
 
 #ifdef USE_FTS
 
-#define CHECK_MASTER( _dst_, _gen_name_ ) \
+#define CHECK_MASTER( _file_buf_, _gen_name_ ) \
 	if( strcasecmp(_gen_name_, node->fts_name) == 0 ) { \
-		assert( *_dst_ == 0 ); \
-		strcpy( _dst_, node->fts_name   ); \
+		assert( !_file_buf_->hasName() ); \
+		_file_buf_->setName( node->fts_name ); \
 	}
 
 bool Metastock::findFiles()
@@ -153,9 +172,9 @@ bool Metastock::findFiles()
 					add_mr_list_datfile( number, node->fts_name );
 				}
 			} else {
-				CHECK_MASTER( m_buf->name, "MASTER" );
-				CHECK_MASTER( e_buf->name, "EMASTER" );
-				CHECK_MASTER( x_buf->name, "XMASTER" );
+				CHECK_MASTER( m_buf, "MASTER" );
+				CHECK_MASTER( e_buf, "EMASTER" );
+				CHECK_MASTER( x_buf, "XMASTER" );
 			}
 		}
 	}
@@ -176,10 +195,10 @@ bool Metastock::findFiles()
 
 #else /*USE_FTS*/
 
-#define CHECK_MASTER( _dst_, _gen_name_ ) \
+#define CHECK_MASTER( _file_buf_, _gen_name_ ) \
 	if( strcasecmp(_gen_name_, dirp->d_name) == 0 ) { \
-		assert( *_dst_ == 0 ); \
-		strcpy( _dst_, dirp->d_name ); \
+		assert( !_file_buf_->hasName() ); \
+		_file_buf_->setName( dirp->d_name ); \
 	}
 
 bool Metastock::findFiles()
@@ -204,9 +223,9 @@ bool Metastock::findFiles()
 				add_mr_list_datfile( number, dirp->d_name );
 			}
 		} else {
-			CHECK_MASTER( m_buf->name, "MASTER" );
-			CHECK_MASTER( e_buf->name, "EMASTER" );
-			CHECK_MASTER( x_buf->name, "XMASTER" );
+			CHECK_MASTER( m_buf, "MASTER" );
+			CHECK_MASTER( e_buf, "EMASTER" );
+			CHECK_MASTER( x_buf, "XMASTER" );
 		}
 	}
 	
@@ -278,9 +297,9 @@ bool Metastock::readFile( FileBuf *file_buf ) const
 {
 	// build file name with full path
 	char *file_path = (char*) alloca( strlen(ms_dir)
-		+ strlen(file_buf->name) + 1 );
+		+ strlen(file_buf->constName()) + 1 );
 	strcpy( file_path, ms_dir );
-	strcpy( file_path + strlen(ms_dir), file_buf->name );
+	strcpy( file_path + strlen(ms_dir), file_buf->constName() );
 	
 	
 	int fd = open( file_path, O_RDONLY );
@@ -350,12 +369,12 @@ bool Metastock::parseMasters()
 
 bool Metastock::readMasters()
 {
-	if( !*m_buf->name && !*e_buf->name && !*x_buf->name ) {
+	if( !m_buf->hasName() && !e_buf->hasName() && !x_buf->hasName() ) {
 		setError( "no *Master files found" );
 		return false;
 	}
 	
-	if( *m_buf->name ) {
+	if( m_buf->hasName() ) {
 		if( !readFile( m_buf ) ) {
 			return false;
 		}
@@ -363,7 +382,7 @@ bool Metastock::readMasters()
 		printWarn("Master file not found");
 	}
 	
-	if( *e_buf->name ) {
+	if( e_buf->hasName() ) {
 		if( !readFile( e_buf ) ) {
 			return false;
 		}
@@ -371,7 +390,7 @@ bool Metastock::readMasters()
 		printWarn("EMaster file not found");
 	}
 	
-	if( *x_buf->name ) {
+	if( x_buf->hasName() ) {
 		if( !readFile( x_buf ) ) {
 			return false;
 		}
@@ -643,9 +662,9 @@ bool Metastock::dumpData() const
 
 bool Metastock::dumpData( unsigned short n, unsigned char fields, const char *pfx ) const
 {
-	strcpy( fdat_buf->name, mr_list[n].file_name);
+	fdat_buf->setName( mr_list[n].file_name );
 	
-	if( *fdat_buf->name == '\0' ) {
+	if( !fdat_buf->hasName() ) {
 		setError( "no fdat found" );
 		return false;
 	}
@@ -667,5 +686,5 @@ bool Metastock::dumpData( unsigned short n, unsigned char fields, const char *pf
 
 bool Metastock::hasXMaster() const
 {
-	return( *x_buf->name != 0  );
+	return( x_buf->hasName() );
 }
