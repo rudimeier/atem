@@ -49,6 +49,7 @@ Metastock::Metastock() :
 {
 	error[0] = '\0';
 #define MAX_MR_LEN 4096
+	max_dat_num = 0;
 	mr_len = 0;
 	mr_list = (master_record*) calloc( MAX_MR_LEN, sizeof(master_record) );
 	mr_skip_list = (bool*) calloc( MAX_MR_LEN, sizeof(bool) );
@@ -161,6 +162,9 @@ bool Metastock::findFiles()
 			long int number = strtol( c_number, &end, 10 );
 			assert( number > 0 && number < MAX_MR_LEN && c_number != end );
 			if( strcasecmp(end, ".MWD") == 0 || strcasecmp(end, ".DAT") == 0 ) {
+				if( number > max_dat_num ) {
+					max_dat_num = number;
+				}
 				strcpy( mr_list[number].file_name, dirp->d_name );
 			}
 		} else {
