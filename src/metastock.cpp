@@ -531,19 +531,24 @@ bool Metastock::dumpSymbolInfo() const
 }
 
 
+void Metastock::resize_mr_list( int new_len )
+{
+	mr_list = (master_record*) realloc( mr_list,
+		new_len * sizeof(master_record) );
+	memset( mr_list + mr_len, '\0',
+		(new_len - mr_len) * sizeof(master_record) );
+	mr_len = new_len;
+}
+
+
 void Metastock::add_mr_list_datfile(  int datnum, const char* datname )
 {
 	if( datnum > max_dat_num ) {
 		max_dat_num = datnum;
 	}
 	if( mr_len <= datnum ) {
-		 /* increase length by 128 instead of 1 to avoid some reallocs */
-		int new_len = datnum + 128;
-		mr_list = (master_record*) realloc( mr_list,
-			new_len * sizeof(master_record) );
-		memset( mr_list + mr_len, '\0',
-			(new_len - mr_len) * sizeof(master_record) );
-		mr_len = new_len;
+		/* increase by 128 instead of 1 to avoid some reallocs */
+		resize_mr_list(datnum + 128);
 	}
 	strcpy( mr_list[datnum].file_name, datname );
 }
