@@ -65,12 +65,6 @@ Metastock::Metastock() :
 	master_file( new FileBuf() ),
 	emaster_file( new FileBuf() ),
 	xmaster_file( new FileBuf() ),
-	ba_master( NULL ),
-	master_len(0),
-	ba_emaster( NULL ),
-	emaster_len(0),
-	ba_xmaster( NULL ),
-	xmaster_len(0),
 	ba_fdat( (char*) malloc( MAX_FILE_LENGTH ) )
 {
 	error[0] = '\0';
@@ -93,9 +87,6 @@ Metastock::Metastock() :
 Metastock::~Metastock()
 {
 	free( ba_fdat );
-	free( ba_xmaster );
-	free( ba_emaster);
-	free( ba_master);
 	
 	free( mr_skip_list );
 	free( mr_list );
@@ -286,9 +277,9 @@ bool Metastock::readFile( const char *file_name , char *buf, int *len ) const
 
 bool Metastock::parseMasters()
 {
-	MasterFile mf( ba_master, master_len );
-	EMasterFile emf( ba_emaster, emaster_len );
-	XMasterFile xmf( ba_xmaster, xmaster_len );
+	MasterFile mf( master_file->buf, master_file->buf_len );
+	EMasterFile emf( emaster_file->buf, emaster_file->buf_len );
+	XMasterFile xmf( xmaster_file->buf, xmaster_file->buf_len );
 	int cntM = mf.countRecords();
 	int cntE = emf.countRecords();
 	int cntX = xmf.countRecords();
@@ -343,8 +334,7 @@ bool Metastock::readMasters()
 	}
 	
 	if( *master_file->name ) {
-		ba_master = (char*) malloc( MAX_FILE_LENGTH ); //TODO
-		if( !readFile( master_file->name, ba_master, &master_len ) ) {
+		if( !readFile( master_file->name, master_file->buf, &master_file->buf_len ) ) {
 			return false;
 		}
 	} else {
@@ -352,8 +342,7 @@ bool Metastock::readMasters()
 	}
 	
 	if( *emaster_file->name ) {
-		ba_emaster = (char*) malloc( MAX_FILE_LENGTH ); //TODO
-		if( !readFile( emaster_file->name, ba_emaster, &emaster_len ) ) {
+		if( !readFile( emaster_file->name, emaster_file->buf, &emaster_file->buf_len ) ) {
 			return false;
 		}
 	}else {
@@ -361,8 +350,7 @@ bool Metastock::readMasters()
 	}
 	
 	if( *xmaster_file->name ) {
-		ba_xmaster = (char*) malloc( MAX_FILE_LENGTH ); //TODO
-		if( !readFile( xmaster_file->name, ba_xmaster,  &xmaster_len ) ) {
+		if( !readFile( xmaster_file->name, xmaster_file->buf,  &xmaster_file->buf_len ) ) {
 			return false;
 		}
 	} else {
@@ -402,21 +390,21 @@ void Metastock::setError( const char* e1, const char* e2 ) const
 
 void Metastock::dumpMaster() const
 {
-	MasterFile mf( ba_master, master_len );
+	MasterFile mf( master_file->buf, master_file->buf_len );
 	mf.check();
 }
 
 
 void Metastock::dumpEMaster() const
 {
-	EMasterFile emf( ba_emaster, emaster_len );
+	EMasterFile emf( emaster_file->buf, emaster_file->buf_len );
 	emf.check();
 }
 
 
 void Metastock::dumpXMaster() const
 {
-	XMasterFile xmf( ba_xmaster, xmaster_len );
+	XMasterFile xmf( xmaster_file->buf, xmaster_file->buf_len );
 	xmf.check();
 }
 

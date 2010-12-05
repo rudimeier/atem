@@ -58,13 +58,6 @@ class Metastock
 		master_record *mr_list;
 		bool *mr_skip_list;
 		
-		char *ba_master;
-		int master_len;
-		char *ba_emaster;
-		int emaster_len;
-		char *ba_xmaster;
-		int xmaster_len;
-		
 		char *ba_fdat;
 		
 		mutable char error[ERROR_LENGTH];
