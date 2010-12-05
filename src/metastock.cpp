@@ -45,12 +45,13 @@ class FileBuf
 		
 	private:
 		char name[11];
-		char buf[MAX_FILE_LENGTH];
+		char *buf;
 		int buf_len;
 		int buf_size;
 };
 
 FileBuf::FileBuf() :
+	buf( (char*) malloc( MAX_FILE_LENGTH ) ),
 	buf_len(0),
 	buf_size(MAX_FILE_LENGTH)
 {
@@ -59,6 +60,7 @@ FileBuf::FileBuf() :
 
 FileBuf::~FileBuf()
 {
+	free(buf);
 }
 
 bool FileBuf::hasName() const
