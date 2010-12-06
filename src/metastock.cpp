@@ -422,8 +422,7 @@ bool Metastock::readMasters()
 		if( !readFile( x_buf ) ) {
 			return false;
 		}
-	} else {
-		// xmaster is optional, but we could check for existing f#.mwd >255
+	} else if( max_dat_num > 255 ) {
 		printWarn("XMaster file not found");
 	}
 	
