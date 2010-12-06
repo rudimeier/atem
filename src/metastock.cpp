@@ -25,6 +25,8 @@
 
 
 
+#define READ_BLCKSZ 16384
+
 
 class FileBuf
 {
@@ -95,11 +97,11 @@ void FileBuf::readFile( int fildes )
 	buf_len = 0;
 	int tmp_len;
 	do {
-		if( buf_len + 512 > buf_size ) {
-			resize( buf_size + 512 );
+		if( buf_len + READ_BLCKSZ > buf_size ) {
+			resize( buf_size + READ_BLCKSZ );
 			cp = buf + buf_len;
 		}
-		tmp_len = read( fildes, cp, 512 );
+		tmp_len = read( fildes, cp, READ_BLCKSZ );
 		buf_len += tmp_len;
 		cp += tmp_len;
 	} while( tmp_len > 0 );
