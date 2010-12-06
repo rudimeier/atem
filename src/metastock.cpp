@@ -41,7 +41,7 @@ class FileBuf
 		
 		void setName( const char* file_name );
 		
-		void readFile( int fildes );
+		int readFile( int fildes );
 		
 	private:
 		void resize( int size );
@@ -91,7 +91,7 @@ void FileBuf::setName( const char* file_name )
 	strcpy( name, file_name );
 }
 
-void FileBuf::readFile( int fildes )
+int FileBuf::readFile( int fildes )
 {
 	char *cp = buf;
 	buf_len = 0;
@@ -105,6 +105,9 @@ void FileBuf::readFile( int fildes )
 		buf_len += tmp_len;
 		cp += tmp_len;
 	} while( tmp_len > 0 );
+	
+	// tmp_len < 0 is an error with errno set
+	return tmp_len;
 }
 
 
@@ -330,12 +333,14 @@ bool Metastock::readFile( FileBuf *file_buf ) const
 		setError( file_path, strerror(errno) );
 		return false;
 	}
-	file_buf->readFile( fd );
-// 	fprintf( stderr, "read %s: %d bytes\n", file_path, *len);
-	close( fd );
-//	assert( ba->size() == rb ); //TODO
+	int err = file_buf->readFile( fd );
+	if( err < 0 ) {
+		setError( file_path, strerror(errno) );
+	}
 	
-	return true;
+	close( fd );
+	
+	return (err >= 0);
 }
 
 
