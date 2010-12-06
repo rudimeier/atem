@@ -344,6 +344,12 @@ bool Metastock::readFile( FileBuf *file_buf ) const
 }
 
 
+#define DEBUG_MASTER( _buf_, _cnt_ ) \
+	if( _cnt_ <= 0 && _buf_->hasName() ) { \
+		printWarn( _buf_->constName(), "not usable"); \
+	}
+	
+
 bool Metastock::parseMasters()
 {
 	MasterFile mf( m_buf->constBuf(), m_buf->len() );
@@ -357,6 +363,10 @@ bool Metastock::parseMasters()
 		setError( "all *Master files invalid" );
 		return false;
 	}
+	
+	DEBUG_MASTER( m_buf, cntM );
+	DEBUG_MASTER( e_buf, cntE );
+	DEBUG_MASTER( x_buf, cntX );
 	
 	if( cntM > 0 ) {
 		/* we prefer to use Master because EMaster is often broken */
@@ -393,6 +403,8 @@ bool Metastock::parseMasters()
 	
 	return true;
 }
+
+#undef DEBUG_MASTER
 
 
 bool Metastock::readMasters()
