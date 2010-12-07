@@ -9,6 +9,8 @@ AM_INIT_AUTOMAKE([foreign])
 ## compiler check
 CXXFLAGS="-O3 -g -Wall -W"
 AC_PROG_CXX
+AC_PROG_CC_C_O
+AC_PROG_CC_C99
 
 
 ## tweaks

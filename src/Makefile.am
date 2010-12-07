@@ -13,8 +13,9 @@ atem_SOURCES += ms_file.cpp
 atem_SOURCES += util.cpp
 noinst_HEADERS =
 noinst_HEADERS += metastock.h ms_file.h util.h
-noinst_HEADERS += ftoa.c
-noinst_HEADERS += itoa.c
+EXTRA_atem_SOURCES =
+EXTRA_atem_SOURCES += ftoa.c
+EXTRA_atem_SOURCES += itoa.c
 atem_LDADD = -lpopt
 atem_CPPFLAGS = $(AM_CPPFLAGS)
 atem_LDFLAGS = $(AM_LDFLAGS)
@@ -30,11 +31,11 @@ CLEANFILES += *.i
 .c.i:
 	$(COMPILE) -E -o $@ $<
 .cpp.i:
-	$(COMPILE) -E -o $@ $<
+	$(CXXCOMPILE) -E -o $@ $<
 
 ## Create assembler output (debugging purposes only)
 .c.s:
 	$(COMPILE) -S -c $(cflags) $<
 .cpp.s:
-	$(COMPILE) -S -c $(cflags) $<
+	$(CXXCOMPILE) -S -c $(cflags) $<
 
