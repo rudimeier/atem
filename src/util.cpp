@@ -1,10 +1,6 @@
 #include "util.h"
 
-#include <math.h>
-#include <stdio.h>
 #include <string.h>
-#include <assert.h>
-#include <limits.h>
 
 #include "config.h"
 
@@ -15,6 +11,7 @@
 	#include "itoa.c"
 	#include "ftoa.c"
 #else
+	#include <stdio.h>
 
 int itoa( char *s, int n )
 {
