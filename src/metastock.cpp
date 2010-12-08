@@ -46,7 +46,7 @@ class FileBuf
 	private:
 		void resize( int size );
 		
-		char name[11];
+		char name[MAX_LEN_MR_FILENAME + 1];
 		char *buf;
 		int buf_len;
 		int buf_size;

@@ -33,6 +33,7 @@ enum ms_data_field {
 
 #define MAX_LEN_MR_SYMBOL 14
 #define MAX_LEN_MR_LNAME 45
+#define MAX_LEN_MR_FILENAME 10
 
 
 struct master_record
@@ -47,15 +48,16 @@ struct master_record
 	char c_symbol[MAX_LEN_MR_SYMBOL + 1]; /* M, E, X */
 // 	char c_short_name[64]; /* M, E */
 	char c_long_name[MAX_LEN_MR_LNAME + 1]; /* E, X  */
-	char file_name[11];
+	char file_name[MAX_LEN_MR_FILENAME + 1];
 	int from_date;
 	int to_date;
 };
 
 /* estimated maximum string length returned by mr_record_to_string()
    sizes of ints (incl. seperators) + char* lengths (+/- seperator/zero) */
-#define MAX_SIZE_MR_STRING ((6 + 2 + 6 + 4 + 2) \
-	+ (MAX_LEN_MR_SYMBOL + 1 + MAX_LEN_MR_LNAME + 1 + 11) + 8 + 8)
+#define MAX_SIZE_MR_STRING ( 6 + 2 + 6 + 4 + 2 \
+	+ MAX_LEN_MR_SYMBOL + 1 + MAX_LEN_MR_LNAME + 1 + MAX_LEN_MR_FILENAME + 1 \
+	+ 9 + 9 )
 
 
 int mr_record_to_string( char *dest, const struct master_record*,
