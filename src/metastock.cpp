@@ -348,7 +348,16 @@ bool Metastock::readFile( FileBuf *file_buf ) const
 	if( _cnt_ <= 0 && _buf_->hasName() ) { \
 		printWarn( _buf_->constName(), "not usable"); \
 	}
-	
+
+#define SELECT_MR( _master_ ) \
+	do { \
+		int datnum = _master_.fileNumber(i); \
+		if( mr_len <= datnum ) { \
+			resize_mr_list(datnum + 128); \
+		} \
+		mr = &mr_list[ datnum ]; \
+	} while( false )
+
 
 bool Metastock::parseMasters()
 {
@@ -368,17 +377,19 @@ bool Metastock::parseMasters()
 	DEBUG_MASTER( e_buf, cntE );
 	DEBUG_MASTER( x_buf, cntX );
 	
+	master_record *mr;
+	
 	if( cntM > 0 ) {
 		/* we prefer to use Master because EMaster is often broken */
 		for( int i = 1; i<=cntM; i++ ) {
-			master_record *mr = &mr_list[ mf.fileNumber(i) ];
+			SELECT_MR( mf );
 			assert( mr->record_number == 0 );
 			mf.getRecord( mr, i );
 		}
 		if( cntE == cntM ) {
 			/* EMaster seems to be usable - fill up long names */
 			for( int i = 1; i<=cntE; i++ ) {
-				master_record *mr = &mr_list[ emf.fileNumber(i) ];
+				SELECT_MR( emf );
 				assert( mr->record_number != 0 );
 				emf.getLongName( mr, i );
 			}
@@ -386,7 +397,7 @@ bool Metastock::parseMasters()
 	} else if ( cntE > 0 ) {
 		/* Master is broken - use EMaster */
 		for( int i = 1; i<=cntE; i++ ) {
-			master_record *mr = &mr_list[ emf.fileNumber(i) ];
+			SELECT_MR( emf );
 			assert( mr->record_number == 0 );
 			emf.getRecord( mr, i );
 		}
@@ -395,7 +406,7 @@ bool Metastock::parseMasters()
 	if( cntX > 0 ) {
 		/* XMaster is optional */
 		for( int i = 1; i<=cntX; i++ ) {
-			master_record *mr = &mr_list[ xmf.fileNumber(i) ];
+			SELECT_MR( xmf );
 			assert( mr->record_number == 0 );
 			xmf.getRecord( mr, i );
 		}
@@ -405,6 +416,7 @@ bool Metastock::parseMasters()
 }
 
 #undef DEBUG_MASTER
+#undef SELECT_MR
 
 
 bool Metastock::readMasters()
