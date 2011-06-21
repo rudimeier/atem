@@ -570,6 +570,7 @@ bool Metastock::setPrintDateFrom( const char *date )
 		return false;
 	}
 	print_date_from = dt;
+	FDat::setPrintDateFrom( dt );
 	return true;
 }
 

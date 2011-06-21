@@ -853,12 +853,19 @@ FDat::FDat( const char *_buf, int _size, unsigned char fields ) :
 
 char FDat::print_sep = '\t';
 unsigned int FDat::print_bitset = 0xff;
+int FDat::print_date_from = 0;
 
 
 void FDat::initPrinter( char sep, unsigned int bitset )
 {
 	print_sep = sep;
 	print_bitset = bitset;
+}
+
+
+void FDat::setPrintDateFrom( int date )
+{
+	print_date_from = date;
 }
 
 
@@ -886,10 +893,12 @@ void FDat::print( const char* header ) const
 	
 	while( record < end ) {
 		int len = record_to_string( record, buf_p );
+		record += record_length;
+		if( len < 0) {
+			continue;
+		}
 		buf_p[len++] = '\n';
 		buf_p[len] = '\0';
-		
-		record += record_length;
 		
 		fputs( buf, stdout );
 	}
@@ -918,10 +927,19 @@ int FDat::record_to_string( const char *record, char *s ) const
 	int offset = 0;
 	char *begin = s;
 	
-	float date, time, open, high , low, close, volume, openint;
-	date = time = open = high = low = close = volume = openint = DEFAULT_FLOAT;
+	int date, time;
+	float open, high , low, close, volume, openint;
+	date = time = 0;
+	open = high = low = close = volume = openint = DEFAULT_FLOAT;
 	
-	READ_FIELD( date, D_DAT );
+	if( field_bitset & D_DAT ) {
+		date = floatToIntDate_YYY(readFloat(record, offset));
+		if( date < print_date_from ) {
+			return -1;
+		}
+		offset += 4;
+	}
+	
 	READ_FIELD( time, D_TIM );
 	READ_FIELD( open, D_OPE );
 	READ_FIELD( high, D_HIG );
@@ -930,8 +948,8 @@ int FDat::record_to_string( const char *record, char *s ) const
 	READ_FIELD( volume, D_VOL );
 	READ_FIELD( openint, D_OPI );
 	
-	PRINT_FIELD( itodatestr, D_DAT, floatToIntDate_YYY(date) );
-	PRINT_FIELD( itotimestr, D_TIM, (int) time );
+	PRINT_FIELD( itodatestr, D_DAT, date );
+	PRINT_FIELD( itotimestr, D_TIM, time );
 	PRINT_FIELD( ftoa, D_OPE, open );
 	PRINT_FIELD( ftoa, D_HIG, high );
 	PRINT_FIELD( ftoa, D_LOW, low );
