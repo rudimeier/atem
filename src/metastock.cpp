@@ -120,6 +120,7 @@ void FileBuf::resize( int size )
 
 
 
+bool Metastock::print_header = true;
 char Metastock::print_sep = '\t';
 unsigned short Metastock::prnt_master_fields = 0;
 unsigned char Metastock::prnt_data_fields = 0;
@@ -290,26 +291,22 @@ bool Metastock::setDir( const char* d )
 }
 
 
-bool Metastock::setOutputFormat( char sep, int fmt_data, int fmt_symbols )
+bool Metastock::setOutputFormat( char sep, int fmt_data, int skipheader )
 {
 	print_sep = sep;
+	print_header = !skipheader;
 	
-	
-	if( fmt_data < 0 || fmt_symbols < 0 ) {
+	if( fmt_data < 0 ) {
 		setError( "wrong output format" );
 		return false;
 	}
 	
-	if( fmt_symbols ) {
-		prnt_master_fields = fmt_symbols;
+	if( fmt_data ) {
+		prnt_master_fields = fmt_data >> 9;
+		prnt_data_fields = fmt_data;
+		prnt_data_mr_fields = prnt_master_fields;
 	} else {
 		prnt_master_fields = 0xFFFF;
-	}
-	
-	if( fmt_data ) {
-		prnt_data_fields = fmt_data;
-		prnt_data_mr_fields = fmt_data >> 9;
-	} else {
 		prnt_data_fields = 0xFF;
 		prnt_data_mr_fields = M_SYM;
 	}
@@ -570,6 +567,7 @@ bool Metastock::setPrintDateFrom( const char *date )
 		return false;
 	}
 	print_date_from = dt;
+	FDat::setPrintDateFrom( dt );
 	return true;
 }
 
@@ -620,11 +618,19 @@ bool Metastock::excludeFiles( const char *stamp ) const
 bool Metastock::dumpSymbolInfo() const
 {
 	char buf[MAX_SIZE_MR_STRING + 1];
+	int len;
+	
+	if( print_header ) {
+		len = mr_header_to_string( buf, prnt_master_fields, print_sep );
+		buf[len++] = '\n';
+		buf[len] = '\0';
+		fputs( buf, stdout );
+	}
 	
 	for( int i = 1; i<mr_len; i++ ) {
 		if( mr_list[i].record_number != 0 && !mr_skip_list[i] ) {
 			assert( mr_list[i].file_number == i );
-			int len = mr_record_to_string( buf, &mr_list[i],
+			len = mr_record_to_string( buf, &mr_list[i],
 				prnt_master_fields, print_sep );
 			buf[len++] = '\n';
 			buf[len] = '\0';
@@ -664,38 +670,25 @@ void Metastock::add_mr_list_datfile(  int datnum, const char* datname )
 }
 
 
-int Metastock::build_mr_string( char *dst, const master_record *mr ) const
-{
-	char *cp = dst;
-	int tmp = 0;
-	
-	if( prnt_data_mr_fields & M_SYM ) {
-		tmp = strlen(mr->c_symbol);
-		memcpy( cp, mr->c_symbol, tmp );
-		cp += tmp;
-		*cp++ = print_sep;
-	}
-	
-	if( prnt_data_mr_fields & M_NAM ) {
-		tmp = strlen(mr->c_long_name);
-		memcpy( cp, mr->c_long_name, tmp );
-		cp += tmp;
-		*cp++ = print_sep;
-	}
-	
-	*cp = '\0';
-	return cp - dst;
-}
-
 
 bool Metastock::dumpData() const
 {
 	char buf[256];
+	int len;
+	
+	if( print_header ) {
+		len = mr_header_to_string( buf, prnt_data_mr_fields, print_sep );
+		if( len > 0 ) {
+			buf[len++] = print_sep;
+			buf[len] = '\0';
+		}
+		FDat::print_header( buf );
+	}
 	
 	for( int i = 1; i<mr_len; i++ ) {
 		if( mr_list[i].record_number != 0 && !mr_skip_list[i] ) {
 			assert( mr_list[i].file_number == i );
-			int len = mr_record_to_string( buf, &mr_list[i],
+			len = mr_record_to_string( buf, &mr_list[i],
 				prnt_data_mr_fields, print_sep );
 			if( len > 0 ) {
 				buf[len++] = print_sep;

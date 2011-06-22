@@ -16,7 +16,7 @@ class Metastock
 		bool hasXMaster() const;
 		
 		bool setDir( const char* dir );
-		bool setOutputFormat(  char sep, int fmt_data, int fmt_symbols );
+		bool setOutputFormat( char sep, int fmt_data, int skipheader );
 		bool setPrintDateFrom( const char *date );
 		
 		bool parseMasters();
@@ -37,10 +37,10 @@ class Metastock
 		bool readMasters();
 		void resize_mr_list( int new_len );
 		void add_mr_list_datfile( int datnum, const char* datname );
-		int build_mr_string( char *dst, const master_record *mr ) const;
 		bool dumpData( unsigned short number, unsigned char fields,
 			const char *pfx) const;
 		
+		static bool print_header;
 		static char print_sep;
 		static unsigned short prnt_master_fields;
 		static unsigned char prnt_data_fields;

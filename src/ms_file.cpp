@@ -65,6 +65,33 @@ int mr_record_to_string( char *dest, const struct master_record* mr,
 	return cp - dest;
 }
 
+
+int mr_header_to_string( char *dest,
+	unsigned short prnt_master_fields, char sep )
+{
+	char * cp = dest;
+	
+	PRINT_FIELD( strcpy_len, M_SYM, "symbol" );
+	PRINT_FIELD( strcpy_len, M_NAM, "long_name" );
+	PRINT_FIELD( strcpy_len, M_PER, "barsize" );
+	PRINT_FIELD( strcpy_len, M_DT1, "from_date" );
+	PRINT_FIELD( strcpy_len, M_DT2, "to_date" );
+	PRINT_FIELD( strcpy_len, M_FNO, "file_number" );
+	PRINT_FIELD( strcpy_len, M_FIL, "file_name" );
+	PRINT_FIELD( strcpy_len, M_FLD, "field_bitset" );
+	PRINT_FIELD( strcpy_len, M_RNO, "record_number" );
+	PRINT_FIELD( strcpy_len, M_KND, "kind" );
+	
+	// remove last separator if exists
+	if( cp != dest ) {
+		*--cp = '\0';
+	} else {
+		*cp = '\0';
+	}
+	assert( (cp - dest) < MAX_SIZE_MR_STRING );
+	return cp - dest;
+}
+
 #undef PRINT_FIELD
 
 
@@ -853,12 +880,19 @@ FDat::FDat( const char *_buf, int _size, unsigned char fields ) :
 
 char FDat::print_sep = '\t';
 unsigned int FDat::print_bitset = 0xff;
+int FDat::print_date_from = 0;
 
 
 void FDat::initPrinter( char sep, unsigned int bitset )
 {
 	print_sep = sep;
 	print_bitset = bitset;
+}
+
+
+void FDat::setPrintDateFrom( int date )
+{
+	print_date_from = date;
 }
 
 
@@ -886,14 +920,33 @@ void FDat::print( const char* header ) const
 	
 	while( record < end ) {
 		int len = record_to_string( record, buf_p );
+		record += record_length;
+		if( len < 0) {
+			continue;
+		}
 		buf_p[len++] = '\n';
 		buf_p[len] = '\0';
-		
-		record += record_length;
 		
 		fputs( buf, stdout );
 	}
 	fflush( stdout );
+}
+
+
+void FDat::print_header( const char* symbol_header )
+{
+	char buf[512];
+	char *buf_p = buf;
+	
+	int h_size = strlen( symbol_header );
+	memcpy( buf, symbol_header, h_size );
+	buf_p += h_size;
+	
+	int len = header_to_string( buf_p );
+	buf_p[len++] = '\n';
+	buf_p[len] = '\0';
+	
+	fputs( buf, stdout );
 }
 
 
@@ -918,10 +971,19 @@ int FDat::record_to_string( const char *record, char *s ) const
 	int offset = 0;
 	char *begin = s;
 	
-	float date, time, open, high , low, close, volume, openint;
-	date = time = open = high = low = close = volume = openint = DEFAULT_FLOAT;
+	int date, time;
+	float open, high , low, close, volume, openint;
+	date = time = 0;
+	open = high = low = close = volume = openint = DEFAULT_FLOAT;
 	
-	READ_FIELD( date, D_DAT );
+	if( field_bitset & D_DAT ) {
+		date = floatToIntDate_YYY(readFloat(record, offset));
+		if( date < print_date_from ) {
+			return -1;
+		}
+		offset += 4;
+	}
+	
 	READ_FIELD( time, D_TIM );
 	READ_FIELD( open, D_OPE );
 	READ_FIELD( high, D_HIG );
@@ -930,8 +992,8 @@ int FDat::record_to_string( const char *record, char *s ) const
 	READ_FIELD( volume, D_VOL );
 	READ_FIELD( openint, D_OPI );
 	
-	PRINT_FIELD( itodatestr, D_DAT, floatToIntDate_YYY(date) );
-	PRINT_FIELD( itotimestr, D_TIM, (int) time );
+	PRINT_FIELD( itodatestr, D_DAT, date );
+	PRINT_FIELD( itotimestr, D_TIM, time );
 	PRINT_FIELD( ftoa, D_OPE, open );
 	PRINT_FIELD( ftoa, D_HIG, high );
 	PRINT_FIELD( ftoa, D_LOW, low );
@@ -950,6 +1012,28 @@ int FDat::record_to_string( const char *record, char *s ) const
 
 #undef DEFAULT_FLOAT
 #undef READ_FIELD
+
+int FDat::header_to_string( char *s )
+{
+	char *begin = s;
+	
+	PRINT_FIELD( strcpy_len, D_DAT, "date" );
+	PRINT_FIELD( strcpy_len, D_TIM, "time" );
+	PRINT_FIELD( strcpy_len, D_OPE, "open" );
+	PRINT_FIELD( strcpy_len, D_HIG, "high" );
+	PRINT_FIELD( strcpy_len, D_LOW, "low" );
+	PRINT_FIELD( strcpy_len, D_CLO, "close" );
+	PRINT_FIELD( strcpy_len, D_VOL, "volume" );
+	PRINT_FIELD( strcpy_len, D_OPI, "openint" );
+	
+	if( s != begin ) {
+		*(--s) = '\0';
+	} else {
+		*s = '\0';
+	}
+	
+	return s - begin;
+}
 
 
 unsigned short FDat::countRecords() const

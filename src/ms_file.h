@@ -63,6 +63,7 @@ struct master_record
 int mr_record_to_string( char *dest, const struct master_record*,
 	unsigned short print_bitset, char sep );
 
+int mr_header_to_string( char *dest, unsigned short print_bitset, char sep );
 
 
 
@@ -171,16 +172,20 @@ class FDat
 		static bool checkHeader( const char* buf );
 		static bool checkRecord( const char* buf, int record  );
 		static void initPrinter( char sep, unsigned int bitset );
+		static void setPrintDateFrom( int date );
+		static void print_header( const char* symbol_header );
 		
 		bool checkHeader() const;
 		void print( const char* header ) const;
 		unsigned short countRecords() const;
 		
 	private:
+		static int header_to_string( char *s );
 		int record_to_string( const char *record, char *s ) const;
 		
 		static char print_sep;
 		static unsigned int print_bitset;
+		static int print_date_from;
 		
 		const unsigned char field_bitset;
 		const unsigned int record_length;
