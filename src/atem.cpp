@@ -21,6 +21,12 @@ static const char *exclude_older_thanp = "";
 static int fdatp = -1;
 
 
+#define BITSET_HELP_MSG "\
+BITSET controls the output columns. Specifying octal numbers (digits 0-7 and\n\
+leading 0) is recommended. The first 3 octal digits (9 bits) are used for\n\
+time series columns (date dependent). They are ignored if -s is used. All\n\
+higher bits are used for symbol info (date independent).\n"
+
 
 
 static void displayArgs( poptContext con, poptCallbackReason /*foo*/,
@@ -28,6 +34,7 @@ static void displayArgs( poptContext con, poptCallbackReason /*foo*/,
 {
 	if (key->shortName == 'h') {
 		poptPrintHelp(con, stdout, 0);
+		fprintf(stdout, "\n" BITSET_HELP_MSG);
 	} else if (key->shortName == 'V') {
 		fprintf(stdout, PACKAGE_NAME " - metastock reverse "
 			"(" PACKAGE_VERSION ")\n");
