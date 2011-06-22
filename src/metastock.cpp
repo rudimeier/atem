@@ -617,11 +617,17 @@ bool Metastock::excludeFiles( const char *stamp ) const
 bool Metastock::dumpSymbolInfo() const
 {
 	char buf[MAX_SIZE_MR_STRING + 1];
+	int len;
+	
+	len = mr_header_to_string( buf, prnt_master_fields, print_sep );
+	buf[len++] = '\n';
+	buf[len] = '\0';
+	fputs( buf, stdout );
 	
 	for( int i = 1; i<mr_len; i++ ) {
 		if( mr_list[i].record_number != 0 && !mr_skip_list[i] ) {
 			assert( mr_list[i].file_number == i );
-			int len = mr_record_to_string( buf, &mr_list[i],
+			len = mr_record_to_string( buf, &mr_list[i],
 				prnt_master_fields, print_sep );
 			buf[len++] = '\n';
 			buf[len] = '\0';

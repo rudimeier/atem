@@ -65,6 +65,33 @@ int mr_record_to_string( char *dest, const struct master_record* mr,
 	return cp - dest;
 }
 
+
+int mr_header_to_string( char *dest,
+	unsigned short prnt_master_fields, char sep )
+{
+	char * cp = dest;
+	
+	PRINT_FIELD( strcpy_len, M_SYM, "symbol" );
+	PRINT_FIELD( strcpy_len, M_NAM, "long_name" );
+	PRINT_FIELD( strcpy_len, M_PER, "barsize" );
+	PRINT_FIELD( strcpy_len, M_DT1, "from_date" );
+	PRINT_FIELD( strcpy_len, M_DT2, "to_date" );
+	PRINT_FIELD( strcpy_len, M_FNO, "file_number" );
+	PRINT_FIELD( strcpy_len, M_FIL, "file_name" );
+	PRINT_FIELD( strcpy_len, M_FLD, "field_bitset" );
+	PRINT_FIELD( strcpy_len, M_RNO, "record_number" );
+	PRINT_FIELD( strcpy_len, M_KND, "kind" );
+	
+	// remove last separator if exists
+	if( cp != dest ) {
+		*--cp = '\0';
+	} else {
+		*cp = '\0';
+	}
+	assert( (cp - dest) < MAX_SIZE_MR_STRING );
+	return cp - dest;
+}
+
 #undef PRINT_FIELD
 
 

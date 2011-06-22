@@ -63,6 +63,7 @@ struct master_record
 int mr_record_to_string( char *dest, const struct master_record*,
 	unsigned short print_bitset, char sep );
 
+int mr_header_to_string( char *dest, unsigned short print_bitset, char sep );
 
 
 
