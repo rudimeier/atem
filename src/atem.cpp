@@ -55,14 +55,15 @@ static struct poptOption flow_opts[] = {
 	{"skip-header", 'n', POPT_ARG_NONE, &skipheaderp, 0,
 		"Don't print header row.", NULL},
 	{"field-separator", 'F', POPT_ARG_STRING, &sepp, 0,
-		"field separator", NULL},
+		"Field separator (ASCII).", "CHAR"},
 	{"format", 'f', POPT_ARG_INT, &format_datap, 0,
 		"Set output columns, default: 01377 (resp. 01777000 if used with -s). "
 		"See BITSET format below.", "BITSET"},
 	{"date-from", '\0', POPT_ARG_STRING, &date_fromp, 0,
-		"Print data from specified date on.", NULL},
+		"Print data from specified date on (YYYY-MM-DD).", "DATE"},
 	{"exclude-older-than", '\0', POPT_ARG_STRING, &exclude_older_thanp, 0,
-		"Don't process data files older than specified seconds.", NULL},
+		"Don't process data files older than date time (YYYY-MM-DD hh:mm:ss). "
+		"A leading '-' reverts the statement.", "DATE"},
 	{"fdat", '\0', POPT_ARG_INT, &fdatp, 0,
 		"Process specified dat file number only.", NULL},
 	POPT_TABLEEND
