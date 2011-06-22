@@ -87,11 +87,11 @@ static struct poptOption help_opts[] = {
 
 static const struct poptOption atem_opts[] = {
 	{NULL, '\0', POPT_ARG_INCLUDE_TABLE, flow_opts, 0,
-	 "Program advice", NULL},
+	 "Program advice:", NULL},
 	{NULL, '\0', POPT_ARG_INCLUDE_TABLE, debug_opts, 0,
-	 "Debug options", NULL},
+	 "Debug options:", NULL},
 	{NULL, '\0', POPT_ARG_INCLUDE_TABLE, help_opts, 0,
-	 "Help options", NULL},
+	 "Help options:", NULL},
 	POPT_TABLEEND
 };
 
@@ -102,7 +102,7 @@ static const char** atem_parse_cl(size_t argc, const char *argv[])
 	poptContext opt_ctx;
 	
 	opt_ctx = poptGetContext(NULL, argc, argv, atem_opts, 0);
-	poptSetOtherOptionHelp( opt_ctx, "[OPTION...]");
+	poptSetOtherOptionHelp( opt_ctx, "[OPTION]...");
 	
 	int rc;
 	while( (rc = poptGetNextOpt(opt_ctx)) > 0 ) {
