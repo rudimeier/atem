@@ -120,6 +120,7 @@ void FileBuf::resize( int size )
 
 
 
+bool Metastock::print_header = true;
 char Metastock::print_sep = '\t';
 unsigned short Metastock::prnt_master_fields = 0;
 unsigned char Metastock::prnt_data_fields = 0;
@@ -290,10 +291,10 @@ bool Metastock::setDir( const char* d )
 }
 
 
-bool Metastock::setOutputFormat( char sep, int fmt_data )
+bool Metastock::setOutputFormat( char sep, int fmt_data, int skipheader )
 {
 	print_sep = sep;
-	
+	print_header = !skipheader;
 	
 	if( fmt_data < 0 ) {
 		setError( "wrong output format" );
@@ -619,10 +620,12 @@ bool Metastock::dumpSymbolInfo() const
 	char buf[MAX_SIZE_MR_STRING + 1];
 	int len;
 	
-	len = mr_header_to_string( buf, prnt_master_fields, print_sep );
-	buf[len++] = '\n';
-	buf[len] = '\0';
-	fputs( buf, stdout );
+	if( print_header ) {
+		len = mr_header_to_string( buf, prnt_master_fields, print_sep );
+		buf[len++] = '\n';
+		buf[len] = '\0';
+		fputs( buf, stdout );
+	}
 	
 	for( int i = 1; i<mr_len; i++ ) {
 		if( mr_list[i].record_number != 0 && !mr_skip_list[i] ) {
@@ -696,12 +699,14 @@ bool Metastock::dumpData() const
 	char buf[256];
 	int len;
 	
-	len = mr_header_to_string( buf, prnt_data_mr_fields, print_sep );
-	if( len > 0 ) {
-		buf[len++] = print_sep;
-		buf[len] = '\0';
+	if( print_header ) {
+		len = mr_header_to_string( buf, prnt_data_mr_fields, print_sep );
+		if( len > 0 ) {
+			buf[len++] = print_sep;
+			buf[len] = '\0';
+		}
+		FDat::print_header( buf );
 	}
-	FDat::print_header( buf );
 	
 	for( int i = 1; i<mr_len; i++ ) {
 		if( mr_list[i].record_number != 0 && !mr_skip_list[i] ) {

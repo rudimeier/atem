@@ -14,6 +14,7 @@ static int dumpmasterp = 0;
 static int dumpemasterp = 0;
 static int dumpxmasterp = 0;
 static int dumpsymbolsp = 0;
+static int skipheaderp = 0;
 static const char* sepp = "\t";
 static int format_datap = 0;
 static const char *date_fromp = "";
@@ -51,6 +52,8 @@ static void displayArgs( poptContext con, poptCallbackReason /*foo*/,
 static struct poptOption flow_opts[] = {
 	{"dump-symbols", 's', POPT_ARG_NONE, &dumpsymbolsp, 0,
 		"Dump symbol info instead of time series data.", NULL},
+	{"skip-header", 'n', POPT_ARG_NONE, &skipheaderp, 0,
+		"Don't print header row.", NULL},
 	{"field-separator", 'F', POPT_ARG_STRING, &sepp, 0,
 		"field separator", NULL},
 	{"format", 'f', POPT_ARG_INT, &format_datap, 0,
@@ -149,7 +152,7 @@ int main(int argc, const char *argv[])
 		return 2; // exit
 	}
 	
-	if( ! ms.setOutputFormat( *sepp, format_datap ) ) {
+	if( ! ms.setOutputFormat( *sepp, format_datap, skipheaderp ) ) {
 		fprintf( stderr, "error: %s\n", ms.lastError() );
 		return 2; // exit
 	}
