@@ -44,8 +44,6 @@ static void displayArgs( poptContext con, poptCallbackReason /*foo*/,
 
 
 static struct poptOption flow_opts[] = {
-	{"msdir", 'i', POPT_ARG_STRING, &ms_dirp, 0,
-		"input metastock directory", NULL},
 	{"dump-symbols", 's', POPT_ARG_NONE, &dumpsymbolsp, 0,
 		"Dump all symbol info.", NULL},
 	{"dump-data", 'd', POPT_ARG_NONE, &dumpdatap, 0,
@@ -107,12 +105,12 @@ void clear_popt()
 
 
 
-static const char** atem_parse_cl(size_t argc, const char *argv[])
+void atem_parse_cl(size_t argc, const char *argv[])
 {
 	opt_ctx = poptGetContext(NULL, argc, argv, atem_opts, 0);
 	atexit(clear_popt);
 	
-	poptSetOtherOptionHelp( opt_ctx, "[OPTION]...");
+	poptSetOtherOptionHelp( opt_ctx, "[OPTION]... [DATA_DIR]");
 	
 	int rc;
 	while( (rc = poptGetNextOpt(opt_ctx)) > 0 ) {
@@ -127,12 +125,14 @@ static const char** atem_parse_cl(size_t argc, const char *argv[])
 	}
 	
 	const char** rest = poptGetArgs(opt_ctx);
-	if( rest != NULL ) {
-		fprintf( stderr, "error: bad usage\n" );
-		exit(2);
+	if( rest != NULL && *rest != NULL ) {
+		ms_dirp = *rest;
+		rest++;
+		if( *rest != NULL ) {
+			fprintf( stderr, "error: bad usage\n" );
+			exit(2);
+		}
 	}
-	
-	return rest;
 }
 
 
