@@ -12,13 +12,14 @@ static const char *ms_dirp = ".";
 static int dumpmasterp = 0;
 static int dumpemasterp = 0;
 static int dumpxmasterp = 0;
-static int dumpsymbolsp = -1;
-static int dumpdatap = -1;
+static int dumpsymbolsp = 0;
+static int dumpdatap = 0;
 static const char* sepp = "\t";
 static int format_datap = 0;
 static int format_symbolsp = 0;
 static const char *date_fromp = "";
 static const char *exclude_older_thanp = "";
+static int fdatp = -1;
 
 
 
@@ -45,9 +46,9 @@ static void displayArgs( poptContext con, poptCallbackReason /*foo*/,
 static struct poptOption flow_opts[] = {
 	{"msdir", 'i', POPT_ARG_STRING, &ms_dirp, 0,
 		"input metastock directory", NULL},
-	{"dump-symbols", 's', POPT_ARG_INT | POPT_ARGFLAG_OPTIONAL, &dumpsymbolsp, 0,
+	{"dump-symbols", 's', POPT_ARG_NONE, &dumpsymbolsp, 0,
 		"Dump all symbol info.", NULL},
-	{"dump-data", 'd', POPT_ARG_INT | POPT_ARGFLAG_OPTIONAL, &dumpdatap, 0,
+	{"dump-data", 'd', POPT_ARG_NONE, &dumpdatap, 0,
 		"Dump data files.", NULL},
 	{"field-separator", 'F', POPT_ARG_STRING, &sepp, 0,
 		"field separator", NULL},
@@ -59,6 +60,8 @@ static struct poptOption flow_opts[] = {
 		"Print data from specified date on.", NULL},
 	{"exclude-older-than", '\0', POPT_ARG_STRING, &exclude_older_thanp, 0,
 		"Don't process data files older than specified seconds.", NULL},
+	{"fdat", '\0', POPT_ARG_INT, &fdatp, 0,
+		"Process specified dat file number only.", NULL},
 	POPT_TABLEEND
 };
 
@@ -147,14 +150,8 @@ int main(int argc, const char *argv[])
 		return 2; // exit
 	}
 	
-	//TODO maybe parameters of -s and -d should be another one
-	if( dumpsymbolsp > 0 || dumpdatap > 0 ) {
-		if( dumpsymbolsp > 0 && dumpdatap > 0 && dumpsymbolsp != dumpdatap ) {
-			fprintf( stderr, "error: %s\n", "parameter s != d" );
-			return 2; // exit
-		}
-		int f = dumpsymbolsp > dumpdatap ? dumpsymbolsp : dumpdatap;
-		if( ! ms.incudeFile( f ) ) {
+	if( fdatp > 0 ) {
+		if( ! ms.incudeFile( fdatp ) ) {
 			fprintf( stderr, "error: %s\n", ms.lastError() );
 			return 2; // exit
 		}
@@ -186,14 +183,14 @@ int main(int argc, const char *argv[])
 		}
 	}
 	
-	if( dumpsymbolsp >= 0 ) {
+	if( dumpsymbolsp == 1 ) {
 		if( ! ms.dumpSymbolInfo() ) {
 			fprintf( stderr, "error: %s\n", ms.lastError() );
 			return 2; // exit
 		}
 	}
 	
-	if( dumpdatap >= 0 ) {
+	if( dumpdatap == 1 ) {
 		if( ! ms.dumpData() ) {
 			fprintf( stderr, "error: %s\n", ms.lastError() );
 			return 2; // exit
