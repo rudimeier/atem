@@ -7,6 +7,7 @@
 
 
 
+static poptContext opt_ctx;
 
 static const char *ms_dirp = ".";
 static int dumpmasterp = 0;
@@ -102,8 +103,6 @@ static const struct poptOption atem_opts[] = {
 
 static const char** atem_parse_cl(size_t argc, const char *argv[])
 {
-	poptContext opt_ctx;
-	
 	opt_ctx = poptGetContext(NULL, argc, argv, atem_opts, 0);
 	poptSetOtherOptionHelp( opt_ctx, "[OPTION]...");
 	
