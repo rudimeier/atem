@@ -66,7 +66,8 @@ static struct poptOption debug_opts[] = {
 	{"dump-emaster", 'e', POPT_ARG_NONE, &dumpemasterp, 0,
 		"Dump EMASTER file.", NULL},
 	{"dump-xmaster", 'x', POPT_ARG_NONE, &dumpxmasterp, 0,
-		"Dump XMASTER file.", NULL}
+		"Dump XMASTER file.", NULL},
+	POPT_TABLEEND
 };
 
 
