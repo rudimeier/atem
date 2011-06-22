@@ -996,6 +996,28 @@ int FDat::record_to_string( const char *record, char *s ) const
 #undef DEFAULT_FLOAT
 #undef READ_FIELD
 
+int FDat::header_to_string( char *s )
+{
+	char *begin = s;
+	
+	PRINT_FIELD( strcpy_len, D_DAT, "date" );
+	PRINT_FIELD( strcpy_len, D_TIM, "time" );
+	PRINT_FIELD( strcpy_len, D_OPE, "open" );
+	PRINT_FIELD( strcpy_len, D_HIG, "high" );
+	PRINT_FIELD( strcpy_len, D_LOW, "low" );
+	PRINT_FIELD( strcpy_len, D_CLO, "close" );
+	PRINT_FIELD( strcpy_len, D_VOL, "volume" );
+	PRINT_FIELD( strcpy_len, D_OPI, "openint" );
+	
+	if( s != begin ) {
+		*(--s) = '\0';
+	} else {
+		*s = '\0';
+	}
+	
+	return s - begin;
+}
+
 
 unsigned short FDat::countRecords() const
 {

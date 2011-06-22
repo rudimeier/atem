@@ -179,6 +179,7 @@ class FDat
 		unsigned short countRecords() const;
 		
 	private:
+		static int header_to_string( char *s );
 		int record_to_string( const char *record, char *s ) const;
 		
 		static char print_sep;
