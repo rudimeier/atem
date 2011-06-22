@@ -933,6 +933,23 @@ void FDat::print( const char* header ) const
 }
 
 
+void FDat::print_header( const char* symbol_header )
+{
+	char buf[512];
+	char *buf_p = buf;
+	
+	int h_size = strlen( symbol_header );
+	memcpy( buf, symbol_header, h_size );
+	buf_p += h_size;
+	
+	int len = header_to_string( buf_p );
+	buf_p[len++] = '\n';
+	buf_p[len] = '\0';
+	
+	fputs( buf, stdout );
+}
+
+
 // to be printed when field does not exist
 #define DEFAULT_FLOAT -0.0
 

@@ -694,11 +694,19 @@ int Metastock::build_mr_string( char *dst, const master_record *mr ) const
 bool Metastock::dumpData() const
 {
 	char buf[256];
+	int len;
+	
+	len = mr_header_to_string( buf, prnt_data_mr_fields, print_sep );
+	if( len > 0 ) {
+		buf[len++] = print_sep;
+		buf[len] = '\0';
+	}
+	FDat::print_header( buf );
 	
 	for( int i = 1; i<mr_len; i++ ) {
 		if( mr_list[i].record_number != 0 && !mr_skip_list[i] ) {
 			assert( mr_list[i].file_number == i );
-			int len = mr_record_to_string( buf, &mr_list[i],
+			len = mr_record_to_string( buf, &mr_list[i],
 				prnt_data_mr_fields, print_sep );
 			if( len > 0 ) {
 				buf[len++] = print_sep;

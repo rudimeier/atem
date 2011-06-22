@@ -173,6 +173,7 @@ class FDat
 		static bool checkRecord( const char* buf, int record  );
 		static void initPrinter( char sep, unsigned int bitset );
 		static void setPrintDateFrom( int date );
+		static void print_header( const char* symbol_header );
 		
 		bool checkHeader() const;
 		void print( const char* header ) const;
