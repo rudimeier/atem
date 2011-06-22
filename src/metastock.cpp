@@ -670,29 +670,6 @@ void Metastock::add_mr_list_datfile(  int datnum, const char* datname )
 }
 
 
-int Metastock::build_mr_string( char *dst, const master_record *mr ) const
-{
-	char *cp = dst;
-	int tmp = 0;
-	
-	if( prnt_data_mr_fields & M_SYM ) {
-		tmp = strlen(mr->c_symbol);
-		memcpy( cp, mr->c_symbol, tmp );
-		cp += tmp;
-		*cp++ = print_sep;
-	}
-	
-	if( prnt_data_mr_fields & M_NAM ) {
-		tmp = strlen(mr->c_long_name);
-		memcpy( cp, mr->c_long_name, tmp );
-		cp += tmp;
-		*cp++ = print_sep;
-	}
-	
-	*cp = '\0';
-	return cp - dst;
-}
-
 
 bool Metastock::dumpData() const
 {
