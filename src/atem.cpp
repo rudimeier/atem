@@ -37,7 +37,6 @@ static void displayArgs( poptContext con, poptCallbackReason /*foo*/,
 		poptPrintUsage(con, stdout, 0);
 	}
 	
-	poptFreeContext(con);
 	exit(0);
 }
 
@@ -101,9 +100,18 @@ static const struct poptOption atem_opts[] = {
 
 
 
+void clear_popt()
+{
+	poptFreeContext(opt_ctx);
+}
+
+
+
 static const char** atem_parse_cl(size_t argc, const char *argv[])
 {
 	opt_ctx = poptGetContext(NULL, argc, argv, atem_opts, 0);
+	atexit(clear_popt);
+	
 	poptSetOtherOptionHelp( opt_ctx, "[OPTION]...");
 	
 	int rc;
@@ -115,23 +123,17 @@ static const char** atem_parse_cl(size_t argc, const char *argv[])
 	if( rc != -1 ) {
 		fprintf( stderr, "error: %s '%s'\n",
 			poptStrerror(rc), poptBadOption(opt_ctx, 0) );
-		poptFreeContext(opt_ctx);
 		exit(2);
 	}
 	
 	const char** rest = poptGetArgs(opt_ctx);
 	if( rest != NULL ) {
 		fprintf( stderr, "error: bad usage\n" );
-		poptFreeContext(opt_ctx);
 		exit(2);
 	}
 	
-	// we cannot free it when have a non-NULL rest
-	poptFreeContext(opt_ctx);
 	return rest;
 }
-
-
 
 
 int main(int argc, const char *argv[])
