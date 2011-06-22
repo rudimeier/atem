@@ -16,7 +16,6 @@ static int dumpxmasterp = 0;
 static int dumpsymbolsp = 0;
 static const char* sepp = "\t";
 static int format_datap = 0;
-static int format_symbolsp = 0;
 static const char *date_fromp = "";
 static const char *exclude_older_thanp = "";
 static int fdatp = -1;
@@ -47,10 +46,9 @@ static struct poptOption flow_opts[] = {
 		"Dump symbol info instead of time series data.", NULL},
 	{"field-separator", 'F', POPT_ARG_STRING, &sepp, 0,
 		"field separator", NULL},
-	{"format-data", 'f', POPT_ARG_INT, &format_datap, 0,
-		"data output format", NULL},
-	{"format-symbols", 'g', POPT_ARG_INT, &format_symbolsp, 0,
-		"symbol info output format", NULL},
+	{"format", 'f', POPT_ARG_INT, &format_datap, 0,
+		"Set output columns, default: 01377 (resp. 01777000 if used with -s). "
+		"See BITSET format below.", "BITSET"},
 	{"date-from", '\0', POPT_ARG_STRING, &date_fromp, 0,
 		"Print data from specified date on.", NULL},
 	{"exclude-older-than", '\0', POPT_ARG_STRING, &exclude_older_thanp, 0,
@@ -144,7 +142,7 @@ int main(int argc, const char *argv[])
 		return 2; // exit
 	}
 	
-	if( ! ms.setOutputFormat( *sepp, format_datap, format_symbolsp ) ) {
+	if( ! ms.setOutputFormat( *sepp, format_datap ) ) {
 		fprintf( stderr, "error: %s\n", ms.lastError() );
 		return 2; // exit
 	}

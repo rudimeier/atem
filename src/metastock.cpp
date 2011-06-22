@@ -290,26 +290,22 @@ bool Metastock::setDir( const char* d )
 }
 
 
-bool Metastock::setOutputFormat( char sep, int fmt_data, int fmt_symbols )
+bool Metastock::setOutputFormat( char sep, int fmt_data )
 {
 	print_sep = sep;
 	
 	
-	if( fmt_data < 0 || fmt_symbols < 0 ) {
+	if( fmt_data < 0 ) {
 		setError( "wrong output format" );
 		return false;
 	}
 	
-	if( fmt_symbols ) {
-		prnt_master_fields = fmt_symbols;
+	if( fmt_data ) {
+		prnt_master_fields = fmt_data >> 9;
+		prnt_data_fields = fmt_data;
+		prnt_data_mr_fields = prnt_master_fields;
 	} else {
 		prnt_master_fields = 0xFFFF;
-	}
-	
-	if( fmt_data ) {
-		prnt_data_fields = fmt_data;
-		prnt_data_mr_fields = fmt_data >> 9;
-	} else {
 		prnt_data_fields = 0xFF;
 		prnt_data_mr_fields = M_SYM;
 	}
