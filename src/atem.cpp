@@ -45,12 +45,6 @@ static void displayArgs( poptContext con, poptCallbackReason /*foo*/,
 static struct poptOption flow_opts[] = {
 	{"msdir", 'i', POPT_ARG_STRING, &ms_dirp, 0,
 		"input metastock directory", NULL},
-	{"dump-master", 'm', POPT_ARG_NONE, &dumpmasterp, 0,
-		"Dump MASTER file.", NULL},
-	{"dump-emaster", 'e', POPT_ARG_NONE, &dumpemasterp, 0,
-		"Dump EMASTER file.", NULL},
-	{"dump-xmaster", 'x', POPT_ARG_NONE, &dumpxmasterp, 0,
-		"Dump XMASTER file.", NULL},
 	{"dump-symbols", 's', POPT_ARG_INT | POPT_ARGFLAG_OPTIONAL, &dumpsymbolsp, 0,
 		"Dump all symbol info.", NULL},
 	{"dump-data", 'd', POPT_ARG_INT | POPT_ARGFLAG_OPTIONAL, &dumpdatap, 0,
@@ -68,7 +62,14 @@ static struct poptOption flow_opts[] = {
 	POPT_TABLEEND
 };
 
-
+static struct poptOption debug_opts[] = {
+	{"dump-master", 'm', POPT_ARG_NONE, &dumpmasterp, 0,
+		"Dump MASTER file.", NULL},
+	{"dump-emaster", 'e', POPT_ARG_NONE, &dumpemasterp, 0,
+		"Dump EMASTER file.", NULL},
+	{"dump-xmaster", 'x', POPT_ARG_NONE, &dumpxmasterp, 0,
+		"Dump XMASTER file.", NULL}
+};
 
 
 static struct poptOption help_opts[] = {
@@ -87,6 +88,8 @@ static struct poptOption help_opts[] = {
 static const struct poptOption atem_opts[] = {
 	{NULL, '\0', POPT_ARG_INCLUDE_TABLE, flow_opts, 0,
 	 "Program advice", NULL},
+	{NULL, '\0', POPT_ARG_INCLUDE_TABLE, debug_opts, 0,
+	 "Debug options", NULL},
 	{NULL, '\0', POPT_ARG_INCLUDE_TABLE, help_opts, 0,
 	 "Help options", NULL},
 	POPT_TABLEEND
