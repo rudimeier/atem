@@ -20,9 +20,9 @@ typedef union {
 
 int ftoa( char *outbuf, float f )
 {
-	unsigned long mantissa, int_part, frac_part;
+	uint64_t mantissa, int_part, frac_part;
 	int safe_shift;
-	unsigned long safe_mask;
+	uint64_t safe_mask;
 	short exp2;
 	LF_t x;
 	char *p;
@@ -190,8 +190,8 @@ int ftoa_prec_f0( char *outbuf, float f )
 		/*  |f| <= 0.5  */
 		*p++ = '0';
 	} else {
-		unsigned long int_part;
-		unsigned long mantissa = (x.L & 0xFFFFFF) | 0x800000;
+		uint64_t int_part;
+		uint64_t mantissa = (x.L & 0xFFFFFF) | 0x800000;
 		if (exp2 >= 64) {
 			/* |f| >= 2^64 > ULONG_MAX */
 			/* NaNs and +-INF are also handled here*/
