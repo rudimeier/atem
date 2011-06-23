@@ -67,7 +67,8 @@ higher bits are used for symbol info (date independent).\n"
 
 #define VERSION_MSG \
 PACKAGE_NAME " - metastock reverse (" PACKAGE_VERSION ")\n\
-Copyright (C) 2010-2011 Ruediger Meier <sweet_f_a@gmx.de>\n"
+Copyright (C) 2010-2011 Ruediger Meier <sweet_f_a@gmx.de>\n\
+License: BSD 3-Clause\n"
 
 
 static void displayArgs( poptContext con, poptCallbackReason /*foo*/,
