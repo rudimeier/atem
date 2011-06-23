@@ -57,7 +57,7 @@ int ftoa( char *outbuf, float f )
 	}
 	
 	safe_shift = -(exp2 + 1);
-	safe_mask = 0xFFFFFFFFFFFFFFFF >>(64 - 24 - safe_shift);
+	safe_mask = 0xFFFFFFFFFFFFFFFFULL >>(64 - 24 - safe_shift);
 	
 	if (exp2 >= 64) {
 		/* |f| >= 2^64 > ULONG_MAX */
