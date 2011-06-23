@@ -13,7 +13,7 @@ unreachable and unfortunately he'd never released the source code.
 Reasons to use atem
 -------------------
 
- - It's fast, factor 10-15 compared with ms2asc.
+ - It's fast, factor 15-20 compared with ms2asc.
  - Full support of EMaster files. Most other tools are just ignoring them which
    may results in wrong dates and loss of symbol descriptions.
  - Correct handling case sensitivity of file names.
@@ -25,8 +25,14 @@ Reasons to use atem
 Installation
 ------------
 
+ Building from source requires a c++ compiler (tested with icc/icpc and gcc/g++)
+ and libpopt. Windows has been successfully tested using cygwin.
+
  ./configure
+ make
  make install
+
+ (Within git repo type "autoreconf -fi" before.)
 
 
 
@@ -41,10 +47,9 @@ Usage
 Known issues / TODO (feedback is welcome)
 -----------------------------------------
 
- - No Windows support yet.
- - So far atem has been tested on x86_64 Linux only. There might be problems on
-   other architectures because of the optimized to_string functions. In this
-   case try './configure --disable-fast-printing'.
+ - So far atem has been extensively tested on x86_64 Linux only. There might be
+   problems on other architectures because of the optimized to_string functions.
+   In this case try './configure --disable-fast-printing'.
  - Sample data and unit tests to be added.
 
 
