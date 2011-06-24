@@ -1,0 +1,15 @@
+
+ChangeLog, atem -- metastock reverse
+====================================
+
+
+0.3.0 - 2011-06-24  ------------------------------------------------------------
+
+This is the first published stable version.
+
+  - Implement option --date-from.
+  - Print header row per default.
+  - Cleanup cmd interface and consider it stable.
+  - Build on win32 cygwin.
+  - The atem project is licensed under "The BSD 3-Clause License".
+  - Add informative README file.
