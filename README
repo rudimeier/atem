@@ -1,0 +1,61 @@
+
+atem -- metastock reverse
+=========================
+
+atem converts metastock binary data to ASCII text. It was written due to the
+lack of a fast and reliable tool.
+The most useful tool so far was ms2asc by Mohammed Illyas Mansoor but there are
+several bugs and issues which can't be fixed because Mohammed seems to be
+unreachable and unfortunately he'd never released the source code.
+
+
+
+Reasons to use atem
+-------------------
+
+ - It's fast, factor 15-20 compared with ms2asc.
+ - Full support of EMaster files. Most other tools are just ignoring them which
+   may results in wrong dates and loss of symbol descriptions.
+ - Correct handling case sensitivity of file names.
+ - Simple but powerful command line interface.
+ - BSD open source license.
+
+
+
+Installation
+------------
+
+ Building from source requires a c++ compiler (tested with icc/icpc and gcc/g++)
+ and libpopt. Windows has been successfully tested using cygwin.
+
+ ./configure
+ make
+ make install
+
+ (Within git repo type "autoreconf -fi" before.)
+
+
+
+Usage
+-----
+
+ By default atem reads metastock data from current directory and writes complete
+ time series to stdout, see atem --help.
+
+
+
+Known issues / TODO (feedback is welcome)
+-----------------------------------------
+
+ - So far atem has been extensively tested on x86_64 Linux only. There might be
+   problems on other architectures because of the optimized to_string functions.
+   In this case try './configure --disable-fast-printing'.
+ - Sample data and unit tests to be added.
+
+
+
+Contact Information
+-------------------
+
+  If you have questions, bug reports, patches etc., contact
+  Ruediger Meier <sweet_f_a@gmx.de> (in English or German).
