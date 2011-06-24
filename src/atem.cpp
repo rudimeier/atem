@@ -97,7 +97,7 @@ static struct poptOption flow_opts[] = {
 	{"skip-header", 'n', POPT_ARG_NONE, &skipheaderp, 0,
 		"Don't print header row.", NULL},
 	{"field-separator", 'F', POPT_ARG_STRING, &sepp, 0,
-		"Field separator (ASCII).", "CHAR"},
+		"Field separator, default: TAB (ASCII).", "CHAR"},
 	{"format", 'f', POPT_ARG_INT, &format_datap, 0,
 		"Set output columns, default: 01377 (resp. 01777000 if used with -s). "
 		"See BITSET format below.", "BITSET"},
