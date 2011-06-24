@@ -92,7 +92,7 @@ static void displayArgs( poptContext con, poptCallbackReason /*foo*/,
 
 
 static struct poptOption flow_opts[] = {
-	{"dump-symbols", 's', POPT_ARG_NONE, &dumpsymbolsp, 0,
+	{"symbols", 's', POPT_ARG_NONE, &dumpsymbolsp, 0,
 		"Dump symbol info instead of time series data.", NULL},
 	{"skip-header", 'n', POPT_ARG_NONE, &skipheaderp, 0,
 		"Don't print header row.", NULL},
