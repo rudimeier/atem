@@ -361,8 +361,11 @@ bool Metastock::readFile( FileBuf *file_buf ) const
 	strcpy( file_path, ms_dir );
 	strcpy( file_path + strlen(ms_dir), file_buf->constName() );
 	
-	
+#if defined O_BINARY
+	int fd = open( file_path, O_RDONLY | O_BINARY );
+#else
 	int fd = open( file_path, O_RDONLY );
+#endif
 	if( fd < 0 ) {
 		setError( file_path, strerror(errno) );
 		return false;
