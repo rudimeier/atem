@@ -555,7 +555,7 @@ time_t str2time( const char* s)
 {
 	struct tm dt;
 	time_t dt_t;
-	bzero( &dt, sizeof(tm) );
+	memset( &dt, 0, sizeof(tm) );
 	
 	int ret = sscanf( s, "%d-%d-%d %d:%d:%d", &dt.tm_year,
 		&dt.tm_mon, &dt.tm_mday, &dt.tm_hour, &dt.tm_min, &dt.tm_sec );
