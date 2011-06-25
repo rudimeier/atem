@@ -356,8 +356,8 @@ bool Metastock::setOutputFormat( char sep, int fmt_data, int skipheader )
 bool Metastock::readFile( FileBuf *file_buf ) const
 {
 	// build file name with full path
-	char *file_path = (char*) alloca( strlen(ms_dir)
-		+ strlen(file_buf->constName()) + 1 );
+	char puff[strlen(ms_dir) + strlen(file_buf->constName()) + 1];
+	char *file_path = puff;
 	strcpy( file_path, ms_dir );
 	strcpy( file_path + strlen(ms_dir), file_buf->constName() );
 	
@@ -628,7 +628,8 @@ bool Metastock::excludeFiles( const char *stamp ) const
 		}
 		assert( mr_list[i].file_number == i );
 		
-		char *file_path = (char*) alloca( strlen(ms_dir) + strlen( mr_list[i].file_name) + 1 );
+		char puff[strlen(ms_dir) + strlen( mr_list[i].file_name) + 1];
+		char *file_path = puff;
 		strcpy( file_path, ms_dir );
 		strcpy( file_path + strlen(ms_dir), mr_list[i].file_name );
 		
