@@ -26,7 +26,7 @@ Installation
 ------------
 
  Building from source requires a c++ compiler (tested with icc/icpc and gcc/g++)
- and libpopt. Windows has been successfully tested using cygwin.
+ and libpopt. Windows has been successfully tested using cygwin and mingw.
 
  ./configure
  make
