@@ -39,9 +39,11 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include "atem_ggo.h"
 #include "config.h"
 #include "metastock.h"
 
+#include "atem_ggo.c"
 
 
 static poptContext opt_ctx;
@@ -57,6 +59,9 @@ static int format_datap = 0;
 static const char *date_fromp = "";
 static const char *exclude_older_thanp = "";
 static int fdatp = -1;
+
+
+static gengetopt_args_info args_info;
 
 
 #define BITSET_HELP_MSG "\
@@ -152,6 +157,10 @@ void clear_popt()
 	poptFreeContext(opt_ctx);
 }
 
+static void gengetopt_free()
+{
+	cmdline_parser_free( &args_info );
+}
 
 
 void atem_parse_cl(size_t argc, const char *argv[])
@@ -185,9 +194,15 @@ void atem_parse_cl(size_t argc, const char *argv[])
 }
 
 
-int main(int argc, const char *argv[])
+int main(int argc, char *argv[])
 {
-	atem_parse_cl(argc, argv);
+	atexit( gengetopt_free );
+	
+	if( cmdline_parser(argc, argv, &args_info) != 0 ) {
+		return 2; // exit
+	}
+	
+	atem_parse_cl(argc, (const char **)argv);
 	
 	Metastock ms;
 	if( ! ms.setDir( ms_dirp ) ) {
