@@ -21,7 +21,6 @@ EXTRA_atem_SOURCES += ftoa.c
 EXTRA_atem_SOURCES += itoa.c
 BUILT_SOURCES =
 BUILT_SOURCES += atem_ggo.c atem_ggo.h
-atem_LDADD = -lpopt
 atem_CPPFLAGS = $(AM_CPPFLAGS)
 atem_LDFLAGS = $(AM_LDFLAGS)
 
