@@ -42,6 +42,11 @@
 #include "config.h"
 #include "metastock.h"
 
+#ifdef _WIN32
+	#include <fcntl.h>
+	#include <io.h>
+#endif
+
 #include "atem_ggo.c"
 
 
@@ -90,6 +95,12 @@ static void gengetopt_free()
 
 int main(int argc, char *argv[])
 {
+#ifdef _WIN32
+	/* never write CRLF line feeds */
+	_setmode(_fileno(stderr),_O_BINARY);
+	_setmode(_fileno(stdout),_O_BINARY);
+#endif
+	
 	atexit( gengetopt_free );
 	
 	if( cmdline_parser(argc, argv, &args_info) != 0 ) {
