@@ -763,7 +763,11 @@ bool Metastock::dumpData( unsigned short n, unsigned char fields, const char *pf
 // 		n, datfile.countRecords(), count_bits(fields) * 4 );
 	
 	datfile.checkHeader();
-	datfile.print( pfx );
+	if( datfile.print( pfx ) < 0) {
+		/* This is should only happen on WIN32 instead of SIGPIPE */
+		setError( "writing interrupted" );
+		return false;
+	}
 	
 	return true;
 }
