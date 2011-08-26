@@ -200,6 +200,11 @@ Metastock::~Metastock()
 	delete( e_buf );
 	delete( m_buf );
 	free( ms_dir );
+	
+	/* out is either stdout or a real file which was opened in set_outfile() */
+	if( out != stdout && out != NULL ) {
+		fclose( (FILE*)out );
+	}
 }
 
 
