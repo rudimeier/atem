@@ -40,6 +40,10 @@ args "--no-handle-error --long-help --unamed-opts=DATA_DIR"
 # section
 section "Program advice"
 
+option "output" o
+"Write output to FILE instead of stdout."
+string typestr="FILE" optional
+
 option "symbols" s
 "Dump symbol info instead of time series data."
 optional

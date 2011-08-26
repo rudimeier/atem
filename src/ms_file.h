@@ -208,6 +208,7 @@ class FDat
 		
 		static bool checkHeader( const char* buf );
 		static bool checkRecord( const char* buf, int record  );
+		static void set_outfile( void *file );
 		static void initPrinter( char sep, unsigned int bitset );
 		static void setPrintDateFrom( int date );
 		static void print_header( const char* symbol_header );
@@ -220,6 +221,7 @@ class FDat
 		static int header_to_string( char *s );
 		int record_to_string( const char *record, char *s ) const;
 		
+		static void *out;
 		static char print_sep;
 		static unsigned int print_bitset;
 		static int print_date_from;

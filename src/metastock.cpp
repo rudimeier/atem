@@ -170,7 +170,8 @@ Metastock::Metastock() :
 	m_buf( new FileBuf() ),
 	e_buf( new FileBuf() ),
 	x_buf( new FileBuf() ),
-	fdat_buf( new FileBuf() )
+	fdat_buf( new FileBuf() ),
+	out( stdout )
 {
 	error[0] = '\0';
 /* dat file numbers are unsigned short only */
@@ -302,6 +303,29 @@ bool Metastock::findFiles()
 #endif /*USE_FTS*/
 
 
+bool Metastock::set_outfile( const char *file )
+{
+	int fd = open( file,
+#if defined _WIN32
+		_O_WRONLY | _O_CREAT |O_TRUNC | _O_BINARY );
+#else
+		O_WRONLY | O_CREAT | O_TRUNC , 0666 );
+#endif
+	if( fd < 0 ) {
+		setError( file, strerror(errno) );
+		return false;
+	}
+	
+	out = fdopen( fd, "wb");
+	if( out == NULL ) {
+		setError( file, strerror(errno) );
+		return false;
+	}
+	
+	return true;
+}
+
+
 bool Metastock::setDir( const char* d )
 {
 	// set member ms_dir inclusive trailing '/'
@@ -324,6 +348,7 @@ bool Metastock::setDir( const char* d )
 		return false;
 	}
 	
+	FDat::set_outfile( out );
 	return true;
 }
 
@@ -665,7 +690,7 @@ bool Metastock::dumpSymbolInfo() const
 		len = mr_header_to_string( buf, prnt_master_fields, print_sep );
 		buf[len++] = '\n';
 		buf[len] = '\0';
-		fputs( buf, stdout );
+		fputs( buf, (FILE*)out );
 	}
 	
 	for( int i = 1; i<mr_len; i++ ) {
@@ -675,7 +700,7 @@ bool Metastock::dumpSymbolInfo() const
 				prnt_master_fields, print_sep );
 			buf[len++] = '\n';
 			buf[len] = '\0';
-			fputs( buf, stdout );
+			fputs( buf, (FILE*)out );
 		}
 	}
 	return true;

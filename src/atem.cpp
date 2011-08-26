@@ -118,6 +118,14 @@ int main(int argc, char *argv[])
 	}
 	
 	Metastock ms;
+	
+	if( args_info.output_given ) {
+		if( ! ms.set_outfile( args_info.output_arg ) ) {
+			fprintf( stderr, "error: %s\n", ms.lastError() );
+			return 2; // exit
+		}
+	}
+	
 	if( ! ms.setDir( ms_dirp ) ) {
 		fprintf( stderr, "error: %s\n", ms.lastError() );
 		return 2; // exit

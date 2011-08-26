@@ -52,6 +52,7 @@ class Metastock
 		
 		bool hasXMaster() const;
 		
+		bool set_outfile( const char *file );
 		bool setDir( const char* dir );
 		bool setOutputFormat( char sep, int fmt_data, int skipheader );
 		bool setPrintDateFrom( const char *date );
@@ -95,6 +96,8 @@ class Metastock
 		int mr_len;
 		master_record *mr_list;
 		bool *mr_skip_list;
+		
+		void *out;
 		
 		mutable char error[ERROR_LENGTH];
 };
