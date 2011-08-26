@@ -3,7 +3,9 @@ LC_ALL = C
 
 SUBDIRS = src
 
-dist_doc_DATA =
-dist_doc_DATA += README
-dist_doc_DATA += ChangeLog
+doc_DATA =
+doc_DATA += README
+doc_DATA += ChangeLog
 
+dist_doc_DATA =
+dist_doc_DATA += LICENSE
