@@ -80,15 +80,15 @@ section "Debug options"
 
 option "dump-master" m
 "Dump MASTER file."
-optional
+optional hidden
 
 option "dump-emaster" e
 "Dump EMASTER file."
-optional
+optional hidden
 
 option "dump-xmaster" x
 "Dump XMASTER file."
-optional
+optional hidden
 
 
 # section
@@ -96,6 +96,10 @@ section "Help options"
 
 option "help" h
 "Show this help message."
+optional
+
+option "full-help" -
+"Print help, including hidden debugging options."
 optional
 
 option "version" V
