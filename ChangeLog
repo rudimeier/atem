@@ -13,6 +13,7 @@ This release makes it possible to distribute static windows binaries.
   - Handle not existing SIGPIPE on win32.
   - NEW option [-oFILE|--output=FILE] for those who don't want to write to
     stdout.
+  - Hide debug options in --help message and add option --full-help
 
 
 
