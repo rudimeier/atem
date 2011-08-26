@@ -213,7 +213,7 @@ class FDat
 		static void print_header( const char* symbol_header );
 		
 		bool checkHeader() const;
-		void print( const char* header ) const;
+		int print( const char* header ) const;
 		unsigned short countRecords() const;
 		
 	private:

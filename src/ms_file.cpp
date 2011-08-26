@@ -944,7 +944,7 @@ bool FDat::checkHeader() const
 }
 
 
-void FDat::print( const char* header ) const
+int FDat::print( const char* header ) const
 {
 	const char *record = buf + record_length;
 	const char *end = buf + size;
@@ -955,6 +955,7 @@ void FDat::print( const char* header ) const
 	memcpy( buf, header, h_size );
 	buf_p += h_size;
 	
+	int err = 0;
 	while( record < end ) {
 		int len = record_to_string( record, buf_p );
 		record += record_length;
@@ -964,9 +965,13 @@ void FDat::print( const char* header ) const
 		buf_p[len++] = '\n';
 		buf_p[len] = '\0';
 		
-		fputs( buf, stdout );
+		/* We don't check errors every loop to be fast. Main reason to check
+		   errors at all is because there is no SIGPIPE on WIN32. */
+		err = fputs( buf, stdout );
 	}
+	
 	fflush( stdout );
+	return err;
 }
 
 
