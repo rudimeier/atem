@@ -915,9 +915,16 @@ FDat::FDat( const char *_buf, int _size, unsigned char fields ) :
 }
 
 
+void* FDat::out = stdout;
 char FDat::print_sep = '\t';
 unsigned int FDat::print_bitset = 0xff;
 int FDat::print_date_from = 0;
+
+
+void FDat::set_outfile( void *file )
+{
+	out = file;
+}
 
 
 void FDat::initPrinter( char sep, unsigned int bitset )
@@ -967,10 +974,10 @@ int FDat::print( const char* header ) const
 		
 		/* We don't check errors every loop to be fast. Main reason to check
 		   errors at all is because there is no SIGPIPE on WIN32. */
-		err = fputs( buf, stdout );
+		err = fputs( buf, (FILE*)out );
 	}
 	
-	fflush( stdout );
+	fflush( (FILE*)out );
 	return err;
 }
 
@@ -988,7 +995,7 @@ void FDat::print_header( const char* symbol_header )
 	buf_p[len++] = '\n';
 	buf_p[len] = '\0';
 	
-	fputs( buf, stdout );
+	fputs( buf, (FILE*)out );
 }
 
 
