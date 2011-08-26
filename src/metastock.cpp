@@ -563,7 +563,7 @@ void Metastock::dumpXMaster() const
 }
 
 
-bool Metastock::incudeFile( unsigned short f ) const
+bool Metastock::incudeFile( int f ) const
 {
 	for( int i = 1; i< mr_len; i++ ) {
 			mr_skip_list[i] = true;

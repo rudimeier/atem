@@ -61,7 +61,7 @@ class Metastock
 		void dumpMaster() const;
 		void dumpEMaster() const;
 		void dumpXMaster() const;
-		bool incudeFile( unsigned short f ) const;
+		bool incudeFile( int f ) const;
 		bool excludeFiles( const char *stamp ) const;
 		bool dumpSymbolInfo() const;
 		bool dumpData() const;
