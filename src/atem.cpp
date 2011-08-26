@@ -71,9 +71,13 @@ License: BSD 3-Clause\n"
 
 static void check_display_args()
 {
-	if( args_info.help_given ) {
+	if( args_info.full_help_given || args_info.help_given ) {
 		gengetopt_args_info_usage = "Usage: " PACKAGE " [OPTION]... [DATA_DIR]";
-		cmdline_parser_print_help();
+		if( args_info.full_help_given ) {
+			cmdline_parser_print_full_help();
+		} else {
+			cmdline_parser_print_help();
+		}
 		printf( "\n" BITSET_HELP_MSG );
 	} else if( args_info.usage_given ) {
 		printf( "%s\n", gengetopt_args_info_usage );
