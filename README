@@ -25,14 +25,15 @@ Reasons to use atem
 Installation
 ------------
 
- Building from source requires a c++ compiler (tested with icc/icpc and gcc/g++)
- and libpopt. Windows has been successfully tested using cygwin and mingw.
+Building from source requires a C++ compiler (tested with icc/icpc and gcc/g++).
+Windows has been successfully tested using cygwin and mingw.
+
+When building from git checkout you need the autotools and gengetopt and don't
+forget to type "autoreconf -vfi" first.
 
  ./configure
  make
  make install
-
- (Within git repo type "autoreconf -fi" before.)
 
 
 
