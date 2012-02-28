@@ -1,6 +1,6 @@
 /*** ms_file.h -- parsing metastock files
  *
- * Copyright (C) 2010 - 2011 Ruediger Meier
+ * Copyright (C) 2010-2012 Ruediger Meier
  *
  * Author:  Ruediger Meier <sweet_f_a@gmx.de>
  *

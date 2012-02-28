@@ -1,6 +1,6 @@
 /*** test_xtoa.c -- simple tests for xtoa funcs
  *
- * Copyright (C) 2010 Ruediger Meier
+ * Copyright (C) 2010-2012 Ruediger Meier
  *
  * Author:  Ruediger Meier <sweet_f_a@gmx.de>
  *
