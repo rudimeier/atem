@@ -1,7 +1,7 @@
 LANG = C
 LC_ALL = C
 
-SUBDIRS = src
+SUBDIRS = src doc
 
 doc_DATA =
 doc_DATA += README
