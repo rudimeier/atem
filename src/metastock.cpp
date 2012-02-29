@@ -40,12 +40,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-
-#ifdef USE_FTS
-	#include <fts.h>
-#else 
-	#include <dirent.h>
-#endif
+#include <dirent.h>
 
 #include <stdio.h>
 #include <unistd.h>
@@ -208,63 +203,6 @@ Metastock::~Metastock()
 }
 
 
-#ifdef USE_FTS
-
-#define CHECK_MASTER( _file_buf_, _gen_name_ ) \
-	if( strcasecmp(_gen_name_, node->fts_name) == 0 ) { \
-		assert( !_file_buf_->hasName() ); \
-		_file_buf_->setName( node->fts_name ); \
-	}
-
-bool Metastock::findFiles()
-{
-	//TODO error handling!
-	char *path_argv[] = { ms_dir, NULL };
-	FTS *tree = fts_open( path_argv,
-		FTS_NOCHDIR | FTS_LOGICAL | FTS_NOSTAT, NULL );
-	if (!tree) {
-		perror("fts_open");
-		assert(false);
-	}
-	FTSENT *node;
-	while ((node = fts_read(tree))) {
-		if( (node->fts_level > 0) && (node->fts_info == FTS_D ) ) {
-			fts_set(tree, node, FTS_SKIP);
-		} else if( node->fts_info == FTS_F ) {
-			if( (*node->fts_name == 'F' || *node->fts_name == 'f') &&
-				node->fts_name[1] >= '1' && node->fts_name[1] <= '9') {
-				char *c_number = node->fts_name + 1;
-				char *end;
-				long int number = strtol( c_number, &end, 10 );
-				assert( number > 0 && c_number != end );
-				if( (strcasecmp(end, ".MWD") == 0 || strcasecmp(end, ".DAT") == 0)
-					&& number <= MAX_DAT_NUM ) {
-					add_mr_list_datfile( number, node->fts_name );
-				}
-			} else {
-				CHECK_MASTER( m_buf, "MASTER" );
-				CHECK_MASTER( e_buf, "EMASTER" );
-				CHECK_MASTER( x_buf, "XMASTER" );
-			}
-		}
-	}
-	
-	if (errno) {
-		perror("fts_read");
-		assert( false );
-	}
-	
-	if (fts_close(tree)) {
-		perror("fts_close");
-		assert( false );
-	}
-	return true;
-}
-
-#undef CHECK_MASTER
-
-#else /*USE_FTS*/
-
 #define CHECK_MASTER( _file_buf_, _gen_name_ ) \
 	if( strcasecmp(_gen_name_, dirp->d_name) == 0 ) { \
 		assert( !_file_buf_->hasName() ); \
@@ -304,8 +242,6 @@ bool Metastock::findFiles()
 }
 
 #undef CHECK_MASTER
-
-#endif /*USE_FTS*/
 
 
 bool Metastock::set_outfile( const char *file )
