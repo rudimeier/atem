@@ -18,7 +18,10 @@ built_mans += atem.1
 
 ## help2man helpers
 %.1: $(top_srcdir)/src/%.ggo $(top_srcdir)/configure
+	help_opt="--help"; \
+	$(top_builddir)/src/$* --full-help >/dev/null 2>&1 && help_opt="--full-help"; \
 	$(HELP2MAN) -S "$(PACKAGE_STRING)" -N \
+		--help-option=$$help_opt \
 		-I "$(srcdir)/$*.h2m" -I "$(builddir)/$*.h2m" \
 		-I "$(srcdir)/author.h2m" \
 		-o $@ $(top_builddir)/src/$*
