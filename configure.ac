@@ -23,7 +23,6 @@ if test "${enable_fast_printing}" = "yes"; then
 fi
 
 
-dnl AC_DEFINE([FAST_PRINTING], [1], [Define if fast printing is preferred.]
 
 ## output
 AC_CONFIG_FILES([Makefile])
