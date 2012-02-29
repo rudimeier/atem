@@ -16,6 +16,9 @@ BUILT_SOURCES += $(built_mans)
 built_mans =
 built_mans += atem.1
 
+## non generic deps per executable
+atem.1: $(top_srcdir)/src/atem.cpp
+
 ## help2man helpers
 %.1: $(top_srcdir)/src/%.ggo $(top_srcdir)/configure
 	help_opt="--help"; \
