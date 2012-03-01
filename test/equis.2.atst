@@ -1,0 +1,13 @@
+## -*- shell-script -*-
+
+TOOL=atem
+INFILE="msdir_equis_a"
+OUTFILE="testload.csv"
+CMDLINE="--symbols '${INFILE}' > '${OUTFILE}'"
+
+## STDIN
+
+## STDOUT
+
+## outfile sum
+OUTFILE_SHA1="21d0863a920b57a775f3dfac400dbcc0b491d049"

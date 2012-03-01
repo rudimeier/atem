@@ -15,6 +15,9 @@ LOG_COMPILER = echo
 
 EXTRA_DIST += msdir_equis_a.tar.xz
 
+TESTS += equis.1.atst
+TESTS += equis.2.atst
+
 all-local:
 	tar -xf $(srcdir)/msdir_equis_a.tar.xz
 
