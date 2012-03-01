@@ -4,7 +4,7 @@ AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_SRCDIR([src/])
 
-AM_INIT_AUTOMAKE([foreign])
+AM_INIT_AUTOMAKE([foreign parallel-tests])
 
 ## compiler check
 CXXFLAGS="-O3 -g -Wall -W"
@@ -29,5 +29,6 @@ AM_MISSING_PROG([HELP2MAN], [help2man], ["${missing_dir}"])
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([src/Makefile])
 AC_CONFIG_FILES([doc/Makefile])
+AC_CONFIG_FILES([test/Makefile])
 AC_OUTPUT
 
