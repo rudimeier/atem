@@ -4,8 +4,11 @@
 LANG = C
 LC_ALL = C
 
+BUILT_SOURCES =
+BUILT_SOURCES += $(ms_dirs)
 EXTRA_DIST = $(TESTS)
 EXTRA_DIST += $(ATST_LOG_COMPILER)
+EXTRA_DIST += $(patsubst %,%.tar.xz,$(ms_dirs))
 TESTS =
 
 TEST_EXTENSIONS = .atst
@@ -13,13 +16,20 @@ ATST_LOG_COMPILER = $(srcdir)/atem-test.sh
 AM_ATST_LOG_FLAGS = --builddir $(top_builddir)/src --hash sha1sum
 LOG_COMPILER = echo
 
-EXTRA_DIST += msdir_equis_a.tar.xz
+ms_dirs =
+ms_dirs += msdir_equis_a
 
-TESTS += equis.1.atst
-TESTS += equis.2.atst
+TESTS += equis.01.atst
+TESTS += equis.02.atst
+TESTS += equis.03.atst
+TESTS += equis.04.atst
+TESTS += equis.05.atst
+TESTS += equis.06.atst
+TESTS += equis.07.atst
+TESTS += equis.08.atst
 
-all-local:
-	tar -xf $(srcdir)/msdir_equis_a.tar.xz
+msdir_%: msdir_%.tar.xz
+	tar -xf $< && touch $@
 
 clean-local:
 	-rm -rf msdir_equis_a

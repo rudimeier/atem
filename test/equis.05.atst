@@ -1,0 +1,17 @@
+## -*- shell-script -*-
+
+
+TOOL=atem
+INFILE="msdir_equis_a"
+OUTFILE="testload.csv"
+tmp_stamp="$(date -r "${INFILE}/F1011.MWD" +"%F %T")"
+CMDLINE="--skip-header --format=00100000
+	--exclude-older-than='${tmp_stamp}' '${INFILE}' |uniq |tr -d '\t'
+	> '${OUTFILE}'"
+
+## STDIN
+
+## STDOUT
+
+## outfile sum
+OUTFILE_SHA1="ceeb8f887515f0cb12e32bf7428cfae07b201c6c"
