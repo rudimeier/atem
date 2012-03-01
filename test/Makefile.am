@@ -21,6 +21,12 @@ ms_dirs += msdir_equis_a
 
 TESTS += equis.01.atst
 TESTS += equis.02.atst
+TESTS += equis.03.atst
+TESTS += equis.04.atst
+TESTS += equis.05.atst
+TESTS += equis.06.atst
+TESTS += equis.07.atst
+TESTS += equis.08.atst
 
 msdir_%: msdir_%.tar.xz
 	tar -xf $< && touch $@

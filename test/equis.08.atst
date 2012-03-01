@@ -1,0 +1,13 @@
+## -*- shell-script -*-
+
+TOOL=atem
+INFILE="msdir_equis_a"
+OUTFILE="testload.csv"
+CMDLINE="--format=01011 --date-from='2001-06-27' '${INFILE}' > '${OUTFILE}'"
+
+## STDIN
+
+## STDOUT
+
+## outfile sum
+OUTFILE_SHA1="283c57f86997d8ae9a37e0060cb89bfbc1f7efe9"
