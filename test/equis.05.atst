@@ -1,10 +1,12 @@
 ## -*- shell-script -*-
 
+
 TOOL=atem
 INFILE="msdir_equis_a"
 OUTFILE="testload.csv"
+tmp_stamp="$(date -r "${INFILE}/F1011.MWD" +"%F %T")"
 CMDLINE="--skip-header --format=00100000
-	--exclude-older-than='2011-02-09 10:45:58' '${INFILE}' |uniq |tr -d '\t'
+	--exclude-older-than='${tmp_stamp}' '${INFILE}' |uniq |tr -d '\t'
 	> '${OUTFILE}'"
 
 ## STDIN

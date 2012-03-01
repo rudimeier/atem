@@ -2,9 +2,10 @@
 
 TOOL=atem
 INFILE="msdir_equis_a"
+tmp_stamp="$(date -r "${INFILE}/F1011.MWD" +"%F %T")"
 OUTFILE="testload.csv"
 CMDLINE="--symbols --skip-header --format=00100000
-	--exclude-older-than='-2011-02-09 10:45:58' '${INFILE}' > '${OUTFILE}'"
+	--exclude-older-than='-${tmp_stamp}' '${INFILE}' > '${OUTFILE}'"
 
 ## STDIN
 
