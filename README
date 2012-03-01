@@ -40,8 +40,10 @@ forget to type "autoreconf -vfi" first.
 Usage
 -----
 
- By default atem reads metastock data from current directory and writes complete
- time series to stdout, see atem --help.
+By default atem reads metastock data from current directory and writes complete
+time series to stdout, see
+ atem --help
+You'll find some sample data in the test directory.
 
 
 
@@ -51,7 +53,6 @@ Known issues / TODO (feedback is welcome)
  - So far atem has been extensively tested on x86_64 Linux only. There might be
    problems on other architectures because of the optimized to_string functions.
    In this case try './configure --disable-fast-printing'.
- - Sample data and unit tests to be added.
 
 
 
