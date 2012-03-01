@@ -19,8 +19,8 @@ LOG_COMPILER = echo
 ms_dirs =
 ms_dirs += msdir_equis_a
 
-TESTS += equis.1.atst
-TESTS += equis.2.atst
+TESTS += equis.01.atst
+TESTS += equis.02.atst
 
 msdir_%: msdir_%.tar.xz
 	tar -xf $< && touch $@
