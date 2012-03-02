@@ -33,3 +33,6 @@ msdir_%: msdir_%.tar.xz
 
 clean-local:
 	-rm -rf msdir_equis_a
+
+# don't run the tests parallel
+.NOTPARALLEL:
