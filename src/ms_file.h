@@ -200,6 +200,7 @@ class XMasterFile
 
 
 
+typedef int (*ftoa_func)(char*, float);
 
 class FDat
 {
@@ -211,6 +212,7 @@ class FDat
 		static void set_outfile( void *file );
 		static void initPrinter( char sep, unsigned int bitset );
 		static void setPrintDateFrom( int date );
+		static void setForceFloat( ms_data_field );
 		static void print_header( const char* symbol_header );
 		
 		bool checkHeader() const;
@@ -225,6 +227,9 @@ class FDat
 		static char print_sep;
 		static unsigned int print_bitset;
 		static int print_date_from;
+		static ftoa_func prc_ftoa;
+		static ftoa_func vol_ftoa;
+		static ftoa_func opi_ftoa;
 		
 		const unsigned char field_bitset;
 		const unsigned int record_length;

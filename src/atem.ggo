@@ -61,6 +61,14 @@ option "format" f
 BITSET format below."
 int typestr="BITSET" optional
 
+option "float-opi" -
+"Print openint column as float."
+optional
+
+option "float-vol" -
+"Print volume column as float."
+optional
+
 option "date-from" -
 "Print data from specified date on (YYYY-MM-DD)."
 string typestr="DATE" optional
