@@ -920,6 +920,10 @@ char FDat::print_sep = '\t';
 unsigned int FDat::print_bitset = 0xff;
 int FDat::print_date_from = 0;
 
+ftoa_func FDat::prc_ftoa = ftoa;
+ftoa_func FDat::vol_ftoa = ftoa_prec_f0;
+ftoa_func FDat::opi_ftoa = ftoa_prec_f0;
+
 
 void FDat::set_outfile( void *file )
 {
@@ -1043,12 +1047,12 @@ int FDat::record_to_string( const char *record, char *s ) const
 	
 	PRINT_FIELD( itodatestr, D_DAT, date );
 	PRINT_FIELD( itotimestr, D_TIM, time );
-	PRINT_FIELD( ftoa, D_OPE, open );
-	PRINT_FIELD( ftoa, D_HIG, high );
-	PRINT_FIELD( ftoa, D_LOW, low );
-	PRINT_FIELD( ftoa, D_CLO, close );
-	PRINT_FIELD( ftoa_prec_f0, D_VOL, volume );
-	PRINT_FIELD( ftoa_prec_f0, D_OPI, openint );
+	PRINT_FIELD( prc_ftoa, D_OPE, open );
+	PRINT_FIELD( prc_ftoa, D_HIG, high );
+	PRINT_FIELD( prc_ftoa, D_LOW, low );
+	PRINT_FIELD( prc_ftoa, D_CLO, close );
+	PRINT_FIELD( vol_ftoa, D_VOL, volume );
+	PRINT_FIELD( opi_ftoa, D_OPI, openint );
 	
 	if( s != begin ) {
 		*(--s) = '\0';
