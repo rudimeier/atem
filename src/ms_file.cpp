@@ -943,6 +943,21 @@ void FDat::setPrintDateFrom( int date )
 	print_date_from = date;
 }
 
+void FDat::setForceFloat( ms_data_field fld )
+{
+	switch(fld) {
+	case D_OPI:
+		opi_ftoa = prc_ftoa;
+		break;
+	case D_VOL:
+		vol_ftoa = prc_ftoa;
+		break;
+	default:
+		/* maybe extend this switch if ever needed */
+		assert(false);
+	}
+}
+
 
 bool FDat::checkHeader() const
 {

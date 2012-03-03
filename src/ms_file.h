@@ -212,6 +212,7 @@ class FDat
 		static void set_outfile( void *file );
 		static void initPrinter( char sep, unsigned int bitset );
 		static void setPrintDateFrom( int date );
+		static void setForceFloat( ms_data_field );
 		static void print_header( const char* symbol_header );
 		
 		bool checkHeader() const;

@@ -319,6 +319,18 @@ bool Metastock::setOutputFormat( char sep, int fmt_data, int skipheader )
 }
 
 
+bool Metastock::setForceFloat( bool opi, bool vol )
+{
+	if( opi ) {
+		FDat::setForceFloat(D_OPI);
+	}
+	if( vol ) {
+		FDat::setForceFloat(D_VOL);
+	}
+	return true;
+}
+
+
 bool Metastock::readFile( FileBuf *file_buf ) const
 {
 	// build file name with full path
