@@ -142,7 +142,13 @@ int main(int argc, char *argv[])
 		fprintf( stderr, "error: %s\n", ms.lastError() );
 		return 2; // exit
 	}
-	
+
+	if( !ms.setForceFloat(
+			args_info.float_opi_given, args_info.float_vol_given) ) {
+		fprintf( stderr, "error: %s\n", ms.lastError() );
+		return 2; // exit
+	}
+
 	if( args_info.fdat_given ) {
 		if( ! ms.incudeFile( args_info.fdat_arg ) ) {
 			fprintf( stderr, "error: %s\n", ms.lastError() );
