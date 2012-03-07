@@ -41,3 +41,26 @@ AC_CONFIG_FILES([doc/Makefile])
 AC_CONFIG_FILES([test/Makefile])
 AC_OUTPUT
 
+## prepare build summary
+if test : ; then
+	output_csv="*"
+else
+	output_csv=" "
+fi
+if test "${have_uterus}" = "yes"; then
+	output_uterus="*"
+else
+	output_uterus=" "
+fi
+
+cat <<EOF
+
+
+Build summary
+=============
+Build client:	atem
+Output support:	
+  [[${output_csv}]] csv
+  [[${output_uterus}]] libuterus
+
+EOF
