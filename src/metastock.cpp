@@ -157,9 +157,9 @@ void FileBuf::resize( int size )
 
 bool Metastock::print_header = true;
 char Metastock::print_sep = '\t';
-unsigned short Metastock::prnt_master_fields = 0;
-unsigned char Metastock::prnt_data_fields = 0;
-unsigned short Metastock::prnt_data_mr_fields = 0;
+unsigned short Metastock::prnt_master_fields = 0xFFFF;
+unsigned char Metastock::prnt_data_fields = 0xFF;
+unsigned short Metastock::prnt_data_mr_fields = M_SYM;
 
 
 Metastock::Metastock() :
@@ -311,10 +311,6 @@ bool Metastock::setOutputFormat( char sep, int fmt_data, int skipheader )
 		prnt_master_fields = fmt_data >> 9;
 		prnt_data_fields = fmt_data;
 		prnt_data_mr_fields = prnt_master_fields;
-	} else {
-		prnt_master_fields = 0xFFFF;
-		prnt_data_fields = 0xFF;
-		prnt_data_mr_fields = M_SYM;
 	}
 	
 	FDat::initPrinter( sep, prnt_data_fields );
