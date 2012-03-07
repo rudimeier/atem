@@ -35,6 +35,9 @@
  *
  ***/
 
+#if defined HAVE_CONFIG_H
+# include "config.h"
+#endif	// HAVE_CONFIG_H
 #include "metastock.h"
 
 #include <string.h>
@@ -755,3 +758,146 @@ bool Metastock::hasXMaster() const
 {
 	return( x_buf->hasName() );
 }
+
+#if defined HAVE_UTERUS
+#include <uterus.h>
+#include <m30.h>
+
+struct rec_clo_s {
+	utectx_t hdl;
+	struct scdl_s sn[1];
+};
+
+bool Metastock::dumpUte() const
+{
+	struct rec_clo_s clo = {
+		.hdl = ute_mktemp(UO_RDWR),
+		.sn[0] = {0},
+	};
+	bool res = true;
+	int len;
+		
+	if (clo.hdl == NULL) {
+		setError( "ute_mktemp() b0rked" );
+		return false;
+	}
+
+	// hand out the name of the file
+	puts(ute_fn(clo.hdl));
+
+	for( int i = 1; i<mr_len; i++ ) {
+		if( mr_list[i].record_number != 0 && !mr_skip_list[i] ) {
+			char buf[256];
+
+			assert( mr_list[i].file_number == i );
+			len = mr_record_to_string( buf, &mr_list[i],
+				prnt_data_mr_fields, print_sep );
+			if (len >= SLUT_SYMLEN) {
+				// cut off after SLUT_SYMLEN
+				buf[SLUT_SYMLEN] = '\0';
+			} else if (len > 0) {
+				buf[len] = '\0';
+			} else {
+				// no symbol, this is somewhat alarming :|
+			}
+
+			// get us an ute index for this one
+			{
+				uint16_t idx = ute_sym2idx(clo.hdl, buf);
+				scdl_set_tblidx(clo.sn, idx);
+			}
+
+			// no millisecond resolution in metastock
+			scdl_set_stmp_msec(clo.sn, 0);
+			// also it's always candles of trades or so
+			scdl_set_ttf(clo.sn, SCDL_FLAVOUR | SL1T_TTF_FIX);
+
+			if( !dumpUte( i, &clo ) ) {
+				res = false;
+				goto out;
+			}
+		}
+	}
+out:
+	ute_close(clo.hdl);
+	return res;
+}
+
+static int
+rec_cb(struct glue_s g, void *clo)
+{
+// add data in G to ute handle in CLO
+// at the moment, we assume candles in G and CLO
+	struct rec_clo_s *rec_clo = (struct rec_clo_s*)clo;
+
+	// date fiddling, metastock uses bcd-dates
+	{
+		struct tm tm = {
+			.tm_year = (g.date / 10000) - 1900,
+			.tm_mon = (g.date / 100) % 100 - 1,
+			.tm_mday = (g.date % 100),
+			.tm_hour = (g.time / 10000),
+			.tm_min = (g.time / 100) % 100,
+			.tm_sec = (g.time % 100),
+			
+			.tm_wday = /*bugger*/0,
+			.tm_yday = /*bugger*/0,
+			.tm_isdst = /*assume UTC*/0,
+		};
+		time_t unx = timegm(&tm);
+
+		rec_clo->sn->sta_ts = unx;
+		// daily candles?
+		scdl_set_stmp_sec(rec_clo->sn, unx + 86400);
+	}
+
+	// fill in the rest of the candle
+	rec_clo->sn->o = ffff_m30_get_f(g.open).u;
+	rec_clo->sn->h = ffff_m30_get_f(g.high).u;
+	rec_clo->sn->l = ffff_m30_get_f(g.low).u;
+	rec_clo->sn->c = ffff_m30_get_f(g.close).u;
+	rec_clo->sn->cnt = ffff_m30_get_f(g.volume).u;
+	ute_add_tick(rec_clo->hdl, AS_SCOM(rec_clo->sn));
+	return 0;
+}
+
+bool Metastock::dumpUte( unsigned short n, void *clo ) const
+{
+	fdat_buf->setName( mr_list[n].file_name );
+	
+	if( !fdat_buf->hasName() ) {
+		setError( "no fdat found" );
+		return false;
+	}
+	
+	if( ! readFile( fdat_buf ) ) {
+		return false;
+	}
+	
+	{
+		unsigned char flds = mr_list[n].field_bitset;
+		FDat datfile( fdat_buf->constBuf(), fdat_buf->len(), flds );
+		
+		datfile.checkHeader();
+		datfile.iter( rec_cb, clo );
+	}
+	return true;
+}
+
+#else  // !HAVE_UTERUS
+
+bool Metastock::dumpUte() const
+{
+	// trivial response in this case
+	setError( "no ute support in this version of atem" );
+	return false;
+}
+
+bool Metastock::dumpUte( unsigned short n, unsigned char flds, const char *pfx ) const
+{
+	// trivial response in this case
+	setError( "no ute support in this version of atem" );
+	return false;
+}
+
+#endif	// HAVE_UTERUS
