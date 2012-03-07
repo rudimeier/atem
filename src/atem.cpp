@@ -35,6 +35,9 @@
  *
  ***/
 
+#if defined HAVE_CONFIG_H
+# include "config.h"
+#endif	// HAVE_CONFIG_H
 #include <stdlib.h>
 #include <assert.h>
 
@@ -61,7 +64,18 @@ leading 0) is recommended. The first 3 octal digits (9 bits) are used for\n\
 time series columns (date dependent). They are ignored if -s is used. All\n\
 higher bits are used for symbol info (date independent).\n\
 \n\
-Report bugs to sweet_f_a@gmx.de\n"
+"
+
+#define UTERUS_HELP_MSG "\
+This version of " PACKAGE_NAME " supports uterus output.  In addition\n\
+to BITSET the option -f|--format allows the string `ute' to indicate\n\
+that output should go into an ute file.\n\
+\n\
+"
+
+#define BUG_MSG	"\
+Report bugs to sweet_f_a@gmx.de\n\
+"
 
 #define VERSION_MSG \
 PACKAGE_NAME " - metastock reverse (" PACKAGE_VERSION ")\n\
@@ -78,7 +92,13 @@ static void check_display_args()
 		} else {
 			cmdline_parser_print_help();
 		}
-		printf( "\n" BITSET_HELP_MSG );
+		puts( "\n"
+		      BITSET_HELP_MSG
+#if defined HAVE_UTERUS
+		      UTERUS_HELP_MSG
+#endif	// HAVE_UTERUS
+		      BUG_MSG
+		      );
 	} else if( args_info.usage_given ) {
 		printf( "%s\n", gengetopt_args_info_usage );
 	} else if( args_info.version_given ) {
@@ -99,6 +119,10 @@ static void gengetopt_free()
 
 int main(int argc, char *argv[])
 {
+	bool dump_csv = false;
+	bool dump_ute = false;
+	int fmt_data = 0;
+
 #ifdef _WIN32
 	/* never write CRLF line feeds */
 	_setmode(_fileno(stderr),_O_BINARY);
@@ -135,12 +159,33 @@ int main(int argc, char *argv[])
 		return 2; // exit
 	}
 	
-	if( !ms.setOutputFormat(
+	if( args_info.format_given &&
+	    strcmp( args_info.format_arg, "ute" ) == 0 ) {
+#if defined HAVE_UTERUS
+		dump_ute = true;
+#else  // !HAVE_UTERUS
+		fprintf( stderr, "error: no ute support in this version of "
+			 PACKAGE_NAME "\n" );
+		return 2; // exit
+#endif	// HAVE_UTERUS
+	} else if( args_info.format_given &&
+		   ({
+			   char *on;
+			   fmt_data = strtol( args_info.format_arg, &on, 0 );
+			   *on;
+		   }) ) {
+		fprintf( stderr, "error: invalid numeric value: %s\n",
+			 args_info.format_arg );
+		return 2; // exit
+	} else if( !ms.setOutputFormat(
 		  args_info.field_separator_given ?*args_info.field_separator_arg :'\t',
-		  args_info.format_given ? args_info.format_arg : 0,
+		  fmt_data,
 		  args_info.skip_header_given ) ) {
 		fprintf( stderr, "error: %s\n", ms.lastError() );
 		return 2; // exit
+	} else {
+		// all went well
+		dump_csv = true;
 	}
 
 	if( !ms.setForceFloat(
@@ -194,11 +239,11 @@ int main(int argc, char *argv[])
 		}
 	}
 	
-	if( dumpdata ) {
-		if( ! ms.dumpData() ) {
-			fprintf( stderr, "error: %s\n", ms.lastError() );
-			return 2; // exit
-		}
+	if( dumpdata &&
+	    ( dump_csv && ! ms.dumpData() ) ||
+	    ( dump_ute && ! ms.dumpUte() ) ) {
+		fprintf( stderr, "error: %s\n", ms.lastError() );
+		return 2; // exit
 	}
 	
 	return 0;

@@ -66,6 +66,7 @@ class Metastock
 		bool excludeFiles( const char *stamp ) const;
 		bool dumpSymbolInfo() const;
 		bool dumpData() const;
+		bool dumpUte() const;
 		const char* lastError() const;
 		
 	private:
@@ -78,6 +79,7 @@ class Metastock
 		void add_mr_list_datfile( int datnum, const char* datname );
 		bool dumpData( unsigned short number, unsigned char fields,
 			const char *pfx) const;
+		bool dumpUte( unsigned short number, void *clo ) const;
 		
 		static bool print_header;
 		static char print_sep;

@@ -23,6 +23,11 @@ BUILT_SOURCES =
 BUILT_SOURCES += atem_ggo.c atem_ggo.h
 atem_CPPFLAGS = $(AM_CPPFLAGS)
 atem_LDFLAGS = $(AM_LDFLAGS)
+atem_LDADD =
+if HAVE_UTERUS
+atem_CPPFLAGS += $(uterus_CFLAGS)
+atem_LDADD += $(uterus_LIBS)
+endif ## HAVE_UTERUS
 
 # Build all executables at distribution time to generate the man pages.
 dist-hook: $(bin_PROGRAMS)
