@@ -154,9 +154,9 @@ void FileBuf::resize( int size )
 
 bool Metastock::print_header = true;
 char Metastock::print_sep = '\t';
-unsigned short Metastock::prnt_master_fields = 0;
-unsigned char Metastock::prnt_data_fields = 0;
-unsigned short Metastock::prnt_data_mr_fields = 0;
+unsigned short Metastock::prnt_master_fields = 0xFFFF;
+unsigned char Metastock::prnt_data_fields = 0xFF;
+unsigned short Metastock::prnt_data_mr_fields = M_SYM;
 
 
 Metastock::Metastock() :
