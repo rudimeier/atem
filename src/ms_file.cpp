@@ -45,6 +45,10 @@
 
 #include "util.h"
 
+#if defined __INTEL_COMPILER
+// don't warn about order of evaluation
+# pragma warning (disable:981)
+#endif	// __INTEL_COMPILER
 
 
 /**
