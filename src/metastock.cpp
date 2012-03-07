@@ -765,19 +765,18 @@ bool Metastock::hasXMaster() const
 
 struct rec_clo_s {
 	utectx_t hdl;
-	struct scdl_s sn[1];
+	uint16_t idx;
+	uint16_t ttf;
+	uint32_t len;
 };
 
 bool Metastock::dumpUte() const
 {
-	struct rec_clo_s clo = {
-		.hdl = ute_mktemp(UO_RDWR),
-		.sn[0] = {0},
-	};
+	struct rec_clo_s clo;
 	bool res = true;
 	int len;
 		
-	if (clo.hdl == NULL) {
+	if ((clo.hdl = ute_mktemp(UO_RDWR)) == NULL) {
 		setError( "ute_mktemp() b0rked" );
 		return false;
 	}
@@ -802,15 +801,11 @@ bool Metastock::dumpUte() const
 			}
 
 			// get us an ute index for this one
-			{
-				uint16_t idx = ute_sym2idx(clo.hdl, buf);
-				scdl_set_tblidx(clo.sn, idx);
-			}
-
-			// no millisecond resolution in metastock
-			scdl_set_stmp_msec(clo.sn, 0);
-			// also it's always candles of trades or so
-			scdl_set_ttf(clo.sn, SCDL_FLAVOUR | SL1T_TTF_FIX);
+			clo.idx = ute_sym2idx(clo.hdl, buf);
+			// also it's always candles of trades or something
+			clo.ttf = SCDL_FLAVOUR | SL1T_TTF_FIX;
+			// candles are assumed to be daily
+			clo.len = 86400;
 
 			if( !dumpUte( i, &clo ) ) {
 				res = false;
@@ -829,35 +824,46 @@ rec_cb(struct glue_s g, void *clo)
 // add data in G to ute handle in CLO
 // at the moment, we assume candles in G and CLO
 	struct rec_clo_s *rec_clo = (struct rec_clo_s*)clo;
+	struct scdl_s sn[1];
+	time_t unx;
 
 	// date fiddling, metastock uses bcd-dates
 	{
-		struct tm tm = {
-			.tm_year = (g.date / 10000) - 1900,
-			.tm_mon = (g.date / 100) % 100 - 1,
-			.tm_mday = (g.date % 100),
-			.tm_hour = (g.time / 10000),
-			.tm_min = (g.time / 100) % 100,
-			.tm_sec = (g.time % 100),
-			
-			.tm_wday = /*bugger*/0,
-			.tm_yday = /*bugger*/0,
-			.tm_isdst = /*assume UTC*/0,
-		};
-		time_t unx = timegm(&tm);
+		struct tm tm;
 
-		rec_clo->sn->sta_ts = unx;
-		// daily candles?
-		scdl_set_stmp_sec(rec_clo->sn, unx + 86400);
+		tm.tm_year = (g.date / 10000) - 1900;
+		tm.tm_mon = (g.date / 100) % 100 - 1;
+		tm.tm_mday = (g.date % 100);
+		tm.tm_hour = (g.time / 10000);
+		tm.tm_min = (g.time / 100) % 100;
+		tm.tm_sec = (g.time % 100);
+
+		tm.tm_wday = /*bugger*/0;
+		tm.tm_yday = /*bugger*/0;
+		tm.tm_isdst = /*assume UTC*/0;
+		unx = timegm(&tm);
+
+		// candles store the end stamp
+		scdl_set_stmp_sec(sn, unx + rec_clo->len);
+		// no millisecond resolution in metastock
+		scdl_set_stmp_msec(sn, 0);
 	}
 
-	// fill in the rest of the candle
-	rec_clo->sn->o = ffff_m30_get_f(g.open).u;
-	rec_clo->sn->h = ffff_m30_get_f(g.high).u;
-	rec_clo->sn->l = ffff_m30_get_f(g.low).u;
-	rec_clo->sn->c = ffff_m30_get_f(g.close).u;
-	rec_clo->sn->cnt = ffff_m30_get_f(g.volume).u;
-	ute_add_tick(rec_clo->hdl, AS_SCOM(rec_clo->sn));
+	// finish candle header set up
+	scdl_set_tblidx(sn, rec_clo->idx);
+	scdl_set_ttf(sn, rec_clo->ttf);
+
+	// fill in the rest of the candle, payload
+	sn->o = ffff_m30_get_f(g.open).u;
+	sn->h = ffff_m30_get_f(g.high).u;
+	sn->l = ffff_m30_get_f(g.low).u;
+	sn->c = ffff_m30_get_f(g.close).u;
+	sn->cnt = ffff_m30_get_f(g.volume).u;
+	// start stamp
+	sn->sta_ts = unx;
+
+	// and off we dump this to ute
+	ute_add_tick(rec_clo->hdl, AS_SCOM(sn));
 	return 0;
 }
 
