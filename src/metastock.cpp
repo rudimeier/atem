@@ -776,15 +776,22 @@ bool Metastock::dumpUte() const
 	struct rec_clo_s clo;
 	bool res = true;
 	int len;
-		
-	if ((clo.hdl = ute_mktemp(UO_RDWR)) == NULL) {
-		setError( "ute_mktemp() b0rked" );
+	
+	if( fname &&
+	    (clo.hdl = ute_open( fname, UO_CREAT | UO_TRUNC | UO_RDWR )) ) {
+		// perfect
+		;
+	} else if( (clo.hdl = ute_mktemp( UO_RDWR )) ) {
+		// second best result, we've got a temp file
+		// don't know if the fall-through from above is desirable
+		// anyway, hand out the name of the file
+		puts(ute_fn(clo.hdl));
+	} else {
+		// total fail
+		setError( "cannot open ute file" );
 		return false;
 	}
-
-	// hand out the name of the file
-	puts(ute_fn(clo.hdl));
-
+	
 	for( int i = 1; i<mr_len; i++ ) {
 		if( mr_list[i].record_number != 0 && !mr_skip_list[i] ) {
 			char buf[256];
