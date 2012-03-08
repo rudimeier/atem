@@ -169,7 +169,8 @@ Metastock::Metastock() :
 	e_buf( new FileBuf() ),
 	x_buf( new FileBuf() ),
 	fdat_buf( new FileBuf() ),
-	out( stdout )
+	out( stdout ),
+	fname( NULL )
 {
 	error[0] = '\0';
 /* dat file numbers are unsigned short only */
@@ -267,6 +268,9 @@ bool Metastock::set_outfile( const char *file )
 		return false;
 	}
 	
+	// leave a note about the name so other funs can have a party
+	fname = file;
+
 	return true;
 }
 
