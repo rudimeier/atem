@@ -169,7 +169,8 @@ Metastock::Metastock() :
 	e_buf( new FileBuf() ),
 	x_buf( new FileBuf() ),
 	fdat_buf( new FileBuf() ),
-	out( stdout )
+	out( stdout ),
+	fname( NULL )
 {
 	error[0] = '\0';
 /* dat file numbers are unsigned short only */
@@ -251,10 +252,11 @@ bool Metastock::set_outfile( const char *file )
 {
 	int fd = open( file,
 #if defined _WIN32
-		_O_WRONLY | _O_CREAT |O_TRUNC | _O_BINARY );
+		_O_WRONLY | _O_CREAT |O_TRUNC | _O_BINARY
 #else
-		O_WRONLY | O_CREAT | O_TRUNC , 0666 );
+		O_WRONLY | O_CREAT | O_TRUNC , 0666
 #endif
+		);
 	if( fd < 0 ) {
 		setError( file, strerror(errno) );
 		return false;
@@ -266,6 +268,9 @@ bool Metastock::set_outfile( const char *file )
 		return false;
 	}
 	
+	// leave a note about the name so other funs can have a party
+	fname = file;
+
 	return true;
 }
 
@@ -771,15 +776,22 @@ bool Metastock::dumpUte() const
 	struct rec_clo_s clo;
 	bool res = true;
 	int len;
-		
-	if ((clo.hdl = ute_mktemp(UO_RDWR)) == NULL) {
-		setError( "ute_mktemp() b0rked" );
+	
+	if( fname &&
+	    (clo.hdl = ute_open( fname, UO_CREAT | UO_TRUNC | UO_RDWR )) ) {
+		// perfect
+		;
+	} else if( (clo.hdl = ute_mktemp( UO_RDWR )) ) {
+		// second best result, we've got a temp file
+		// don't know if the fall-through from above is desirable
+		// anyway, hand out the name of the file
+		puts(ute_fn(clo.hdl));
+	} else {
+		// total fail
+		setError( "cannot open ute file" );
 		return false;
 	}
-
-	// hand out the name of the file
-	puts(ute_fn(clo.hdl));
-
+	
 	for( int i = 1; i<mr_len; i++ ) {
 		if( mr_list[i].record_number != 0 && !mr_skip_list[i] ) {
 			char buf[256];

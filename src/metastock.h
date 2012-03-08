@@ -100,7 +100,10 @@ class Metastock
 		master_record *mr_list;
 		bool *mr_skip_list;
 		
+		/* fdopen()'d FILE*, or stdout by default */
 		void *out;
+		/* file name used at the command line, strdup'd */
+		const char *fname;
 		
 		mutable char error[ERROR_LENGTH];
 };
