@@ -251,10 +251,11 @@ bool Metastock::set_outfile( const char *file )
 {
 	int fd = open( file,
 #if defined _WIN32
-		_O_WRONLY | _O_CREAT |O_TRUNC | _O_BINARY );
+		_O_WRONLY | _O_CREAT |O_TRUNC | _O_BINARY
 #else
-		O_WRONLY | O_CREAT | O_TRUNC , 0666 );
+		O_WRONLY | O_CREAT | O_TRUNC , 0666
 #endif
+		);
 	if( fd < 0 ) {
 		setError( file, strerror(errno) );
 		return false;
