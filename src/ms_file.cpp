@@ -44,13 +44,14 @@
 
 
 #include "util.h"
+#include "config.h"
 
 
 
 /**
  * copy src to dst string, return strlen
  */
-inline int strcpy_len( char *dest, const char *src )
+static inline int strcpy_len( char *dest, const char *src )
 {
 	int len = strlen( src );
 	memcpy( dest, src, len );
@@ -60,7 +61,7 @@ inline int strcpy_len( char *dest, const char *src )
 /**
  * copy a char to dst string, return strlen
  */
-inline int cpychar( char *dest, char c )
+static inline int cpychar( char *dest, char c )
 {
 	*dest = c;
 	return 1;
@@ -132,48 +133,70 @@ int mr_header_to_string( char *dest,
 #undef PRINT_FIELD
 
 
+#define SWAP_ENDIAN_INT16( _num_ ) \
+	_num_ = (_num_>>8) | (_num_<<8)
+
+#define SWAP_ENDIAN_INT32( _num_ ) \
+	_num_ = ((_num_>>24)&0xff) | ((_num_<<8)&0xff0000) \
+	      | ((_num_>>8)&0xff00) | ((_num_<<24)&0xff000000)
 
 
-char readChar( const char *c, int offset )
+static inline char readChar( const char *c, int offset )
 {
 	return (char)(c[offset]);
 }
 
-unsigned char readUnsignedChar( const char *c, int offset )
+static inline unsigned char readUnsignedChar( const char *c, int offset )
 {
 	return (unsigned char) c[offset];
 }
 
-unsigned short readUnsignedShort( const char *c, int offset )
+static inline unsigned short readUnsignedShort( const char *c, int offset )
 {
-	return  *( (unsigned short*)(c + offset) );
+	uint16_t num = *( (uint16_t*)(c + offset) );
+#if defined WORDS_BIGENDIAN
+	SWAP_ENDIAN_INT16(num);
+#endif
+	return num;
 }
 
 
-/**
- Read a signed four byte int, least significant byte first
- */
-int readInt( const char *c, int offset )
+static inline int readInt( const char *c, int offset )
 {
-	return  *( (int*)(c + offset) );
+	int32_t num = *( (int32_t*)(c + offset) );
+#if defined WORDS_BIGENDIAN
+	SWAP_ENDIAN_INT32(num);
+#endif
+	return  num;
 }
 
 
-float readFloat_IEEE(const char *c, int offset)
+static inline float readFloat_IEEE(const char *c, int offset)
 {
-	float ret = * (const float*) (c+offset);
-	return ret;
+	union {
+		uint32_t L;
+		float F;
+	} x;
+
+	x.L = *( (uint32_t*)(c + offset) );
+#if defined WORDS_BIGENDIAN
+	SWAP_ENDIAN_INT32(x.L);
+#endif
+	return x.F;
 }
 
 
-float readFloat(const char *c, int offset)
+static inline float readFloat(const char *c, int offset)
 {
 	union {
 		uint32_t L;
 		float F;
 	} x;
 	
-	const uint32_t msf = *( (uint32_t*)(c + offset) );
+	uint32_t msf = *( (uint32_t*)(c + offset) );
+#if defined WORDS_BIGENDIAN
+	SWAP_ENDIAN_INT32(msf);
+#endif
 	
 	/* regardless of endianness, that's how these floats look like
 	  MBF:  eeeeeeeeSmmmmmmmmmmmmmmmmmmmmmmm
@@ -205,13 +228,9 @@ float readFloat(const char *c, int offset)
 }
 
 
-int floatToIntDate_YYY( float d )
+static inline int floatToIntDate_YYY( float d )
 {
 	int i = (int)d;
-	
-	// is integer
-	assert( d == i );
-	
 	return i + 19000000;
 }
 

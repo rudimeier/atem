@@ -19,6 +19,7 @@ Reasons to use atem
  - Correct handling case sensitivity of file names.
  - Simple but powerful command line interface.
  - BSD open source license.
+ - Support for both big and little endian systems.
 
 
 
