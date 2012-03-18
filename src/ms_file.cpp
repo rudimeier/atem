@@ -161,9 +161,6 @@ static inline unsigned short readUnsignedShort( const char *c, int offset )
 }
 
 
-/**
- Read a signed four byte int, least significant byte first
- */
 static inline int readInt( const char *c, int offset )
 {
 	int32_t num = *( (int32_t*)(c + offset) );
