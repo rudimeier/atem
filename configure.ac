@@ -12,6 +12,7 @@ AC_PROG_CXX
 AC_PROG_CC_C_O
 AC_PROG_CC_C99
 
+AC_C_BIGENDIAN()
 
 ## tweaks
 AC_ARG_ENABLE([fast-printing],[
