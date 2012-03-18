@@ -44,6 +44,7 @@
 
 
 #include "util.h"
+#include "config.h"
 
 
 
@@ -132,6 +133,12 @@ int mr_header_to_string( char *dest,
 #undef PRINT_FIELD
 
 
+#define SWAP_ENDIAN_INT16( _num_ ) \
+	_num_ = (_num_>>8) | (_num_<<8)
+
+#define SWAP_ENDIAN_INT32( _num_ ) \
+	_num_ = ((_num_>>24)&0xff) | ((_num_<<8)&0xff0000) \
+	      | ((_num_>>8)&0xff00) | ((_num_<<24)&0xff000000)
 
 
 char readChar( const char *c, int offset )
@@ -146,7 +153,11 @@ unsigned char readUnsignedChar( const char *c, int offset )
 
 unsigned short readUnsignedShort( const char *c, int offset )
 {
-	return  *( (unsigned short*)(c + offset) );
+	uint16_t num = *( (uint16_t*)(c + offset) );
+#if defined WORDS_BIGENDIAN
+	SWAP_ENDIAN_INT16(num);
+#endif
+	return num;
 }
 
 
@@ -155,14 +166,26 @@ unsigned short readUnsignedShort( const char *c, int offset )
  */
 int readInt( const char *c, int offset )
 {
-	return  *( (int*)(c + offset) );
+	int32_t num = *( (int32_t*)(c + offset) );
+#if defined WORDS_BIGENDIAN
+	SWAP_ENDIAN_INT32(num);
+#endif
+	return  num;
 }
 
 
 float readFloat_IEEE(const char *c, int offset)
 {
-	float ret = * (const float*) (c+offset);
-	return ret;
+	union {
+		uint32_t L;
+		float F;
+	} x;
+
+	x.L = *( (uint32_t*)(c + offset) );
+#if defined WORDS_BIGENDIAN
+	SWAP_ENDIAN_INT32(x.L);
+#endif
+	return x.F;
 }
 
 
@@ -173,7 +196,10 @@ float readFloat(const char *c, int offset)
 		float F;
 	} x;
 	
-	const uint32_t msf = *( (uint32_t*)(c + offset) );
+	uint32_t msf = *( (uint32_t*)(c + offset) );
+#if defined WORDS_BIGENDIAN
+	SWAP_ENDIAN_INT32(msf);
+#endif
 	
 	/* regardless of endianness, that's how these floats look like
 	  MBF:  eeeeeeeeSmmmmmmmmmmmmmmmmmmmmmmm
