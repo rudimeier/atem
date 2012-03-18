@@ -202,6 +202,11 @@ class XMasterFile
 
 typedef int (*ftoa_func)(char*, float);
 
+struct glue_s {
+	int date, time;
+	float open, high, low, close, volume, openint;
+};
+
 class FDat
 {
 	public:
@@ -218,10 +223,14 @@ class FDat
 		bool checkHeader() const;
 		int print( const char* header ) const;
 		unsigned short countRecords() const;
-		
+
+		/** iterator */
+		int iter( int(*cb)(struct glue_s, void *clo), void *clo ) const;
+
 	private:
 		static int header_to_string( char *s );
 		int record_to_string( const char *record, char *s ) const;
+		struct glue_s record_to_glue( const char *record ) const;
 		
 		static void *out;
 		static char print_sep;

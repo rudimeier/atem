@@ -28,6 +28,10 @@ TESTS += equis.06.atst
 TESTS += equis.07.atst
 TESTS += equis.08.atst
 
+if HAVE_UTERUS
+TESTS += ute.01.atst
+endif ## HAVE_UTERUS
+
 msdir_%: msdir_%.tar.xz
 	tar -xf $< && touch $@
 

@@ -23,6 +23,15 @@ if test "${enable_fast_printing}" = "yes"; then
     AC_DEFINE([FAST_PRINTING], [1], [Define if fast printing is preferred.])
 fi
 
+## uterus
+PKG_CHECK_MODULES([uterus], [libuterus >= 0.2], [have_uterus="yes"], [:])
+pushdef([ute_test], [test "${have_uterus}" = "yes"])
+if []ute_test[]; then
+	AC_DEFINE([HAVE_UTERUS], [1], [Define when uterus is present])
+fi
+AM_CONDITIONAL([HAVE_UTERUS], []ute_test[])
+popdef([ute_test])
+
 
 AM_MISSING_PROG([HELP2MAN], [help2man], ["${missing_dir}"])
 
@@ -33,3 +42,26 @@ AC_CONFIG_FILES([doc/Makefile])
 AC_CONFIG_FILES([test/Makefile])
 AC_OUTPUT
 
+## prepare build summary
+if test : ; then
+	output_csv="*"
+else
+	output_csv=" "
+fi
+if test "${have_uterus}" = "yes"; then
+	output_uterus="*"
+else
+	output_uterus=" "
+fi
+
+cat <<EOF
+
+
+Build summary
+=============
+Build client:	atem
+Output support:	
+  [[${output_csv}]] csv
+  [[${output_uterus}]] libuterus
+
+EOF

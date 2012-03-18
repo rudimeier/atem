@@ -46,6 +46,10 @@
 #include "util.h"
 #include "config.h"
 
+#if defined __INTEL_COMPILER
+// don't warn about order of evaluation
+# pragma warning (disable:981)
+#endif	// __INTEL_COMPILER
 
 
 /**
@@ -989,6 +993,28 @@ bool FDat::checkHeader() const
 }
 
 
+int FDat::iter( int(*cb)(struct glue_s, void *clo), void *clo ) const
+{
+	int err = 0;
+
+	for( const char *record = buf + record_length, *end = buf + size;
+	     record < end && err >= 0;
+	     record += record_length ) {
+		struct glue_s rec = record_to_glue( record );
+
+		if( rec.date < print_date_from ) {
+			// crack on
+			continue;
+		}
+		
+		if( (err = cb(rec, clo)) < 0 ) {
+			break;
+		}
+	}
+	return err;
+}
+
+
 int FDat::print( const char* header ) const
 {
 	const char *record = buf + record_length;
@@ -1095,6 +1121,30 @@ int FDat::record_to_string( const char *record, char *s ) const
 	}
 	
 	return s - begin;
+}
+
+struct glue_s FDat::record_to_glue( const char *record ) const
+{
+	int offset = 0;
+	struct glue_s res = {0};
+
+	res.open = res.high = res.low = res.close =
+		res.volume = res.openint = DEFAULT_FLOAT;
+	
+	if( field_bitset & D_DAT ) {
+		res.date = floatToIntDate_YYY(readFloat(record, offset));
+		offset += 4;
+	}
+	
+	READ_FIELD( res.time, D_TIM );
+	READ_FIELD( res.open, D_OPE );
+	READ_FIELD( res.high, D_HIG );
+	READ_FIELD( res.low, D_LOW );
+	READ_FIELD( res.close, D_CLO );
+	READ_FIELD( res.volume, D_VOL );
+	READ_FIELD( res.openint, D_OPI );
+	
+	return res;
 }
 
 #undef DEFAULT_FLOAT
