@@ -231,10 +231,6 @@ static inline float readFloat(const char *c, int offset)
 static inline int floatToIntDate_YYY( float d )
 {
 	int i = (int)d;
-	
-	// is integer
-	assert( d == i );
-	
 	return i + 19000000;
 }
 
