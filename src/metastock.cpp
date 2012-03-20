@@ -754,7 +754,12 @@ bool Metastock::dumpSymbolInfo() const
 {
 	char buf[MAX_SIZE_MR_STRING + 1];
 	int len;
-	
+
+	if( prnt_master_fields == 0 ) {
+		setError( "bad output format", "no symbol columns given" );
+		return false;
+	}
+
 	if( print_header ) {
 		len = mr_header_to_string( buf, prnt_master_fields, print_sep );
 		buf[len++] = '\n';
@@ -810,7 +815,12 @@ bool Metastock::dumpData() const
 {
 	char buf[256];
 	int len;
-	
+
+	if( prnt_data_fields == 0 && prnt_data_mr_fields == 0 ) {
+		setError( "bad output format", "no columns given" );
+		return false;
+	}
+
 	if( print_header ) {
 		len = mr_header_to_string( buf, prnt_data_mr_fields, print_sep );
 		if( len > 0 ) {
