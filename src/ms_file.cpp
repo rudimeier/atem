@@ -68,6 +68,42 @@ static inline int cpychar( char *dest, char c )
 }
 
 
+#define RETURN_IF_COLUMN( _field_ ) \
+	do { \
+		if( strcasecmp(column, STR_##_field_) == 0 ) { \
+			return _field_; \
+		} \
+	} while(0)
+
+unsigned int str_to_master_field( const char* column )
+{
+	RETURN_IF_COLUMN( M_SYM );
+	RETURN_IF_COLUMN( M_NAM );
+	RETURN_IF_COLUMN( M_PER );
+	RETURN_IF_COLUMN( M_DT1 );
+	RETURN_IF_COLUMN( M_DT2 );
+	RETURN_IF_COLUMN( M_FNO );
+	RETURN_IF_COLUMN( M_FIL );
+	RETURN_IF_COLUMN( M_FLD );
+	RETURN_IF_COLUMN( M_RNO );
+	RETURN_IF_COLUMN( M_KND );
+	return 0;
+}
+
+unsigned int str_to_data_field( const char* column )
+{
+	RETURN_IF_COLUMN( D_DAT );
+	RETURN_IF_COLUMN( D_HIG );
+	RETURN_IF_COLUMN( D_LOW );
+	RETURN_IF_COLUMN( D_CLO );
+	RETURN_IF_COLUMN( D_VOL );
+	RETURN_IF_COLUMN( D_OPE );
+	RETURN_IF_COLUMN( D_OPI );
+	RETURN_IF_COLUMN( D_TIM );
+	return 0;
+}
+
+#undef RETURN_IF_COLUMN
 
 
 #define PRINT_FIELD( _func_, _field_, _var_ ) \
