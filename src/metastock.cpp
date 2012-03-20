@@ -312,7 +312,7 @@ void Metastock::set_skip_header( int skipheader )
 bool Metastock::setOutputFormat( int fmt_data )
 {
 	if( fmt_data < 0 ) {
-		setError( "wrong output format" );
+		setError( "negative output format bitset" );
 		return false;
 	}
 	
