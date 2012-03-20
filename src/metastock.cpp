@@ -309,7 +309,7 @@ void Metastock::set_skip_header( int skipheader )
 	print_header = !skipheader;
 }
 
-bool Metastock::setOutputFormat( int fmt_data )
+bool Metastock::set_out_format( int fmt_data )
 {
 	if( fmt_data < 0 ) {
 		setError( "negative output format bitset" );
@@ -330,6 +330,23 @@ bool Metastock::setOutputFormat( int fmt_data )
 	return true;
 }
 
+bool Metastock::setOutputFormat( const char *columns )
+{
+	/* non or empty columns is default */
+	if( columns == NULL || *columns == '\0' ) {
+		return set_out_format( 0 );
+	}
+
+	/* check whether an integer (bitset) is given */
+	char *endptr;
+	int bitset = strtol(columns, &endptr, 0);
+	if( *endptr == '\0' ) {
+		return set_out_format( bitset );
+	}
+
+	/* parse human readable columns */
+	assert(false); //TODO
+}
 
 bool Metastock::setForceFloat( bool opi, bool vol )
 {

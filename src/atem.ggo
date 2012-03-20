@@ -59,7 +59,7 @@ string typestr="CHAR" optional
 option "format" f
 "Set output columns, default: 01377 (resp. 01777000 if used with -s). See \
 BITSET format below."
-int typestr="BITSET" optional
+string typestr="BITSET" optional
 
 option "float-opi" -
 "Print openint column as float."

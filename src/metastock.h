@@ -56,7 +56,8 @@ class Metastock
 		bool setDir( const char* dir );
 		bool set_field_sep( const char *sep );
 		void set_skip_header( int skipheader );
-		bool setOutputFormat( int fmt_data );
+		bool set_out_format( int fmt_data );
+		bool setOutputFormat( const char *columns );
 		bool setForceFloat( bool opi, bool vol );
 		bool setPrintDateFrom( const char *date );
 		
