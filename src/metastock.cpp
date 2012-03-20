@@ -294,9 +294,15 @@ bool Metastock::setDir( const char* d )
 }
 
 
-bool Metastock::setOutputFormat( char sep, int fmt_data, int skipheader )
+bool Metastock::set_field_sep( const char *sep )
 {
-	print_sep = sep;
+	print_sep = *sep;
+	return true;
+}
+
+
+bool Metastock::setOutputFormat( int fmt_data, int skipheader )
+{
 	print_header = !skipheader;
 	
 	if( fmt_data < 0 ) {
@@ -314,7 +320,7 @@ bool Metastock::setOutputFormat( char sep, int fmt_data, int skipheader )
 		prnt_data_mr_fields = M_SYM;
 	}
 	
-	FDat::initPrinter( sep, prnt_data_fields );
+	FDat::initPrinter( print_sep, prnt_data_fields );
 	return true;
 }
 

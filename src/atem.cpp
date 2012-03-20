@@ -133,9 +133,14 @@ int main(int argc, char *argv[])
 	if( ! ms.setDir( ms_dirp ) ) {
 		goto ms_error;
 	}
-	
+
+	if( args_info.field_separator_given ) {
+		if( ! ms.set_field_sep(args_info.field_separator_arg) ) {
+			goto ms_error;
+		}
+	}
+
 	if( !ms.setOutputFormat(
-		  args_info.field_separator_given ?*args_info.field_separator_arg :'\t',
 		  args_info.format_given ? args_info.format_arg : 0,
 		  args_info.skip_header_given ) ) {
 		goto ms_error;
