@@ -309,43 +309,51 @@ void Metastock::set_skip_header( int skipheader )
 	print_header = !skipheader;
 }
 
-bool Metastock::set_out_format( int fmt_data )
+void Metastock::set_out_format( int fmt_data )
 {
 	if( fmt_data < 0 ) {
-		setError( "negative output format bitset" );
-		return false;
-	}
-	
-	if( fmt_data ) {
-		prnt_master_fields = fmt_data >> 9;
-		prnt_data_fields = fmt_data;
-		prnt_data_mr_fields = prnt_master_fields;
-	} else {
+		/* defaults */
 		prnt_master_fields = 0xFFFF;
 		prnt_data_fields = 0xFF;
 		prnt_data_mr_fields = M_SYM;
+	} else {
+		prnt_master_fields = fmt_data >> 9;
+		prnt_data_fields = fmt_data;
+		prnt_data_mr_fields = prnt_master_fields;
 	}
-	
-	FDat::initPrinter( print_sep, prnt_data_fields );
-	return true;
 }
 
-bool Metastock::setOutputFormat( const char *columns )
+bool Metastock::set_out_format( const char *columns )
 {
+	char *endptr;
+	int bitset;
+
 	/* non or empty columns is default */
 	if( columns == NULL || *columns == '\0' ) {
-		return set_out_format( 0 );
+		set_out_format( -1 );
+		goto end;
 	}
 
 	/* check whether an integer (bitset) is given */
-	char *endptr;
-	int bitset = strtol(columns, &endptr, 0);
+	bitset = strtol(columns, &endptr, 0);
 	if( *endptr == '\0' ) {
-		return set_out_format( bitset );
+		if( bitset < 0 ) {
+			setError( "negative output format bitset" );
+			goto fail;
+		} else {
+			set_out_format( bitset );
+			goto end;
+		}
 	}
 
 	/* parse human readable columns */
 	assert(false); //TODO
+
+fail:
+	return false;
+end:
+	FDat::initPrinter( print_sep, prnt_data_fields );
+	return true;
 }
 
 bool Metastock::setForceFloat( bool opi, bool vol )

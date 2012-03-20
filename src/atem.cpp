@@ -151,7 +151,7 @@ static int ms2csv( const char *ms_dirp )
 
 	ms.set_skip_header( args_info.skip_header_given );
 
-	if( !ms.setOutputFormat(
+	if( !ms.set_out_format(
 		  args_info.format_given ? args_info.format_arg : NULL) ) {
 		goto ms_error;
 	}
