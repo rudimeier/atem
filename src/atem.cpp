@@ -97,6 +97,9 @@ static void gengetopt_free()
 }
 
 
+static int ms2csv( const char *ms_dirp );
+
+
 int main(int argc, char *argv[])
 {
 #ifdef _WIN32
@@ -120,7 +123,13 @@ int main(int argc, char *argv[])
 		fprintf( stderr, "error: bad usage\n" );
 		return 2; // exit
 	}
-	
+
+	return ms2csv( ms_dirp ); // exit
+}
+
+
+static int ms2csv( const char *ms_dirp )
+{
 	Metastock ms;
 	bool dumpdata = true;
 	
@@ -202,5 +211,5 @@ int main(int argc, char *argv[])
 
 ms_error:
 	fprintf( stderr, "error: %s\n", ms.lastError() );
-	return 2; // exit
+	return 2;
 }
