@@ -323,6 +323,71 @@ void Metastock::set_out_format( int fmt_data )
 	}
 }
 
+void Metastock::format_incl( unsigned int fmt_data )
+{
+	prnt_master_fields |= ( fmt_data >> 9 );
+	prnt_data_fields |= fmt_data;
+	prnt_data_mr_fields |= ( fmt_data >> 9 );
+}
+
+void Metastock::format_excl( unsigned int fmt_data )
+{
+	prnt_master_fields &= ~( fmt_data >> 9 );
+	prnt_data_fields &= ~fmt_data;
+	prnt_data_mr_fields &= ~( fmt_data >> 9 );
+}
+
+
+static int token2format( const char *token )
+{
+	int ret = 0;
+	ret = str_to_data_field(token);
+	if( ret == 0 ) {
+		ret = str_to_master_field(token) << 9;
+	}
+	return ret;
+}
+
+bool Metastock::columns2bitset( const char *columns )
+{
+	static const char *sepset = ",;: \t\n";
+	char col_split[strlen(columns) + 1];
+	char *token;
+
+	strcpy( col_split, columns );
+	token = strtok(col_split, sepset);
+
+	/* if first rule is an exclude then init defaults else zero */
+	if( *token == '-' ) {
+		set_out_format( -1 );
+	} else {
+		set_out_format( 0 );
+	}
+
+	while( true ) {
+		unsigned int bitset;
+		bool exclude = false;
+
+		if (token == NULL) {
+			break;
+		}
+
+		if( *token == '-' ) {
+			token++;
+			exclude = true;
+		}
+		bitset = token2format(token);
+		if( exclude ) {
+			format_excl( bitset );
+		} else {
+			format_incl(bitset);
+		}
+
+		token = strtok(NULL, sepset);
+	}
+	return true;
+}
+
 bool Metastock::set_out_format( const char *columns )
 {
 	char *endptr;
@@ -347,7 +412,8 @@ bool Metastock::set_out_format( const char *columns )
 	}
 
 	/* parse human readable columns */
-	assert(false); //TODO
+	columns2bitset(columns);
+	goto end;
 
 fail:
 	return false;
