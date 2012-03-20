@@ -351,7 +351,11 @@ static int token2format( const char *token )
 			ret = INT_MAX;
 		}
 	}
-	return ret;
+	if( ret != 0 ) {
+		return ret;
+	} else {
+		return -1;
+	}
 }
 
 bool Metastock::columns2bitset( const char *columns )
@@ -371,7 +375,7 @@ bool Metastock::columns2bitset( const char *columns )
 	}
 
 	while( true ) {
-		unsigned int bitset;
+		int bitset;
 		bool exclude = false;
 
 		if (token == NULL) {
@@ -383,6 +387,10 @@ bool Metastock::columns2bitset( const char *columns )
 			exclude = true;
 		}
 		bitset = token2format(token);
+		if( bitset < 0 ) {
+			setError("invalid format token", token);
+			return false;
+		}
 		if( exclude ) {
 			format_excl( bitset );
 		} else {
@@ -410,7 +418,7 @@ bool Metastock::set_out_format( const char *columns )
 	if( *endptr == '\0' ) {
 		if( bitset < 0 ) {
 			setError( "negative output format bitset" );
-			goto fail;
+			return false;
 		} else {
 			set_out_format( bitset );
 			goto end;
@@ -418,11 +426,10 @@ bool Metastock::set_out_format( const char *columns )
 	}
 
 	/* parse human readable columns */
-	columns2bitset(columns);
-	goto end;
+	if( ! columns2bitset(columns) ) {
+		return false;
+	}
 
-fail:
-	return false;
 end:
 	FDat::initPrinter( print_sep, prnt_data_fields );
 	return true;
