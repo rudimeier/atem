@@ -304,11 +304,13 @@ bool Metastock::set_field_sep( const char *sep )
 	return true;
 }
 
-
-bool Metastock::setOutputFormat( int fmt_data, int skipheader )
+void Metastock::set_skip_header( int skipheader )
 {
 	print_header = !skipheader;
-	
+}
+
+bool Metastock::setOutputFormat( int fmt_data )
+{
 	if( fmt_data < 0 ) {
 		setError( "wrong output format" );
 		return false;

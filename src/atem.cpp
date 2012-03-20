@@ -140,9 +140,10 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	ms.set_skip_header( args_info.skip_header_given );
+
 	if( !ms.setOutputFormat(
-		  args_info.format_given ? args_info.format_arg : 0,
-		  args_info.skip_header_given ) ) {
+		  args_info.format_given ? args_info.format_arg : 0) ) {
 		goto ms_error;
 	}
 
