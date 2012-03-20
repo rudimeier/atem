@@ -345,6 +345,12 @@ static int token2format( const char *token )
 	if( ret == 0 ) {
 		ret = str_to_master_field(token) << 9;
 	}
+	if( ret == 0  ) {
+		/* token does not match any valid column - try some "flavour" strings */
+		if( strcasecmp(token, "all") == 0 ) {
+			ret = INT_MAX;
+		}
+	}
 	return ret;
 }
 
