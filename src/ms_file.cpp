@@ -109,16 +109,16 @@ int mr_header_to_string( char *dest,
 {
 	char * cp = dest;
 	
-	PRINT_FIELD( strcpy_len, M_SYM, "symbol" );
-	PRINT_FIELD( strcpy_len, M_NAM, "long_name" );
-	PRINT_FIELD( strcpy_len, M_PER, "barsize" );
-	PRINT_FIELD( strcpy_len, M_DT1, "from_date" );
-	PRINT_FIELD( strcpy_len, M_DT2, "to_date" );
-	PRINT_FIELD( strcpy_len, M_FNO, "file_number" );
-	PRINT_FIELD( strcpy_len, M_FIL, "file_name" );
-	PRINT_FIELD( strcpy_len, M_FLD, "field_bitset" );
-	PRINT_FIELD( strcpy_len, M_RNO, "record_number" );
-	PRINT_FIELD( strcpy_len, M_KND, "kind" );
+	PRINT_FIELD( strcpy_len, M_SYM, STR_M_SYM );
+	PRINT_FIELD( strcpy_len, M_NAM, STR_M_NAM );
+	PRINT_FIELD( strcpy_len, M_PER, STR_M_PER );
+	PRINT_FIELD( strcpy_len, M_DT1, STR_M_DT1 );
+	PRINT_FIELD( strcpy_len, M_DT2, STR_M_DT2 );
+	PRINT_FIELD( strcpy_len, M_FNO, STR_M_FNO );
+	PRINT_FIELD( strcpy_len, M_FIL, STR_M_FIL );
+	PRINT_FIELD( strcpy_len, M_FLD, STR_M_FLD );
+	PRINT_FIELD( strcpy_len, M_RNO, STR_M_RNO );
+	PRINT_FIELD( strcpy_len, M_KND, STR_M_KND );
 	
 	// remove last separator if exists
 	if( cp != dest ) {
@@ -1104,14 +1104,14 @@ int FDat::header_to_string( char *s )
 {
 	char *begin = s;
 	
-	PRINT_FIELD( strcpy_len, D_DAT, "date" );
-	PRINT_FIELD( strcpy_len, D_TIM, "time" );
-	PRINT_FIELD( strcpy_len, D_OPE, "open" );
-	PRINT_FIELD( strcpy_len, D_HIG, "high" );
-	PRINT_FIELD( strcpy_len, D_LOW, "low" );
-	PRINT_FIELD( strcpy_len, D_CLO, "close" );
-	PRINT_FIELD( strcpy_len, D_VOL, "volume" );
-	PRINT_FIELD( strcpy_len, D_OPI, "openint" );
+	PRINT_FIELD( strcpy_len, D_DAT, STR_D_DAT );
+	PRINT_FIELD( strcpy_len, D_TIM, STR_D_TIM );
+	PRINT_FIELD( strcpy_len, D_OPE, STR_D_OPE );
+	PRINT_FIELD( strcpy_len, D_HIG, STR_D_HIG );
+	PRINT_FIELD( strcpy_len, D_LOW, STR_D_LOW );
+	PRINT_FIELD( strcpy_len, D_CLO, STR_D_CLO );
+	PRINT_FIELD( strcpy_len, D_VOL, STR_D_VOL );
+	PRINT_FIELD( strcpy_len, D_OPI, STR_D_OPI );
 	
 	if( s != begin ) {
 		*(--s) = '\0';

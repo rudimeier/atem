@@ -67,6 +67,26 @@ enum ms_data_field {
 	D_TIM = 0200
 };
 
+#define STR_M_SYM "symbol"
+#define STR_M_NAM "long_name"
+#define STR_M_PER "barsize"
+#define STR_M_DT1 "from_date"
+#define STR_M_DT2 "to_date"
+#define STR_M_FNO "file_number"
+#define STR_M_FIL "file_name"
+#define STR_M_FLD "field_bitset"
+#define STR_M_RNO "record_number"
+#define STR_M_KND "kind"
+
+#define STR_D_DAT "date"
+#define STR_D_HIG "high"
+#define STR_D_LOW "low"
+#define STR_D_CLO "close"
+#define STR_D_VOL "volume"
+#define STR_D_OPE "open"
+#define STR_D_OPI "openint"
+#define STR_D_TIM "time"
+
 
 #define MAX_LEN_MR_SYMBOL 14
 #define MAX_LEN_MR_LNAME 45
