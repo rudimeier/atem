@@ -296,6 +296,10 @@ bool Metastock::setDir( const char* d )
 
 bool Metastock::set_field_sep( const char *sep )
 {
+	if( sep[0] == '\0' || sep[1] != '\0' ) {
+		setError( "bad field separator" );
+		return false;
+	}
 	print_sep = *sep;
 	return true;
 }
