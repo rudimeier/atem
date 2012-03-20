@@ -122,55 +122,48 @@ int main(int argc, char *argv[])
 	}
 	
 	Metastock ms;
+	bool dumpdata = true;
 	
 	if( args_info.output_given ) {
 		if( ! ms.set_outfile( args_info.output_arg ) ) {
-			fprintf( stderr, "error: %s\n", ms.lastError() );
-			return 2; // exit
+			goto ms_error;
 		}
 	}
 	
 	if( ! ms.setDir( ms_dirp ) ) {
-		fprintf( stderr, "error: %s\n", ms.lastError() );
-		return 2; // exit
+		goto ms_error;
 	}
 	
 	if( !ms.setOutputFormat(
 		  args_info.field_separator_given ?*args_info.field_separator_arg :'\t',
 		  args_info.format_given ? args_info.format_arg : 0,
 		  args_info.skip_header_given ) ) {
-		fprintf( stderr, "error: %s\n", ms.lastError() );
-		return 2; // exit
+		goto ms_error;
 	}
 
 	if( !ms.setForceFloat(
 			args_info.float_opi_given, args_info.float_vol_given) ) {
-		fprintf( stderr, "error: %s\n", ms.lastError() );
-		return 2; // exit
+		goto ms_error;
 	}
 
 	if( args_info.fdat_given ) {
 		if( ! ms.incudeFile( args_info.fdat_arg ) ) {
-			fprintf( stderr, "error: %s\n", ms.lastError() );
-			return 2; // exit
+			goto ms_error;
 		}
 	}
 	
 	if( args_info.date_from_given ) {
 		if( !ms.setPrintDateFrom( args_info.date_from_arg ) ) {
-			fprintf( stderr, "error: %s\n", ms.lastError() );
-			return 2; // exit
+			goto ms_error;
 		}
 	}
 	
 	if( args_info.exclude_older_than_given ) {
 		if( !ms.excludeFiles( args_info.exclude_older_than_arg ) ) {
-			fprintf( stderr, "error: %s\n", ms.lastError() );
-			return 2; // exit
+			goto ms_error;
 		}
 	}
 	
-	bool dumpdata = true;
 	if( args_info.dump_master_given ) {
 		dumpdata = false;
 		ms.dumpMaster();
@@ -189,17 +182,19 @@ int main(int argc, char *argv[])
 	if( args_info.symbols_given ) {
 		dumpdata = false;
 		if( ! ms.dumpSymbolInfo() ) {
-			fprintf( stderr, "error: %s\n", ms.lastError() );
-			return 2; // exit
+			goto ms_error;
 		}
 	}
 	
 	if( dumpdata ) {
 		if( ! ms.dumpData() ) {
-			fprintf( stderr, "error: %s\n", ms.lastError() );
-			return 2; // exit
+			goto ms_error;
 		}
 	}
 	
 	return 0;
+
+ms_error:
+	fprintf( stderr, "error: %s\n", ms.lastError() );
+	return 2; // exit
 }
