@@ -60,11 +60,11 @@ option "format" f
 "Set the list of output columns, see COLUMNS and BITSET format below."
 string typestr="COLUMNS" optional
 
-option "float-opi" -
+option "float-openint" -
 "Print openint column as float."
 optional
 
-option "float-vol" -
+option "float-volume" -
 "Print volume column as float."
 optional
 

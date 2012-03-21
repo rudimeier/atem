@@ -162,7 +162,7 @@ static int ms2csv( const char *ms_dirp )
 	}
 
 	if( !ms.setForceFloat(
-			args_info.float_opi_given, args_info.float_vol_given) ) {
+			args_info.float_openint_given, args_info.float_volume_given) ) {
 		goto ms_error;
 	}
 
