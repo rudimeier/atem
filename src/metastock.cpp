@@ -309,27 +309,131 @@ void Metastock::set_skip_header( int skipheader )
 	print_header = !skipheader;
 }
 
-bool Metastock::setOutputFormat( int fmt_data )
+void Metastock::set_out_format( int fmt_data )
 {
 	if( fmt_data < 0 ) {
-		setError( "negative output format bitset" );
-		return false;
-	}
-	
-	if( fmt_data ) {
-		prnt_master_fields = fmt_data >> 9;
-		prnt_data_fields = fmt_data;
-		prnt_data_mr_fields = prnt_master_fields;
-	} else {
+		/* defaults */
 		prnt_master_fields = 0xFFFF;
 		prnt_data_fields = 0xFF;
 		prnt_data_mr_fields = M_SYM;
+	} else {
+		prnt_master_fields = fmt_data >> 9;
+		prnt_data_fields = fmt_data;
+		prnt_data_mr_fields = prnt_master_fields;
 	}
-	
-	FDat::initPrinter( print_sep, prnt_data_fields );
+}
+
+void Metastock::format_incl( unsigned int fmt_data )
+{
+	prnt_master_fields |= ( fmt_data >> 9 );
+	prnt_data_fields |= fmt_data;
+	prnt_data_mr_fields |= ( fmt_data >> 9 );
+}
+
+void Metastock::format_excl( unsigned int fmt_data )
+{
+	prnt_master_fields &= ~( fmt_data >> 9 );
+	prnt_data_fields &= ~fmt_data;
+	prnt_data_mr_fields &= ~( fmt_data >> 9 );
+}
+
+
+static int token2format( const char *token )
+{
+	int ret = 0;
+	ret = str_to_data_field(token);
+	if( ret == 0 ) {
+		ret = str_to_master_field(token) << 9;
+	}
+	if( ret == 0  ) {
+		/* token does not match any valid column - try some "flavour" strings */
+		if( strcasecmp(token, "all") == 0 ) {
+			ret = INT_MAX;
+		}
+	}
+	if( ret != 0 ) {
+		return ret;
+	} else {
+		return -1;
+	}
+}
+
+bool Metastock::columns2bitset( const char *columns )
+{
+	static const char *sepset = ",;: \t\n";
+	char col_split[strlen(columns) + 1];
+	char *token;
+
+	strcpy( col_split, columns );
+	token = strtok(col_split, sepset);
+
+	/* if first rule is an exclude then init defaults else zero */
+	if( *token == '-' ) {
+		set_out_format( -1 );
+	} else {
+		set_out_format( 0 );
+	}
+
+	while( true ) {
+		int bitset;
+		bool exclude = false;
+
+		if (token == NULL) {
+			break;
+		}
+
+		if( *token == '-' ) {
+			token++;
+			exclude = true;
+		}
+		bitset = token2format(token);
+		if( bitset < 0 ) {
+			setError("invalid format token", token);
+			return false;
+		}
+		if( exclude ) {
+			format_excl( bitset );
+		} else {
+			format_incl(bitset);
+		}
+
+		token = strtok(NULL, sepset);
+	}
 	return true;
 }
 
+bool Metastock::set_out_format( const char *columns )
+{
+	char *endptr;
+	int bitset;
+
+	/* non or empty columns is default */
+	if( columns == NULL || *columns == '\0' ) {
+		set_out_format( -1 );
+		goto end;
+	}
+
+	/* check whether an integer (bitset) is given */
+	bitset = strtol(columns, &endptr, 0);
+	if( *endptr == '\0' ) {
+		if( bitset < 0 ) {
+			setError( "negative output format bitset" );
+			return false;
+		} else {
+			set_out_format( bitset );
+			goto end;
+		}
+	}
+
+	/* parse human readable columns */
+	if( ! columns2bitset(columns) ) {
+		return false;
+	}
+
+end:
+	FDat::initPrinter( print_sep, prnt_data_fields );
+	return true;
+}
 
 bool Metastock::setForceFloat( bool opi, bool vol )
 {
@@ -650,7 +754,12 @@ bool Metastock::dumpSymbolInfo() const
 {
 	char buf[MAX_SIZE_MR_STRING + 1];
 	int len;
-	
+
+	if( prnt_master_fields == 0 ) {
+		setError( "bad output format", "no symbol columns given" );
+		return false;
+	}
+
 	if( print_header ) {
 		len = mr_header_to_string( buf, prnt_master_fields, print_sep );
 		buf[len++] = '\n';
@@ -706,7 +815,12 @@ bool Metastock::dumpData() const
 {
 	char buf[256];
 	int len;
-	
+
+	if( prnt_data_fields == 0 && prnt_data_mr_fields == 0 ) {
+		setError( "bad output format", "no columns given" );
+		return false;
+	}
+
 	if( print_header ) {
 		len = mr_header_to_string( buf, prnt_data_mr_fields, print_sep );
 		if( len > 0 ) {

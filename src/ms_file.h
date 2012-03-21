@@ -87,6 +87,8 @@ enum ms_data_field {
 #define STR_D_OPI "openint"
 #define STR_D_TIM "time"
 
+unsigned int str_to_master_field( const char* );
+unsigned int str_to_data_field( const char* );
 
 #define MAX_LEN_MR_SYMBOL 14
 #define MAX_LEN_MR_LNAME 45
