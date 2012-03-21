@@ -9,9 +9,14 @@ AM_INIT_AUTOMAKE([foreign parallel-tests color-tests])
 
 ## compiler check
 CXXFLAGS="-O3 -g -Wall -W"
-AC_PROG_CXX
+AC_PROG_CC
 AC_PROG_CC_C_O
 AC_PROG_CC_C99
+AC_PROG_CXX
+AC_PROG_CXX_C_O
+
+AC_LANG([C++])
+AX_COMPILER_VENDOR
 
 AC_C_BIGENDIAN()
 
