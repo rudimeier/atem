@@ -349,13 +349,13 @@ static int token2format( const char *token )
 		/* token does not match any valid column - try some "flavour" strings */
 		if( strcasecmp(token, "all") == 0 ) {
 			ret = INT_MAX;
+		} else if( strcasecmp(token, "none") == 0 ) {
+			ret = 0;
+		} else {
+			ret = -1;
 		}
 	}
-	if( ret != 0 ) {
-		return ret;
-	} else {
-		return -1;
-	}
+	return ret;
 }
 
 bool Metastock::columns2bitset( const char *columns )
@@ -367,8 +367,8 @@ bool Metastock::columns2bitset( const char *columns )
 	strcpy( col_split, columns );
 	token = strtok(col_split, sepset);
 
-	/* if first rule is an exclude then init defaults else zero */
-	if( *token == '-' ) {
+	/* if first rule is explicit in/exclude then init defaults else zero */
+	if( *token == '-' || *token == '+' ) {
 		set_out_format( -1 );
 	} else {
 		set_out_format( 0 );
@@ -382,6 +382,9 @@ bool Metastock::columns2bitset( const char *columns )
 			break;
 		}
 
+		if( *token == '+' ) {
+			token++;
+		}
 		if( *token == '-' ) {
 			token++;
 			exclude = true;
