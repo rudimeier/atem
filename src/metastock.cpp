@@ -154,9 +154,9 @@ void FileBuf::resize( int size )
 
 bool Metastock::print_header = true;
 char Metastock::print_sep = '\t';
-unsigned short Metastock::prnt_master_fields = 0;
-unsigned char Metastock::prnt_data_fields = 0;
-unsigned short Metastock::prnt_data_mr_fields = 0;
+unsigned short Metastock::prnt_master_fields = 0xFFFF;
+unsigned char Metastock::prnt_data_fields = 0xFF;
+unsigned short Metastock::prnt_data_mr_fields = M_SYM;
 
 
 Metastock::Metastock() :
@@ -248,10 +248,11 @@ bool Metastock::set_outfile( const char *file )
 {
 	int fd = open( file,
 #if defined _WIN32
-		_O_WRONLY | _O_CREAT |O_TRUNC | _O_BINARY );
+		_O_WRONLY | _O_CREAT |O_TRUNC | _O_BINARY
 #else
-		O_WRONLY | O_CREAT | O_TRUNC , 0666 );
+		O_WRONLY | O_CREAT | O_TRUNC , 0666
 #endif
+		);
 	if( fd < 0 ) {
 		setError( file, strerror(errno) );
 		return false;

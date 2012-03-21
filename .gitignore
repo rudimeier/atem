@@ -47,8 +47,8 @@ missing
 config.h
 config.h.in
 config.status
-build
-=build
+build*/
+=build*/
 .deps
 stamp-h1
 
