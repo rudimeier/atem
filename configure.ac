@@ -1,16 +1,32 @@
 AC_PREREQ([2.61])
 AC_INIT([atem], [0.3.3], [http://www.ga-group.nl/])
 AC_CONFIG_AUX_DIR([.])
+AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_SRCDIR([src/])
 
 AM_INIT_AUTOMAKE([foreign parallel-tests color-tests])
 
+if test -z "$CXXFLAGS"; then
+	CXXFLAGS="-O3 -g"
+fi
+
 ## compiler check
-CXXFLAGS="-O3 -g -Wall -W"
-AC_PROG_CXX
+AC_PROG_CC
 AC_PROG_CC_C_O
 AC_PROG_CC_C99
+AC_PROG_CXX
+AC_PROG_CXX_C_O
+
+AC_LANG([C++])
+AX_COMPILER_VENDOR
+# enable some warnings
+AX_CHECK_COMPILE_FLAG([-Wall],[warnflags="-Wall"])
+# intel's -Wextra is too verbose
+if test "$ax_cv_cxx_compiler_vendor" != "intel"; then
+	AX_CHECK_COMPILE_FLAG([-Wextra],[warnflags="$warnflags -Wextra"])
+fi
+CXXFLAGS="$warnflags $CXXFLAGS"
 
 AC_C_BIGENDIAN()
 
