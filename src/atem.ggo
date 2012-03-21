@@ -57,9 +57,8 @@ option "field-separator" F
 string typestr="CHAR" optional
 
 option "format" f
-"Set output columns, default: 01377 (resp. 01777000 if used with -s). See \
-BITSET format below."
-string typestr="BITSET" optional
+"Set the list of output columns, see COLUMNS and BITSET format below."
+string typestr="COLUMNS" optional
 
 option "float-opi" -
 "Print openint column as float."
