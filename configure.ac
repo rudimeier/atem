@@ -7,8 +7,11 @@ AC_CONFIG_SRCDIR([src/])
 
 AM_INIT_AUTOMAKE([foreign parallel-tests color-tests])
 
+if test -z "$CXXFLAGS"; then
+	CXXFLAGS="-O3 -g"
+fi
+
 ## compiler check
-CXXFLAGS="-O3 -g -Wall -W"
 AC_PROG_CC
 AC_PROG_CC_C_O
 AC_PROG_CC_C99
@@ -17,6 +20,13 @@ AC_PROG_CXX_C_O
 
 AC_LANG([C++])
 AX_COMPILER_VENDOR
+# enable some warnings
+AX_CHECK_COMPILE_FLAG([-Wall],[warnflags="-Wall"])
+# intel's -Wextra is too verbose
+if test "$ax_cv_cxx_compiler_vendor" != "intel"; then
+	AX_CHECK_COMPILE_FLAG([-Wextra],[warnflags="$warnflags -Wextra"])
+fi
+CXXFLAGS="$warnflags $CXXFLAGS"
 
 AC_C_BIGENDIAN()
 
