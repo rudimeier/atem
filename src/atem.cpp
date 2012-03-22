@@ -66,7 +66,8 @@ leading 0) is recommended. The first 3 octal digits (9 bits) are used for\n\
 time series columns (date dependent). They are ignored if -s is used. All\n\
 higher bits are used for symbol info (date independent).\n\
 \n\
-Report bugs to sweet_f_a@gmx.de\n"
+Report bugs to sweet_f_a@gmx.de\n\
+Homepage: https://github.com/rudimeier/atem/\n"
 
 #define VERSION_MSG \
 PACKAGE_NAME " - metastock reverse (" PACKAGE_VERSION ")\n\
