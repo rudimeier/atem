@@ -56,10 +56,10 @@ static gengetopt_args_info args_info;
 
 
 #define BITSET_HELP_MSG "\
-COLUMNS may be a list of strings, e.g. 'symbol,date,close'. Prepend '-' to\n\
-exclude e.g. 'all,-time' or just '-time' to get the defaults but not time.\n\
-Default is symbol and all date dependent columns (resp. all date independent\n\
-ones if used with --symbols).\n\
+COLUMNS may be a list of strings, e.g. 'symbol,date,close'. Prepend '+' or\n\
+'-' to in/exclude, e.g. 'all,-time' (or just '-time' to get the defaults but\n\
+not time). Default is symbol and all date dependent columns (resp. all date\n\
+independent ones if used with --symbols).\n\
 \n\
 BITSET controls the output columns. Specifying octal numbers (digits 0-7 and\n\
 leading 0) is recommended. The first 3 octal digits (9 bits) are used for\n\
