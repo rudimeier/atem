@@ -5,10 +5,14 @@ ChangeLog, atem -- metastock reverse
 
 0.3.3 - not yet released  ------------------------------------------------------
 
-Maintenance release.
+A few CLI improvements and minor portability fixes.
 
-  - minor internal cleanup 
+  - minor internal code cleanup and build chain tweaks
   - man page added
+  - provide simple test suite (make check)
+  - NEW options --float-[openint|volume] to print floats rather than ints
+  - NEW, --format accepts user friendly column names rather than bitset only
+  - FIX support big endian systems (e.g. ppc)
 
 
 
