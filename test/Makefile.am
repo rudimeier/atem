@@ -27,6 +27,12 @@ TESTS += equis.05.atst
 TESTS += equis.06.atst
 TESTS += equis.07.atst
 TESTS += equis.08.atst
+TESTS += format.01.atst
+TESTS += format.02.atst
+TESTS += format.03.atst
+TESTS += format.04.atst
+TESTS += format.05.atst
+TESTS += format.06.atst
 
 msdir_%: msdir_%.tar.xz
 	tar -xf $< && touch $@
