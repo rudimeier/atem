@@ -75,7 +75,7 @@ string typestr="DATE" optional
 option "exclude-older-than" -
 "Don't process data files older than date time (YYYY-MM-DD hh:mm:ss). A \
 leading '-' reverts the statement."
-string typestr="DATE" optional
+string typestr="DT" optional
 
 option "fdat" -
 "Process specified dat file number only."
