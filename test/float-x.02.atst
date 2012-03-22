@@ -1,0 +1,20 @@
+## -*- shell-script -*-
+
+TOOL=atem
+INFILE="msdir_equis_a"
+OUTFILE="testload.csv"
+CMDLINE="--fdat 12 -f file_name,volume -F, --float-volume '${INFILE}'"
+
+## STDIN
+
+## STDOUT
+stdout=$(mktemp "/tmp/tmp.XXXXXXXXXX")
+cat > "${stdout}" <<EOF
+file_name,volume
+F12.DAT,573827.87500
+F12.DAT,61457.44922
+F12.DAT,19526.43945
+F12.DAT,39828.58984
+EOF
+
+## outfile sum
