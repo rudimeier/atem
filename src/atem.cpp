@@ -96,7 +96,6 @@ static void check_display_args()
 	exit(0);
 }
 
-
 static void gengetopt_free()
 {
 	cmdline_parser_free( &args_info );
@@ -108,6 +107,9 @@ static int ms2csv( const char *ms_dirp );
 
 int main(int argc, char *argv[])
 {
+	int ret = 0;
+	const char *ms_dirp = ".";
+
 #ifdef _WIN32
 	/* never write CRLF line feeds */
 	_setmode(_fileno(stderr),_O_BINARY);
@@ -117,20 +119,28 @@ int main(int argc, char *argv[])
 	atexit( gengetopt_free );
 	
 	if( cmdline_parser(argc, argv, &args_info) != 0 ) {
-		return 2; // exit
+		ret = 2;
+		goto end;
 	}
 	
 	check_display_args();
 	
-	const char *ms_dirp = ".";
 	if( args_info.inputs_num == 1 ) {
 		ms_dirp = args_info.inputs[0];
 	} else if( args_info.inputs_num > 1 ) {
 		fprintf( stderr, "error: bad usage\n" );
-		return 2; // exit
+		ret = 2;
+		goto end;
 	}
 
-	return ms2csv( ms_dirp ); // exit
+	ret = ms2csv( ms_dirp );
+
+end:
+	/* TODO teach Metastock::setError() to distinguish usage and other errors */
+	if( ret == 2 ) {
+		fprintf( stderr, "Try `%s --help' for more information.\n", argv[0] );
+	}
+	return ret; // exit
 }
 
 
