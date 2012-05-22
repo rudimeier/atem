@@ -188,14 +188,13 @@ read_uint16( const char *c, int offset )
 	return num;
 }
 
-
-static inline int readInt( const char *c, int offset )
+static inline int32_t
+read_int32( const char *c, int offset )
 {
 	int32_t num = *( (int32_t*)(c + offset) );
 	num = le32toh(num);
 	return  num;
 }
-
 
 static inline float readFloat_IEEE(const char *c, int offset)
 {
@@ -313,7 +312,7 @@ void MasterFile::printHeader() const
 	fprintf( stdout, "MASTER:\t%d\t%d\t%X\n",
 		readUnsignedChar(buf, 0), // count records (stored in master?)
 		readUnsignedChar(buf, 2), // count records (existing dat files?)
-		readInt(buf, 49) // unknown - just print as hex
+		read_int32(buf, 49) // unknown - just print as hex
 		);
 }
 
@@ -510,7 +509,7 @@ void EMasterFile::printHeader() const
 	fprintf( stdout, "EMASTER:\t%d\t%d\t%X\t'%s'\n",
 		readUnsignedChar(buf, 0), // count records (stored in master?)
 		readUnsignedChar(buf, 2), // count records (existing dat files?)
-		readInt(buf, 49), // unknown - just print as hex
+		read_int32(buf, 49), // unknown - just print as hex
 		buf + 53 // unkown, equis sends a string
 		);
 }
@@ -600,7 +599,7 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	for( int i = 88; i<126; i++ ) {
 		assert( record[i] == '\0' );
 	}
-	int dateL = readInt( record, 126 );
+	int dateL = read_int32( record, 126 );
 	
 	
 	if( date1 > date2 ) {
@@ -647,7 +646,7 @@ void EMasterFile::printRecord( const char *record ) const
 		(int)readFloat_IEEE( record, 76 ),
 		(int)readFloat_IEEE( record, 80 ),
 		(int)readFloat_IEEE( record, 84 ),
-		readInt( record, 126 ), // first date YYYY
+		read_int32( record, 126 ), // first date YYYY
 // 		readFloat( record, 131 ),
 // 		readFloat( record, 135 ),
 		readUnsignedChar( record, 0 ), // unknown, just print hex
@@ -877,11 +876,11 @@ void XMasterFile::printRecord( const char *record ) const
 		read_uint16( record, 65 ), // F#.mwd
 		readChar( record, 62 ), // time frame 'D'
 		readUnsignedChar( record, 70 ), // fields bitset
-		readInt( record, 80 ), // some date ?
+		read_int32( record, 80 ), // some date ?
 // 		readInt( record, 84 ), // stupid date? forst 3 bytes equal 
-		readInt( record, 104 ), // some date ?
-		readInt( record, 108 ), // looks like first date ?
-		readInt( record, 116 ), // looks like last date ?
+		read_int32( record, 104 ), // some date ?
+		read_int32( record, 108 ), // looks like first date ?
+		read_int32( record, 116 ), // looks like last date ?
 		record + 1, // symbol
 		record + 16 // name
 		);
@@ -912,8 +911,8 @@ int XMasterFile::getRecord( master_record *mr, unsigned short rnum ) const
 	mr->barsize = readChar( record, 62 );
 	trim_end( mr->c_symbol, record + 1, MAX_LEN_MR_SYMBOL );
 	trim_end( mr->c_long_name, record + 16, MAX_LEN_MR_LNAME );
-	mr->from_date = readInt( record, 108 );
-	mr->to_date = readInt( record, 116 );
+	mr->from_date = read_int32( record, 108 );
+	mr->to_date = read_int32( record, 116 );
 	return 0;
 }
 
