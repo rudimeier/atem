@@ -16,6 +16,7 @@ atem_SOURCES += ms_file.cpp
 atem_SOURCES += util.cpp
 noinst_HEADERS =
 noinst_HEADERS += metastock.h ms_file.h util.h
+noinst_HEADERS += boobs.h
 EXTRA_atem_SOURCES =
 EXTRA_atem_SOURCES += ftoa.c
 EXTRA_atem_SOURCES += itoa.c
