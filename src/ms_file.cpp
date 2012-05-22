@@ -183,17 +183,25 @@ static inline unsigned char readUnsignedChar( const char *c, int offset )
 static inline uint16_t
 read_uint16( const char *c, int offset )
 {
-	uint16_t num = *( (uint16_t*)(c + offset) );
-	num = le16toh(num);
-	return num;
+	union {
+		uint16_t L;
+		char c[2];
+	} x;
+
+	memcpy(x.c, c + offset, 2);
+	return le16toh(x.L);
 }
 
 static inline uint32_t
 read_uint32( const char *c, int offset )
 {
-	uint32_t num = *( (uint32_t*)(c + offset) );
-	num = le32toh(num);
-	return  num;
+	union {
+		uint32_t L;
+		char c[4];
+	} x;
+
+	memcpy(x.c, c + offset, 4);
+	return le32toh(x.L);
 }
 
 static inline int32_t
