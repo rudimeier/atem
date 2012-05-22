@@ -44,6 +44,7 @@
 
 
 #include "util.h"
+#include "boobs.h"
 #include "config.h"
 
 
@@ -169,14 +170,6 @@ int mr_header_to_string( char *dest,
 #undef PRINT_FIELD
 
 
-#define SWAP_ENDIAN_INT16( _num_ ) \
-	_num_ = (_num_>>8) | (_num_<<8)
-
-#define SWAP_ENDIAN_INT32( _num_ ) \
-	_num_ = ((_num_>>24)&0xff) | ((_num_<<8)&0xff0000) \
-	      | ((_num_>>8)&0xff00) | ((_num_<<24)&0xff000000)
-
-
 static inline char readChar( const char *c, int offset )
 {
 	return (char)(c[offset]);
@@ -190,9 +183,7 @@ static inline unsigned char readUnsignedChar( const char *c, int offset )
 static inline unsigned short readUnsignedShort( const char *c, int offset )
 {
 	uint16_t num = *( (uint16_t*)(c + offset) );
-#if defined WORDS_BIGENDIAN
-	SWAP_ENDIAN_INT16(num);
-#endif
+	num = le16toh(num);
 	return num;
 }
 
@@ -200,9 +191,7 @@ static inline unsigned short readUnsignedShort( const char *c, int offset )
 static inline int readInt( const char *c, int offset )
 {
 	int32_t num = *( (int32_t*)(c + offset) );
-#if defined WORDS_BIGENDIAN
-	SWAP_ENDIAN_INT32(num);
-#endif
+	num = le32toh(num);
 	return  num;
 }
 
@@ -215,9 +204,7 @@ static inline float readFloat_IEEE(const char *c, int offset)
 	} x;
 
 	x.L = *( (uint32_t*)(c + offset) );
-#if defined WORDS_BIGENDIAN
-	SWAP_ENDIAN_INT32(x.L);
-#endif
+	x.L = le32toh(x.L);
 	return x.F;
 }
 
@@ -230,9 +217,7 @@ static inline float readFloat(const char *c, int offset)
 	} x;
 	
 	uint32_t msf = *( (uint32_t*)(c + offset) );
-#if defined WORDS_BIGENDIAN
-	SWAP_ENDIAN_INT32(msf);
-#endif
+	x.L = le32toh(x.L);
 	
 	/* regardless of endianness, that's how these floats look like
 	  MBF:  eeeeeeeeSmmmmmmmmmmmmmmmmmmmmmmm
