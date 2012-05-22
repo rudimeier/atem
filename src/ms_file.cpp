@@ -170,12 +170,14 @@ int mr_header_to_string( char *dest,
 #undef PRINT_FIELD
 
 
-static inline char readChar( const char *c, int offset )
+static inline char
+readChar( const char *c, int offset )
 {
 	return (char)(c[offset]);
 }
 
-static inline unsigned char readUnsignedChar( const char *c, int offset )
+static inline unsigned char
+readUnsignedChar( const char *c, int offset )
 {
 	return (unsigned char) c[offset];
 }
@@ -210,7 +212,8 @@ read_int32( const char *c, int offset )
 	return (int32_t)read_uint32(c, offset);
 }
 
-static inline float readFloat_IEEE(const char *c, int offset)
+static inline float
+readFloat_IEEE(const char *c, int offset)
 {
 	union {
 		uint32_t L;
@@ -221,8 +224,8 @@ static inline float readFloat_IEEE(const char *c, int offset)
 	return x.F;
 }
 
-
-static inline float readFloat(const char *c, int offset)
+static inline float
+readFloat(const char *c, int offset)
 {
 	union {
 		uint32_t L;
@@ -261,7 +264,8 @@ static inline float readFloat(const char *c, int offset)
 }
 
 
-static inline int floatToIntDate_YYY( float d )
+static inline int
+floatToIntDate_YYY( float d )
 {
 	int i = (int)d;
 	return i + 19000000;
