@@ -188,12 +188,18 @@ read_uint16( const char *c, int offset )
 	return num;
 }
 
+static inline uint32_t
+read_uint32( const char *c, int offset )
+{
+	uint32_t num = *( (uint32_t*)(c + offset) );
+	num = le32toh(num);
+	return  num;
+}
+
 static inline int32_t
 read_int32( const char *c, int offset )
 {
-	int32_t num = *( (int32_t*)(c + offset) );
-	num = le32toh(num);
-	return  num;
+	return (int32_t)read_uint32(c, offset);
 }
 
 static inline float readFloat_IEEE(const char *c, int offset)
@@ -203,8 +209,7 @@ static inline float readFloat_IEEE(const char *c, int offset)
 		float F;
 	} x;
 
-	x.L = *( (uint32_t*)(c + offset) );
-	x.L = le32toh(x.L);
+	x.L = read_uint32(c, offset);
 	return x.F;
 }
 
@@ -216,8 +221,7 @@ static inline float readFloat(const char *c, int offset)
 		float F;
 	} x;
 	
-	uint32_t msf = *( (uint32_t*)(c + offset) );
-	x.L = le32toh(x.L);
+	x.L = read_uint32(c, offset);
 	
 	/* regardless of endianness, that's how these floats look like
 	  MBF:  eeeeeeeeSmmmmmmmmmmmmmmmmmmmmmmm
@@ -227,13 +231,13 @@ static inline float readFloat(const char *c, int offset)
 	  point before the assumed bit, while IEEE places the decimal point
 	  after the assumed bit"
 	  -> so ieee_exp = ms_exp - 2 */
-	const uint32_t ms_e = 0xff000000 & msf;
+	const uint32_t ms_e = 0xff000000 & x.L;
 	if( ms_e == 0x00000000 ) {
 		/* "any msbin w/ exponent of zero = zero" */
 		return 0.0;
 	}
 	
-	uint32_t ieee_s = (0x00800000 & msf) << 8;
+	uint32_t ieee_s = (0x00800000 & x.L) << 8;
 	
 	/* Adding -2 to MS exponent. We set zero when ms_e is 1 because it would
 	   overflow. The orignal MS code lets overflow it (type unsigned char!)
@@ -242,7 +246,7 @@ static inline float readFloat(const char *c, int offset)
 	   Note when ms_e is 2 the resulting IEEE mantissa is subnormal - don't
 	   know if MS and IEEE mantissa are compatible in this case. */
 	uint32_t ieee_e = ( (ms_e - 0x02000000) & 0xff000000) >> 1;
-	uint32_t ieee_m = 0x007fffff & msf;
+	uint32_t ieee_m = 0x007fffff & x.L;
 	
 	x.L = ieee_e | ieee_s | ieee_m;
 	return x.F;
