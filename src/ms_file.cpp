@@ -180,7 +180,8 @@ static inline unsigned char readUnsignedChar( const char *c, int offset )
 	return (unsigned char) c[offset];
 }
 
-static inline unsigned short readUnsignedShort( const char *c, int offset )
+static inline uint16_t
+read_uint16( const char *c, int offset )
 {
 	uint16_t num = *( (uint16_t*)(c + offset) );
 	num = le16toh(num);
@@ -360,18 +361,18 @@ bool MasterFile::checkRecord( unsigned char r ) const
 	//           note, premium data sets '\0'
 	// #52,  1b: char, always '\0' (error #1019)
 	
-	assert( readUnsignedShort( record, 1 ) == 101 );
+	assert( read_uint16( record, 1 ) == 101 );
 	assert( record[3] == 4 * record[4] );
 	assert( record[4] >= 5 && record[4] <= 8 );
 	assert( record[5] == '\0' );
 	assert( record[6] == '\0' );
 	
-	assert( readUnsignedShort( record, 23 ) == 0 );
+	assert( read_uint16( record, 23 ) == 0 );
 	int date1 = floatToIntDate_YYY( readFloat( record, 25 ) );
 	int date2 = floatToIntDate_YYY( readFloat( record, 29 ) );
 	assert( date1 <= date2 );
 	assert( record[33] == 'D' || record[33] == 'I' );
-	unsigned short intrTimeFrame = readUnsignedShort( record, 34 );
+	unsigned short intrTimeFrame = read_uint16( record, 34 );
 	assert( intrTimeFrame == 0
 		|| (record[33] == 'I' && intrTimeFrame > 0 && intrTimeFrame <= 60) );
 	
@@ -568,7 +569,7 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	// #139, 52b: char*, long name, when set it should start like short name
 	// #191,  1b: char, last byte zero
 	
-	unsigned short version = readUnsignedShort( record, 0 );
+	unsigned short version = read_uint16( record, 0 );
 	assert( version == 0 || version == 0x3636 );
 	assert( record[3]== '\0' && record[4]== '\0' && record[5]== '\0' );
 	assert( record[6] >=5 && record[6] <= 8);
@@ -586,7 +587,7 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	}
 	assert( record[60] == 'D' || record[60] == 'I' );
 	assert( record[61] == '\0' );
-	unsigned short intrTimeFrame = readUnsignedShort( record, 62 );
+	unsigned short intrTimeFrame = read_uint16( record, 62 );
 	assert( intrTimeFrame == 0
 		|| (record[60] == 'I' && intrTimeFrame > 0 && intrTimeFrame <= 60) );
 	
@@ -764,15 +765,15 @@ bool XMasterFile::checkHeader() const
 	assert( readChar(buf, 2) == 'X' );
 	assert( readChar(buf, 3) == 'M' );
 	// char 4 - 9 unknown
-	assert( readUnsignedShort(buf, 10) ==  countRecords() );
+	assert( read_uint16(buf, 10) ==  countRecords() );
 	assert( readChar( buf, 12 ) == '\x00' );
 	assert( readChar( buf, 13 ) == '\x00' );
-	assert( readUnsignedShort(buf, 14) ==  countRecords() );
+	assert( read_uint16(buf, 14) ==  countRecords() );
 	assert( readChar( buf, 16 ) == '\x00' );
 	assert( readChar( buf, 17 ) == '\x00' );
 	
 	// last used + 1 !?
-	assert( readUnsignedShort(buf, 18) > countRecords() );
+	assert( read_uint16(buf, 18) > countRecords() );
 	assert( readChar( buf, 20 ) == '\x00' );
 	assert( readChar( buf, 21 ) == '\x00' );
 	
@@ -785,9 +786,9 @@ bool XMasterFile::checkHeader() const
 void XMasterFile::printHeader() const
 {
 	fprintf( stdout, "XMASTER:\t%d\t%d\t%d\t'%s'\n",
-		readUnsignedShort(buf, 10), // count records (stored in master?)
-		readUnsignedShort(buf, 14), // count records (the same?)
-		readUnsignedShort(buf, 18), // last used record
+		read_uint16(buf, 10), // count records (stored in master?)
+		read_uint16(buf, 14), // count records (the same?)
+		read_uint16(buf, 18), // last used record
 		buf + 22 //  // unkown, equis sends a string
 		);
 }
@@ -846,7 +847,7 @@ bool XMasterFile::checkRecord( int r ) const
 	
 	char per = record[62];
 	assert( per == 'D' || per == 'I' );
-	unsigned short intrTimeFrame = readUnsignedShort( record, 63 );
+	unsigned short intrTimeFrame = read_uint16( record, 63 );
 	assert( intrTimeFrame == 0
 		|| (per == 'I' && intrTimeFrame > 0 && intrTimeFrame <= 60) );
 	
@@ -873,7 +874,7 @@ bool XMasterFile::checkRecord( int r ) const
 void XMasterFile::printRecord( const char *record ) const
 {
 	fprintf( stdout, "F%4d.mwd\t%c\t%d\t%d\t%d\t%d\t%d\t'%s'\t'%s'\n",
-		readUnsignedShort( record, 65 ), // F#.mwd
+		read_uint16( record, 65 ), // F#.mwd
 		readChar( record, 62 ), // time frame 'D'
 		readUnsignedChar( record, 70 ), // fields bitset
 		readInt( record, 80 ), // some date ?
@@ -893,11 +894,11 @@ int XMasterFile::countRecords() const
 		return -1;
 	}
 	assert( buf != NULL );
-	if( readUnsignedShort( buf, 10 ) != (size / record_length - 1) ) {
+	if( read_uint16( buf, 10 ) != (size / record_length - 1) ) {
 		return -1;
 	}
 	
-	return readUnsignedShort( buf, 10 );
+	return read_uint16( buf, 10 );
 }
 
 
@@ -906,7 +907,7 @@ int XMasterFile::getRecord( master_record *mr, unsigned short rnum ) const
 	const char *record = buf + (record_length * rnum);
 	mr->record_number = rnum;
 	mr->kind = 'X';
-	mr->file_number = readUnsignedShort( record, 65 );
+	mr->file_number = read_uint16( record, 65 );
 	mr->field_bitset = readUnsignedChar( record, 70 );
 	mr->barsize = readChar( record, 62 );
 	trim_end( mr->c_symbol, record + 1, MAX_LEN_MR_SYMBOL );
@@ -920,7 +921,7 @@ int XMasterFile::getRecord( master_record *mr, unsigned short rnum ) const
 int XMasterFile::fileNumber( int r ) const
 {
 	const char *record = buf + (record_length * r);
-	int fileNumber = readUnsignedShort( record, 65 );
+	int fileNumber = read_uint16( record, 65 );
 	
 	assert( fileNumber > 255 );
 	return fileNumber;
@@ -1145,7 +1146,7 @@ int FDat::header_to_string( char *s )
 
 unsigned short FDat::countRecords() const
 {
-	return readUnsignedShort( buf, 2 ) -1;
+	return read_uint16( buf, 2 ) -1;
 }
 
 
