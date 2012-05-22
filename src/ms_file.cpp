@@ -170,54 +170,69 @@ int mr_header_to_string( char *dest,
 #undef PRINT_FIELD
 
 
-static inline char readChar( const char *c, int offset )
+static inline char
+readChar( const char *c, int offset )
 {
 	return (char)(c[offset]);
 }
 
-static inline unsigned char readUnsignedChar( const char *c, int offset )
+static inline unsigned char
+readUnsignedChar( const char *c, int offset )
 {
 	return (unsigned char) c[offset];
 }
 
-static inline unsigned short readUnsignedShort( const char *c, int offset )
+static inline uint16_t
+read_uint16( const char *c, int offset )
 {
-	uint16_t num = *( (uint16_t*)(c + offset) );
-	num = le16toh(num);
-	return num;
+	union {
+		uint16_t L;
+		char c[2];
+	} x;
+
+	memcpy(x.c, c + offset, 2);
+	return le16toh(x.L);
 }
 
-
-static inline int readInt( const char *c, int offset )
+static inline uint32_t
+read_uint32( const char *c, int offset )
 {
-	int32_t num = *( (int32_t*)(c + offset) );
-	num = le32toh(num);
-	return  num;
+	union {
+		uint32_t L;
+		char c[4];
+	} x;
+
+	memcpy(x.c, c + offset, 4);
+	return le32toh(x.L);
 }
 
+static inline int32_t
+read_int32( const char *c, int offset )
+{
+	return (int32_t)read_uint32(c, offset);
+}
 
-static inline float readFloat_IEEE(const char *c, int offset)
+static inline float
+readFloat_IEEE(const char *c, int offset)
 {
 	union {
 		uint32_t L;
 		float F;
 	} x;
 
-	x.L = *( (uint32_t*)(c + offset) );
-	x.L = le32toh(x.L);
+	x.L = read_uint32(c, offset);
 	return x.F;
 }
 
-
-static inline float readFloat(const char *c, int offset)
+static inline float
+readFloat(const char *c, int offset)
 {
 	union {
 		uint32_t L;
 		float F;
 	} x;
 	
-	uint32_t msf = *( (uint32_t*)(c + offset) );
-	x.L = le32toh(x.L);
+	x.L = read_uint32(c, offset);
 	
 	/* regardless of endianness, that's how these floats look like
 	  MBF:  eeeeeeeeSmmmmmmmmmmmmmmmmmmmmmmm
@@ -227,13 +242,13 @@ static inline float readFloat(const char *c, int offset)
 	  point before the assumed bit, while IEEE places the decimal point
 	  after the assumed bit"
 	  -> so ieee_exp = ms_exp - 2 */
-	const uint32_t ms_e = 0xff000000 & msf;
+	const uint32_t ms_e = 0xff000000 & x.L;
 	if( ms_e == 0x00000000 ) {
 		/* "any msbin w/ exponent of zero = zero" */
 		return 0.0;
 	}
 	
-	uint32_t ieee_s = (0x00800000 & msf) << 8;
+	uint32_t ieee_s = (0x00800000 & x.L) << 8;
 	
 	/* Adding -2 to MS exponent. We set zero when ms_e is 1 because it would
 	   overflow. The orignal MS code lets overflow it (type unsigned char!)
@@ -242,14 +257,15 @@ static inline float readFloat(const char *c, int offset)
 	   Note when ms_e is 2 the resulting IEEE mantissa is subnormal - don't
 	   know if MS and IEEE mantissa are compatible in this case. */
 	uint32_t ieee_e = ( (ms_e - 0x02000000) & 0xff000000) >> 1;
-	uint32_t ieee_m = 0x007fffff & msf;
+	uint32_t ieee_m = 0x007fffff & x.L;
 	
 	x.L = ieee_e | ieee_s | ieee_m;
 	return x.F;
 }
 
 
-static inline int floatToIntDate_YYY( float d )
+static inline int
+floatToIntDate_YYY( float d )
 {
 	int i = (int)d;
 	return i + 19000000;
@@ -312,7 +328,7 @@ void MasterFile::printHeader() const
 	fprintf( stdout, "MASTER:\t%d\t%d\t%X\n",
 		readUnsignedChar(buf, 0), // count records (stored in master?)
 		readUnsignedChar(buf, 2), // count records (existing dat files?)
-		readInt(buf, 49) // unknown - just print as hex
+		read_int32(buf, 49) // unknown - just print as hex
 		);
 }
 
@@ -360,18 +376,18 @@ bool MasterFile::checkRecord( unsigned char r ) const
 	//           note, premium data sets '\0'
 	// #52,  1b: char, always '\0' (error #1019)
 	
-	assert( readUnsignedShort( record, 1 ) == 101 );
+	assert( read_uint16( record, 1 ) == 101 );
 	assert( record[3] == 4 * record[4] );
 	assert( record[4] >= 5 && record[4] <= 8 );
 	assert( record[5] == '\0' );
 	assert( record[6] == '\0' );
 	
-	assert( readUnsignedShort( record, 23 ) == 0 );
+	assert( read_uint16( record, 23 ) == 0 );
 	int date1 = floatToIntDate_YYY( readFloat( record, 25 ) );
 	int date2 = floatToIntDate_YYY( readFloat( record, 29 ) );
 	assert( date1 <= date2 );
 	assert( record[33] == 'D' || record[33] == 'I' );
-	unsigned short intrTimeFrame = readUnsignedShort( record, 34 );
+	unsigned short intrTimeFrame = read_uint16( record, 34 );
 	assert( intrTimeFrame == 0
 		|| (record[33] == 'I' && intrTimeFrame > 0 && intrTimeFrame <= 60) );
 	
@@ -509,7 +525,7 @@ void EMasterFile::printHeader() const
 	fprintf( stdout, "EMASTER:\t%d\t%d\t%X\t'%s'\n",
 		readUnsignedChar(buf, 0), // count records (stored in master?)
 		readUnsignedChar(buf, 2), // count records (existing dat files?)
-		readInt(buf, 49), // unknown - just print as hex
+		read_int32(buf, 49), // unknown - just print as hex
 		buf + 53 // unkown, equis sends a string
 		);
 }
@@ -568,7 +584,7 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	// #139, 52b: char*, long name, when set it should start like short name
 	// #191,  1b: char, last byte zero
 	
-	unsigned short version = readUnsignedShort( record, 0 );
+	unsigned short version = read_uint16( record, 0 );
 	assert( version == 0 || version == 0x3636 );
 	assert( record[3]== '\0' && record[4]== '\0' && record[5]== '\0' );
 	assert( record[6] >=5 && record[6] <= 8);
@@ -586,7 +602,7 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	}
 	assert( record[60] == 'D' || record[60] == 'I' );
 	assert( record[61] == '\0' );
-	unsigned short intrTimeFrame = readUnsignedShort( record, 62 );
+	unsigned short intrTimeFrame = read_uint16( record, 62 );
 	assert( intrTimeFrame == 0
 		|| (record[60] == 'I' && intrTimeFrame > 0 && intrTimeFrame <= 60) );
 	
@@ -599,7 +615,7 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	for( int i = 88; i<126; i++ ) {
 		assert( record[i] == '\0' );
 	}
-	int dateL = readInt( record, 126 );
+	int dateL = read_int32( record, 126 );
 	
 	
 	if( date1 > date2 ) {
@@ -646,7 +662,7 @@ void EMasterFile::printRecord( const char *record ) const
 		(int)readFloat_IEEE( record, 76 ),
 		(int)readFloat_IEEE( record, 80 ),
 		(int)readFloat_IEEE( record, 84 ),
-		readInt( record, 126 ), // first date YYYY
+		read_int32( record, 126 ), // first date YYYY
 // 		readFloat( record, 131 ),
 // 		readFloat( record, 135 ),
 		readUnsignedChar( record, 0 ), // unknown, just print hex
@@ -764,15 +780,15 @@ bool XMasterFile::checkHeader() const
 	assert( readChar(buf, 2) == 'X' );
 	assert( readChar(buf, 3) == 'M' );
 	// char 4 - 9 unknown
-	assert( readUnsignedShort(buf, 10) ==  countRecords() );
+	assert( read_uint16(buf, 10) ==  countRecords() );
 	assert( readChar( buf, 12 ) == '\x00' );
 	assert( readChar( buf, 13 ) == '\x00' );
-	assert( readUnsignedShort(buf, 14) ==  countRecords() );
+	assert( read_uint16(buf, 14) ==  countRecords() );
 	assert( readChar( buf, 16 ) == '\x00' );
 	assert( readChar( buf, 17 ) == '\x00' );
 	
 	// last used + 1 !?
-	assert( readUnsignedShort(buf, 18) > countRecords() );
+	assert( read_uint16(buf, 18) > countRecords() );
 	assert( readChar( buf, 20 ) == '\x00' );
 	assert( readChar( buf, 21 ) == '\x00' );
 	
@@ -785,9 +801,9 @@ bool XMasterFile::checkHeader() const
 void XMasterFile::printHeader() const
 {
 	fprintf( stdout, "XMASTER:\t%d\t%d\t%d\t'%s'\n",
-		readUnsignedShort(buf, 10), // count records (stored in master?)
-		readUnsignedShort(buf, 14), // count records (the same?)
-		readUnsignedShort(buf, 18), // last used record
+		read_uint16(buf, 10), // count records (stored in master?)
+		read_uint16(buf, 14), // count records (the same?)
+		read_uint16(buf, 18), // last used record
 		buf + 22 //  // unkown, equis sends a string
 		);
 }
@@ -846,7 +862,7 @@ bool XMasterFile::checkRecord( int r ) const
 	
 	char per = record[62];
 	assert( per == 'D' || per == 'I' );
-	unsigned short intrTimeFrame = readUnsignedShort( record, 63 );
+	unsigned short intrTimeFrame = read_uint16( record, 63 );
 	assert( intrTimeFrame == 0
 		|| (per == 'I' && intrTimeFrame > 0 && intrTimeFrame <= 60) );
 	
@@ -873,14 +889,14 @@ bool XMasterFile::checkRecord( int r ) const
 void XMasterFile::printRecord( const char *record ) const
 {
 	fprintf( stdout, "F%4d.mwd\t%c\t%d\t%d\t%d\t%d\t%d\t'%s'\t'%s'\n",
-		readUnsignedShort( record, 65 ), // F#.mwd
+		read_uint16( record, 65 ), // F#.mwd
 		readChar( record, 62 ), // time frame 'D'
 		readUnsignedChar( record, 70 ), // fields bitset
-		readInt( record, 80 ), // some date ?
+		read_int32( record, 80 ), // some date ?
 // 		readInt( record, 84 ), // stupid date? forst 3 bytes equal 
-		readInt( record, 104 ), // some date ?
-		readInt( record, 108 ), // looks like first date ?
-		readInt( record, 116 ), // looks like last date ?
+		read_int32( record, 104 ), // some date ?
+		read_int32( record, 108 ), // looks like first date ?
+		read_int32( record, 116 ), // looks like last date ?
 		record + 1, // symbol
 		record + 16 // name
 		);
@@ -893,11 +909,11 @@ int XMasterFile::countRecords() const
 		return -1;
 	}
 	assert( buf != NULL );
-	if( readUnsignedShort( buf, 10 ) != (size / record_length - 1) ) {
+	if( read_uint16( buf, 10 ) != (size / record_length - 1) ) {
 		return -1;
 	}
 	
-	return readUnsignedShort( buf, 10 );
+	return read_uint16( buf, 10 );
 }
 
 
@@ -906,13 +922,13 @@ int XMasterFile::getRecord( master_record *mr, unsigned short rnum ) const
 	const char *record = buf + (record_length * rnum);
 	mr->record_number = rnum;
 	mr->kind = 'X';
-	mr->file_number = readUnsignedShort( record, 65 );
+	mr->file_number = read_uint16( record, 65 );
 	mr->field_bitset = readUnsignedChar( record, 70 );
 	mr->barsize = readChar( record, 62 );
 	trim_end( mr->c_symbol, record + 1, MAX_LEN_MR_SYMBOL );
 	trim_end( mr->c_long_name, record + 16, MAX_LEN_MR_LNAME );
-	mr->from_date = readInt( record, 108 );
-	mr->to_date = readInt( record, 116 );
+	mr->from_date = read_int32( record, 108 );
+	mr->to_date = read_int32( record, 116 );
 	return 0;
 }
 
@@ -920,7 +936,7 @@ int XMasterFile::getRecord( master_record *mr, unsigned short rnum ) const
 int XMasterFile::fileNumber( int r ) const
 {
 	const char *record = buf + (record_length * r);
-	int fileNumber = readUnsignedShort( record, 65 );
+	int fileNumber = read_uint16( record, 65 );
 	
 	assert( fileNumber > 255 );
 	return fileNumber;
@@ -1145,7 +1161,7 @@ int FDat::header_to_string( char *s )
 
 unsigned short FDat::countRecords() const
 {
-	return readUnsignedShort( buf, 2 ) -1;
+	return read_uint16( buf, 2 ) -1;
 }
 
 
