@@ -30,6 +30,9 @@ CXXFLAGS="$warnflags $CXXFLAGS"
 
 AC_C_BIGENDIAN()
 
+## check for byteorder utils
+AC_CHECK_HEADERS([endian.h sys/endian.h byteorder.h byteswap.h])
+
 ## tweaks
 AC_ARG_ENABLE([fast-printing],[
 AS_HELP_STRING([--disable-fast-printing],
