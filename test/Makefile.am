@@ -37,7 +37,7 @@ TESTS += format.05.atst
 TESTS += format.06.atst
 
 msdir_%: msdir_%.tar.xz
-	tar -xf $< && touch $@
+	xz -dc $< | $(am__untar) && touch $@
 
 clean-local:
 	-rm -rf msdir_equis_a
