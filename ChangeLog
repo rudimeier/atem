@@ -3,6 +3,17 @@ ChangeLog, atem -- metastock reverse
 ====================================
 
 
+0.3.4 - 2012-05-23  ------------------------------------------------------------
+
+Minor fixes and cleanups.
+
+  - fix, ignore if Master file shows wrong "dat record length in bytes"
+  - fix, reading wrongly aligned numbers (bus error on sparc)
+  - fix, build failed when BSD tar was used
+  - cleanup byteorder code using system headers if possible (boobs.h magic)
+
+
+
 0.3.3 - 2012-03-23  ------------------------------------------------------------
 
 A few CLI improvements and minor portability fixes.
