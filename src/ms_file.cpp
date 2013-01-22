@@ -420,7 +420,7 @@ int MasterFile::countRecords() const
 		return -1;
 	}
 	assert( buf != NULL );
-	if( readUnsignedChar( buf, 0 ) != (size / record_length - 1) ) {
+	if( readUnsignedChar( buf, 0 ) > (size / record_length - 1) ) {
 		return -1;
 	}
 	
@@ -679,7 +679,7 @@ int EMasterFile::countRecords() const
 		return -1;
 	}
 	assert( buf != NULL );
-	if( readUnsignedChar( buf, 0 ) != (size / record_length - 1) ) {
+	if( readUnsignedChar( buf, 0 ) > (size / record_length - 1) ) {
 		return -1;
 	}
 	
@@ -909,7 +909,7 @@ int XMasterFile::countRecords() const
 		return -1;
 	}
 	assert( buf != NULL );
-	if( read_uint16( buf, 10 ) != (size / record_length - 1) ) {
+	if( read_uint16( buf, 10 ) > (size / record_length - 1) ) {
 		return -1;
 	}
 	
