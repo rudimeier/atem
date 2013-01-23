@@ -40,6 +40,8 @@ TESTS += format.06.atst
 TESTS += format.07.atst
 TESTS += format.08.atst
 TESTS += format.09.atst
+TESTS += mininge.01.atst
+TESTS += mininge.02.atst
 
 msdir_%: msdir_%.tar.xz
 	xz -dc $< | $(am__untar) && touch $@

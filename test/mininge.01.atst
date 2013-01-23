@@ -1,0 +1,13 @@
+## -*- shell-script -*-
+
+TOOL=atem
+INFILE="msdir_mininge"
+OUTFILE="testload.csv"
+CMDLINE="'${INFILE}' > '${OUTFILE}'"
+
+## STDIN
+
+## STDOUT
+
+## outfile sum
+OUTFILE_SHA1="c4f5cca3c110d966a79b8eba2ea80f6ae0a84fe0"
