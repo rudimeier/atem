@@ -7,6 +7,11 @@ ChangeLog, atem -- metastock reverse
 
 Maintenance release.
 
+  - fix, Master file might be larger then needed
+  - fix, symbol column was not printed if symbol is empty
+  - fix, don't print last separator if no data columns given
+  - fix, no more segfault if --format string contains spaces only
+
 
 
 0.3.4 - 2012-05-23  ------------------------------------------------------------
