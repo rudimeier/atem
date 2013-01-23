@@ -16,8 +16,10 @@ ATST_LOG_COMPILER = $(srcdir)/atem-test.sh
 AM_ATST_LOG_FLAGS = --builddir $(top_builddir)/src --hash sha1sum
 LOG_COMPILER = echo
 
+# ms_dirs must have prefix msdir_
 ms_dirs =
 ms_dirs += msdir_equis_a
+ms_dirs += msdir_mininge
 
 TESTS += equis.01.atst
 TESTS += equis.02.atst
@@ -40,7 +42,7 @@ msdir_%: msdir_%.tar.xz
 	xz -dc $< | $(am__untar) && touch $@
 
 clean-local:
-	-rm -rf msdir_equis_a
+	-rm -rf $(ms_dirs)
 
 # don't run the tests parallel
 .NOTPARALLEL:
