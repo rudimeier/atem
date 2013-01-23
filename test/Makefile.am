@@ -37,6 +37,7 @@ TESTS += format.03.atst
 TESTS += format.04.atst
 TESTS += format.05.atst
 TESTS += format.06.atst
+TESTS += format.07.atst
 
 msdir_%: msdir_%.tar.xz
 	xz -dc $< | $(am__untar) && touch $@
