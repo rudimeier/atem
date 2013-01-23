@@ -827,7 +827,7 @@ bool Metastock::dumpData() const
 
 	if( print_header ) {
 		len = mr_header_to_string( buf, prnt_data_mr_fields, print_sep );
-		if( len > 0 ) {
+		if( prnt_data_mr_fields != 0 && prnt_data_fields != 0 ) {
 			buf[len++] = print_sep;
 			buf[len] = '\0';
 		}
@@ -839,7 +839,7 @@ bool Metastock::dumpData() const
 			assert( mr_list[i].file_number == i );
 			len = mr_record_to_string( buf, &mr_list[i],
 				prnt_data_mr_fields, print_sep );
-			if( prnt_data_mr_fields != 0 ) {
+			if( prnt_data_mr_fields != 0 && prnt_data_fields != 0 ) {
 				buf[len++] = print_sep;
 				buf[len] = '\0';
 			}
