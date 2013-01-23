@@ -369,7 +369,7 @@ bool Metastock::columns2bitset( const char *columns )
 	token = strtok(col_split, sepset);
 
 	/* if first rule is explicit in/exclude then init defaults else zero */
-	if( *token == '-' || *token == '+' ) {
+	if( token != NULL && (*token == '-' || *token == '+') ) {
 		set_out_format( -1 );
 	} else {
 		set_out_format( 0 );
