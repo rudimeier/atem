@@ -1032,7 +1032,8 @@ bool FDat::checkHeader() const
 int FDat::print( const char* header ) const
 {
 	const char *record = buf + record_length;
-	const char *end = buf + size;
+	const char *end = buf + ((countRecords() + 1) * record_length);
+	assert( end - buf <= size );
 	char buf[512];
 	char *buf_p = buf;
 	
