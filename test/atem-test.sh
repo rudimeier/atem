@@ -70,10 +70,17 @@ xrealpath()
 	) 2>/dev/null
 }
 
+
+tsp_create_env()
+{
+	TS_TMPDIR="`mktemp -d "test_suite.XXXX"`" || return 1
+}
+
 ## setup
 fail=0
 tool_stdout=$(mktemp "/tmp/tmp.XXXXXXXXXX")
 tool_stderr=$(mktemp "/tmp/tmp.XXXXXXXXXX")
+tsp_create_env || exit 1
 
 ## also set srcdir in case the testfile needs it
 if test -z "${srcdir}"; then
@@ -104,6 +111,7 @@ rm_if_not_src()
 
 myexit()
 {
+	rm -rf "${TS_TMPDIR}"
 	rm_if_not_src "${stdin}" "${srcdir}"
 	rm_if_not_src "${stdout}" "${srcdir}"
 	rm_if_not_src "${stderr}" "${srcdir}"
