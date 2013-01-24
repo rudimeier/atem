@@ -416,15 +416,17 @@ void MasterFile::printRecord( const char *record ) const
 
 int MasterFile::countRecords() const
 {
-	if( (size < record_length) || (size % record_length != 0) ) {
+	if( size < record_length ) {
 		return -1;
 	}
-	assert( buf != NULL );
-	if( readUnsignedChar( buf, 0 ) > (size / record_length - 1) ) {
+
+	int cnt = readUnsignedChar( buf, 0 );
+
+	if( (cnt + 1) * record_length > size ) {
 		return -1;
 	}
-	
-	return readUnsignedChar( buf, 0 );
+
+	return cnt;
 }
 
 
@@ -675,15 +677,17 @@ void EMasterFile::printRecord( const char *record ) const
 
 int EMasterFile::countRecords() const
 {
-	if( (size < record_length) || (size % record_length != 0) ) {
+	if( size < record_length ) {
 		return -1;
 	}
-	assert( buf != NULL );
-	if( readUnsignedChar( buf, 0 ) > (size / record_length - 1) ) {
+
+	int cnt = readUnsignedChar( buf, 0 );
+
+	if( (cnt + 1) * record_length > size ) {
 		return -1;
 	}
-	
-	return readUnsignedChar( buf, 0 );
+
+	return cnt;
 }
 
 
@@ -905,15 +909,17 @@ void XMasterFile::printRecord( const char *record ) const
 
 int XMasterFile::countRecords() const
 {
-	if( (size < record_length) || (size % record_length != 0) ) {
+	if( size < record_length ) {
 		return -1;
 	}
-	assert( buf != NULL );
-	if( read_uint16( buf, 10 ) > (size / record_length - 1) ) {
+
+	int cnt = read_uint16( buf, 10 );
+
+	if( (cnt + 1) * record_length > size ) {
 		return -1;
 	}
-	
-	return read_uint16( buf, 10 );
+
+	return cnt;
 }
 
 
@@ -1019,8 +1025,6 @@ bool FDat::checkHeader() const
 	assert( size % record_length == 0 );
 	assert( countRecords() == (size / record_length) - 1 );
 	
-// 	assert( readChar(buf, 0) == '\x5d' );
-	
 	return true;
 }
 
@@ -1028,7 +1032,8 @@ bool FDat::checkHeader() const
 int FDat::print( const char* header ) const
 {
 	const char *record = buf + record_length;
-	const char *end = buf + size;
+	const char *end = buf + ((countRecords() + 1) * record_length);
+	assert( end - buf <= size );
 	char buf[512];
 	char *buf_p = buf;
 	
@@ -1159,9 +1164,19 @@ int FDat::header_to_string( char *s )
 }
 
 
-unsigned short FDat::countRecords() const
+int FDat::countRecords() const
 {
-	return read_uint16( buf, 2 ) -1;
+	if( size < record_length ) {
+		return -1;
+	}
+
+	int cnt = read_uint16( buf, 2 ) - 1;
+
+	if( (cnt + 1) * record_length > size ) {
+		return -1;
+	}
+
+	return cnt;
 }
 
 

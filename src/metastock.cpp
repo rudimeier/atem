@@ -870,7 +870,10 @@ bool Metastock::dumpData( unsigned short n, unsigned char fields, const char *pf
 // 	fprintf( stderr, "#%d: %d x %d bytes\n",
 // 		n, datfile.countRecords(), count_bits(fields) * 4 );
 	
-	datfile.checkHeader();
+	if( datfile.countRecords() < 0 ) {
+		setError( "fdat file unusable", fdat_buf->constName() );
+		return false;
+	}
 	if( datfile.print( pfx ) < 0) {
 		/* This is should only happen on WIN32 instead of SIGPIPE */
 		setError( "writing interrupted" );

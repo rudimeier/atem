@@ -239,7 +239,7 @@ class FDat
 		
 		bool checkHeader() const;
 		int print( const char* header ) const;
-		unsigned short countRecords() const;
+		int countRecords() const;
 		
 	private:
 		static int header_to_string( char *s );
@@ -254,7 +254,7 @@ class FDat
 		static ftoa_func opi_ftoa;
 		
 		const unsigned char field_bitset;
-		const unsigned int record_length;
+		const int record_length;
 		
 		const char * const buf;
 		const int size;
