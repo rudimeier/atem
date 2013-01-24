@@ -420,11 +420,13 @@ int MasterFile::countRecords() const
 		return -1;
 	}
 
-	if( readUnsignedChar( buf, 0 ) > (size / record_length - 1) ) {
+	int cnt = readUnsignedChar( buf, 0 );
+
+	if( (cnt + 1) * record_length > size ) {
 		return -1;
 	}
-	
-	return readUnsignedChar( buf, 0 );
+
+	return cnt;
 }
 
 
@@ -679,11 +681,13 @@ int EMasterFile::countRecords() const
 		return -1;
 	}
 
-	if( readUnsignedChar( buf, 0 ) > (size / record_length - 1) ) {
+	int cnt = readUnsignedChar( buf, 0 );
+
+	if( (cnt + 1) * record_length > size ) {
 		return -1;
 	}
-	
-	return readUnsignedChar( buf, 0 );
+
+	return cnt;
 }
 
 
@@ -909,11 +913,13 @@ int XMasterFile::countRecords() const
 		return -1;
 	}
 
-	if( read_uint16( buf, 10 ) > (size / record_length - 1) ) {
+	int cnt = read_uint16( buf, 10 );
+
+	if( (cnt + 1) * record_length > size ) {
 		return -1;
 	}
-	
-	return read_uint16( buf, 10 );
+
+	return cnt;
 }
 
 
