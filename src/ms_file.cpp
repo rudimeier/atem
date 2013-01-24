@@ -1166,7 +1166,17 @@ int FDat::header_to_string( char *s )
 
 int FDat::countRecords() const
 {
-	return read_uint16( buf, 2 ) -1;
+	if( size < record_length ) {
+		return -1;
+	}
+
+	int cnt = read_uint16( buf, 2 ) - 1;
+
+	if( (cnt + 1) * record_length > size ) {
+		return -1;
+	}
+
+	return cnt;
 }
 
 
