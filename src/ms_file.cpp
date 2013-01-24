@@ -1019,8 +1019,6 @@ bool FDat::checkHeader() const
 	assert( size % record_length == 0 );
 	assert( countRecords() == (size / record_length) - 1 );
 	
-// 	assert( readChar(buf, 0) == '\x5d' );
-	
 	return true;
 }
 
