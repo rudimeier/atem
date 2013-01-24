@@ -1163,7 +1163,7 @@ int FDat::header_to_string( char *s )
 }
 
 
-unsigned short FDat::countRecords() const
+int FDat::countRecords() const
 {
 	return read_uint16( buf, 2 ) -1;
 }
