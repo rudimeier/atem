@@ -7,7 +7,6 @@ usage()
 
 --builddir DIR  specify where tools can be found
 --srcdir DIR    specify where the source tree resides
---hash PROG     use hasher PROG instead of md5sum
 --husk PROG     use husk around tool, e.g. 'valgrind -v'
 
 -h, --help      print a short help screen
@@ -29,10 +28,6 @@ while true; do
 		;;
 	"--srcdir")
 		srcdir="${2}"
-		shift 2
-		;;
-	"--hash")
-		hash="${2}"
 		shift 2
 		;;
 	"--husk")
