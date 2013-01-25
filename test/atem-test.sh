@@ -80,6 +80,7 @@ tsp_create_env()
 	TS_EXP_STDERR="${TS_TMPDIR}/exp_stderr"
 	OUTFILE="${TS_TMPDIR}/tool_outfile"
 	TS_EXP_EXIT_CODE="0"
+	TS_DIFF_OPTS=""
 
 	tool_stdout="${TS_TMPDIR}/tool_stdout"
 	tool_stderr="${TS_TMPDIR}/tool_sterr"
@@ -158,7 +159,7 @@ if test "${TS_EXP_EXIT_CODE}" != "${tool_exit_code}"; then
 fi
 
 if test -r "${stdout}"; then
-	diff -u "${stdout}" "${tool_stdout}" || fail=1
+	eval diff -u "${TS_DIFF_OPTS}" "${stdout}" "${tool_stdout}" || fail=1
 elif test -s "${tool_stdout}"; then
 	echo
 	echo "test stdout was:"
@@ -166,7 +167,7 @@ elif test -s "${tool_stdout}"; then
 	echo
 fi
 if test -r "${stderr}"; then
-	diff -u "${stderr}" "${tool_stderr}" || fail=1
+	eval diff -u "${TS_DIFF_OPTS}" "${stderr}" "${tool_stderr}" || fail=1
 elif test -s "${tool_stderr}"; then
 	echo
 	echo "test stderr was:"
