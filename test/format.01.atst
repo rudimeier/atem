@@ -2,7 +2,6 @@
 
 TOOL=atem
 INFILE="msdir_equis_a"
-OUTFILE="testload.csv"
 CMDLINE="--field-separator=',' --format=' symbol, long_name ,date  open; high
 	low, close,volume' '${INFILE}' -o '${OUTFILE}'"
 

@@ -2,7 +2,6 @@
 
 TOOL=atem
 INFILE="msdir_mininge"
-OUTFILE="testload.csv"
 CMDLINE="--symbols '${INFILE}' > '${OUTFILE}'"
 
 ## STDIN

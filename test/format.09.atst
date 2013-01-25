@@ -2,7 +2,6 @@
 
 TOOL=atem
 INFILE="msdir_mininge"
-OUTFILE="testload.csv"
 CMDLINE="-F, --format='symbol,date' '${INFILE}' |head -n2"
 
 ## STDIN

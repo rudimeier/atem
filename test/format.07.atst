@@ -2,7 +2,6 @@
 
 TOOL=atem
 INFILE="msdir_equis_a"
-OUTFILE="testload.csv"
 # TODO fix test suite to respect the exit code _and_ stderr
 CMDLINE="--fdat 1 -F, --format=' ' '${INFILE}' 2>&1
 	| head -n 1 1>&2"

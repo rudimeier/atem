@@ -3,7 +3,6 @@
 
 TOOL=atem
 INFILE="msdir_equis_a"
-OUTFILE="testload.csv"
 tmp_stamp="$(date -r "${INFILE}/F1011.MWD" +"%F %T")"
 CMDLINE="--skip-header --format=00100000
 	--exclude-older-than='${tmp_stamp}' '${INFILE}' |uniq |tr -d '\t'
