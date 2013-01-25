@@ -77,6 +77,7 @@ tsp_create_env()
 
 	TS_EXP_STDOUT="${TS_TMPDIR}/exp_stdout"
 	TS_EXP_STDERR="${TS_TMPDIR}/exp_stderr"
+	OUTFILE="${TS_TMPDIR}/tool_outfile"
 
 	tool_stdout="${TS_TMPDIR}/tool_stdout"
 	tool_stderr="${TS_TMPDIR}/tool_sterr"
@@ -117,7 +118,6 @@ myexit()
 {
 	rm -rf "${TS_TMPDIR}"
 	rm_if_not_src "${stdin}" "${srcdir}"
-	rm_if_not_src "${OUTFILE}"
 	exit ${1:-1}
 }
 
