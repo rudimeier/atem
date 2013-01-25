@@ -98,23 +98,6 @@ fi
 ## source the check
 . "${testfile}" || fail=1
 
-rm_if_not_src()
-{
-	file="${1}"
-	srcd="${2:-${srcdir}}"
-	dirf=$(dirname "${file}")
-
-	if test "${dirf}" -ef "${srcd}"; then
-		## treat as precious source file
-		:
-	elif test "$(pwd)" -ef "${srcd}"; then
-		## treat as precious source file
-		:
-	else
-		rm -vf -- "${file}"
-	fi
-}
-
 myexit()
 {
 	rm -rf "${TS_TMPDIR}"
