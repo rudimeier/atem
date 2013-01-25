@@ -3,7 +3,7 @@
 usage()
 {
 	cat <<EOF 
-$(basename ${0}) [OPTION] TEST_FILE
+`basename ${0}` [OPTION] TEST_FILE
 
 --builddir DIR  specify where tools can be found
 --srcdir DIR    specify where the source tree resides
@@ -14,8 +14,8 @@ $(basename ${0}) [OPTION] TEST_FILE
 EOF
 }
 
-CLINE=$(getopt -o h \
-	--long help,builddir:,srcdir:,hash:,husk: -n "${0}" -- "${@}")
+CLINE=`getopt -o h \
+	--long help,builddir:,srcdir:,hash:,husk: -n "${0}" -- "${@}"`
 eval set -- "${CLINE}"
 while true; do
 	case "${1}" in
@@ -58,15 +58,15 @@ xrealpath()
 {
 	readlink -f "${1}" 2>/dev/null || \
 	realpath "${1}" 2>/dev/null || \
-	( cd "$(dirname "${1}")" || exit 1
-		tmp_target="$(basename "${1}")"
+	( cd "`dirname "${1}"`" || exit 1
+		tmp_target="`basename "${1}"`"
 		# Iterate down a (possible) chain of symlinks
 		while test -L "${tmp_target}"; do
-			tmp_target="$(readlink "${tmp_target}")"
-			cd "$(dirname "${tmp_target}")" || exit 1
-			tmp_target="$(basename "${tmp_target}")"
+			tmp_target="`readlink "${tmp_target}"`"
+			cd "`dirname "${tmp_target}"`" || exit 1
+			tmp_target="`basename "${tmp_target}"`"
 		done
-		echo "$(pwd -P || pwd)/${tmp_target}"
+		echo "`pwd -P || pwd`/${tmp_target}"
 	) 2>/dev/null
 }
 
@@ -98,9 +98,9 @@ tsp_create_env || myexit 1
 
 ## also set srcdir in case the testfile needs it
 if test -z "${srcdir}"; then
-	srcdir=$(xrealpath $(dirname "${0}"))
+	srcdir=`xrealpath \`dirname "${0}"\``
 else
-	srcdir=$(xrealpath "${srcdir}")
+	srcdir=`xrealpath "${srcdir}"`
 fi
 
 ## source the check
@@ -116,7 +116,7 @@ eval_echo()
 		echo >&3
 	else
 		echo "<<EOF" >&3
-		tmpf=$(mktemp "/tmp/tmp.XXXXXXXXXX")
+		tmpf=`mktemp "/tmp/tmp.XXXXXXXXXX"`
 		tee "${tmpf}" >&3
 		echo "EOF" >&3
 	fi
@@ -135,7 +135,7 @@ fi
 
 ## set finals
 if test -x "${builddir}/${TOOL}"; then
-	TOOL=$(xrealpath "${builddir}/${TOOL}")
+	TOOL=`xrealpath "${builddir}/${TOOL}"`
 fi
 
 stdin=""
