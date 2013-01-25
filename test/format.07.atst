@@ -10,11 +10,10 @@ CMDLINE="--fdat 1 -F, --format=' ' '${INFILE}' 2>&1
 ## STDIN
 
 ## STDOUT
-stdout=$(mktemp "/tmp/tmp.XXXXXXXXXX")
+touch "${TS_EXP_STDOUT}"
 
 ## STDERR
-stderr=$(mktemp "/tmp/tmp.XXXXXXXXXX")
-cat > "${stderr}" <<EOF
+cat > "${TS_EXP_STDERR}" <<EOF
 error: bad output format: no columns given
 EOF
 

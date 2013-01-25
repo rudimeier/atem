@@ -8,8 +8,7 @@ CMDLINE="-F, --format='symbol,date' '${INFILE}' |head -n2"
 ## STDIN
 
 ## STDOUT
-stdout=$(mktemp "/tmp/tmp.XXXXXXXXXX")
-cat > "${stdout}" <<EOF
+cat > "${TS_EXP_STDOUT}" <<EOF
 symbol,date
 ,1984-03-12
 EOF

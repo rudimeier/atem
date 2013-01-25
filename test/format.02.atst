@@ -9,8 +9,7 @@ CMDLINE="--fdat 1 -F, --format='+long_name,-time,-openint' '${INFILE}'
 ## STDIN
 
 ## STDOUT
-stdout=$(mktemp "/tmp/tmp.XXXXXXXXXX")
-cat > "${stdout}" <<EOF
+cat > "${TS_EXP_STDOUT}" <<EOF
 symbol,long_name,date,open,high,low,close,volume
 EOF
 
