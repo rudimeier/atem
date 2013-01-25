@@ -75,6 +75,7 @@ tsp_create_env()
 {
 	TS_TMPDIR="`mktemp -d "test_suite.XXXX"`" || return 1
 
+	TS_STDIN="${TS_TMPDIR}/stdin"
 	TS_EXP_STDOUT="${TS_TMPDIR}/exp_stdout"
 	TS_EXP_STDERR="${TS_TMPDIR}/exp_stderr"
 	OUTFILE="${TS_TMPDIR}/tool_outfile"
@@ -117,7 +118,6 @@ rm_if_not_src()
 myexit()
 {
 	rm -rf "${TS_TMPDIR}"
-	rm_if_not_src "${stdin}" "${srcdir}"
 	exit ${1:-1}
 }
 
@@ -168,7 +168,7 @@ if test -x "${builddir}/${TOOL}"; then
 	TOOL=$(xrealpath "${builddir}/${TOOL}")
 fi
 
-stdin=$(find_file "${stdin}")
+stdin=$(find_file "${TS_STDIN}")
 stdout=$(find_file "${TS_EXP_STDOUT}")
 stderr=$(find_file "${TS_EXP_STDERR}")
 
