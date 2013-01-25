@@ -104,21 +104,6 @@ fi
 ## source the check
 . "${testfile}" || fail=1
 
-find_file()
-{
-	file="${1}"
-
-	if test -z "${file}"; then
-		:
-	elif test -r "${file}"; then
-		echo "${file}"
-	elif test -r "${builddir}/${file}"; then
-		xrealpath "${builddir}/${file}"
-	elif test -r "${srcdir}/${file}"; then
-		xrealpath "${srcdir}/${file}"
-	fi
-}
-
 eval_echo()
 {
 	local ret
@@ -151,9 +136,12 @@ if test -x "${builddir}/${TOOL}"; then
 	TOOL=$(xrealpath "${builddir}/${TOOL}")
 fi
 
-stdin=$(find_file "${TS_STDIN}")
-stdout=$(find_file "${TS_EXP_STDOUT}")
-stderr=$(find_file "${TS_EXP_STDERR}")
+stdin=""
+if test -r "${TS_STDIN}"; then
+	stdin="${TS_STDIN}"
+fi
+stdout="${TS_EXP_STDOUT}"
+stderr="${TS_EXP_STDERR}"
 
 eval_echo "${HUSK}" "${TOOL}" "${CMDLINE}" \
 	< "${stdin:-/dev/null}" \
