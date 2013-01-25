@@ -84,9 +84,15 @@ tsp_create_env()
 	tool_stderr="${TS_TMPDIR}/tool_sterr"
 }
 
+myexit()
+{
+	rm -rf "${TS_TMPDIR}"
+	exit ${1:-1}
+}
+
 ## setup
 fail=0
-tsp_create_env || exit 1
+tsp_create_env || myexit 1
 
 ## also set srcdir in case the testfile needs it
 if test -z "${srcdir}"; then
@@ -97,12 +103,6 @@ fi
 
 ## source the check
 . "${testfile}" || fail=1
-
-myexit()
-{
-	rm -rf "${TS_TMPDIR}"
-	exit ${1:-1}
-}
 
 find_file()
 {
