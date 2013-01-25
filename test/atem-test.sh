@@ -13,11 +13,8 @@ usage()
 EOF
 }
 
-CLINE=`getopt -o h \
-	--long help,builddir:,srcdir:,hash:,husk: -n "${0}" -- "${@}"`
-eval set -- "${CLINE}"
-while true; do
-	case "${1}" in
+for arg; do
+	case "${arg}" in
 	"-h"|"--help")
 		usage
 		exit 0
@@ -30,20 +27,29 @@ while true; do
 		srcdir="${2}"
 		shift 2
 		;;
+	"--hash")
+		hash="${2}"
+		shift 2
+		;;
 	"--husk")
 		HUSK="${2}"
 		shift 2
 		;;
 	--)
 		shift
+		testfile="${1}"
 		break
 		;;
-	*)
-		echo "could not parse options" >&2
+	"-"*)
+		echo "`basename ${0}`: unknown option '${arg}'" >&2
 		exit 1
+		;;
+	*)
+		testfile="${1}"
 		;;
 	esac
 done
+
 
 ## now in ${1} should be the test file
 testfile="${1}"
