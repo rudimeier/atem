@@ -79,6 +79,7 @@ tsp_create_env()
 	TS_EXP_STDOUT="${TS_TMPDIR}/exp_stdout"
 	TS_EXP_STDERR="${TS_TMPDIR}/exp_stderr"
 	OUTFILE="${TS_TMPDIR}/tool_outfile"
+	TS_EXP_EXIT_CODE="0"
 
 	tool_stdout="${TS_TMPDIR}/tool_stdout"
 	tool_stderr="${TS_TMPDIR}/tool_sterr"
@@ -102,7 +103,7 @@ else
 fi
 
 ## source the check
-. "${testfile}" || fail=1
+. "${testfile}" || myexit 1
 
 eval_echo()
 {
@@ -146,11 +147,14 @@ stderr="${TS_EXP_STDERR}"
 eval_echo "${HUSK}" "${TOOL}" "${CMDLINE}" \
 	< "${stdin:-/dev/null}" \
 	3>&2 \
-	> "${tool_stdout}" 2> "${tool_stderr}" || fail=${?}
+	> "${tool_stdout}" 2> "${tool_stderr}"
+tool_exit_code=${?}
 
 echo
-if test "${EXPECT_EXIT_CODE}" = "${fail}"; then
-	fail=0
+if test "${TS_EXP_EXIT_CODE}" != "${tool_exit_code}"; then
+	echo "test exit code was ${tool_exit_code} (expected: ${TS_EXP_EXIT_CODE})"
+	fail=1
+	echo
 fi
 
 if test -r "${stdout}"; then
