@@ -2,14 +2,12 @@
 
 TOOL=atem
 INFILE="msdir_equis_a"
-OUTFILE="testload.csv"
 CMDLINE="--fdat 96 -F, --format='all' '${INFILE}' |head -n1"
 
 ## STDIN
 
 ## STDOUT
-stdout=$(mktemp "/tmp/tmp.XXXXXXXXXX")
-cat > "${stdout}" <<EOF
+cat > "${TS_EXP_STDOUT}" <<EOF
 symbol,long_name,barsize,from_date,to_date,file_number,file_name,field_bitset,\
 record_number,kind,date,time,open,high,low,close,volume,openint
 EOF

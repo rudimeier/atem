@@ -2,7 +2,6 @@
 
 TOOL=atem
 INFILE="msdir_equis_a"
-OUTFILE="testload.csv"
 CMDLINE="'${INFILE}' > '${OUTFILE}'"
 
 ## STDIN

@@ -2,7 +2,6 @@
 
 TOOL=atem
 INFILE="msdir_equis_a"
-OUTFILE="testload.csv"
 CMDLINE="--fdat 1 -F, --format='all,-time,-openint,-barsize,-from_date,-to_date,
 	-file_number,-file_name,-field_bitset,-record_number,-kind' '${INFILE}'
 	|head -n 1"
@@ -10,8 +9,7 @@ CMDLINE="--fdat 1 -F, --format='all,-time,-openint,-barsize,-from_date,-to_date,
 ## STDIN
 
 ## STDOUT
-stdout=$(mktemp "/tmp/tmp.XXXXXXXXXX")
-cat > "${stdout}" <<EOF
+cat > "${TS_EXP_STDOUT}" <<EOF
 symbol,long_name,date,open,high,low,close,volume
 EOF
 

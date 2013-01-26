@@ -2,19 +2,18 @@
 
 TOOL=atem
 INFILE="msdir_equis_a"
-OUTFILE="testload.csv"
-# TODO fix test suite to respect the exit code _and_ stderr
-CMDLINE="--fdat 1 -F, --format='+long_name,bad_column' '${INFILE}' 2>&1
-	| head -n 1 1>&2"
+CMDLINE="--fdat 1 -F, --format='+long_name,bad_column' '${INFILE}'"
+
+TS_DIFF_OPTS="-I \"^Try \\\`.* --help' for more information.\$\""
+TS_EXP_EXIT_CODE="2"
 
 ## STDIN
 
 ## STDOUT
-stdout=$(mktemp "/tmp/tmp.XXXXXXXXXX")
+touch "${TS_EXP_STDOUT}"
 
 ## STDERR
-stderr=$(mktemp "/tmp/tmp.XXXXXXXXXX")
-cat > "${stderr}" <<EOF
+cat > "${TS_EXP_STDERR}" <<EOF
 error: invalid format token: bad_column
 EOF
 
