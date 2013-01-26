@@ -71,6 +71,26 @@ xrealpath()
 	) 2>/dev/null
 }
 
+ts_sha1sum()
+{
+	local file="${1}"
+	local tmp
+
+	if ! test -r "${file}"; then
+		echo "ts_sha1sum: could not read file '${file}'" >&2
+		return 1
+	fi
+
+	if tmp="`sha1sum "${file}" 2>/dev/null`"; then
+		echo "${tmp}" | (read sum rest; echo "${sum}")
+	elif tmp="`sha1 -n "${file}" 2>/dev/null`"; then
+		echo "${tmp}" | (read sum rest; echo "${sum}")
+	else
+		echo "ts_sha1sum: unable to calculate sha1sums" >&2
+		return 1
+	fi
+	return 0
+}
 
 tsp_create_env()
 {
@@ -177,19 +197,18 @@ elif test -s "${tool_stderr}"; then
 fi
 
 ## check if we need to hash stuff
-if test -r "${OUTFILE}"; then
-	if test -n "${OUTFILE_SHA1}"; then
-		sha1sum "${OUTFILE}" |
-		while read sum rest; do
-			if test "${sum}" != "${OUTFILE_SHA1}"; then
-				cat <<EOF >&2
+if test -n "${OUTFILE_SHA1}"; then
+	if sum="`ts_sha1sum "${OUTFILE}"`"; then
+		if test "${sum}" != "${OUTFILE_SHA1}"; then
+			cat <<EOF >&2
 outfile (${OUTFILE}) hashes do not match:
 SHOULD BE: ${OUTFILE_SHA1}
 ACTUAL:    ${sum}
 EOF
-				exit 1
-			fi
-		done || fail=1
+		fail=1
+		fi
+	else
+		fail=1
 	fi
 fi
 
