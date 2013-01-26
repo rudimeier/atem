@@ -2,7 +2,8 @@
 
 TOOL=atem
 INFILE="msdir_equis_a"
-tmp_stamp="$(date -r "${INFILE}/F1011.MWD" +"%F %T")"
+# this is the mtime of msdir_equis_a/F1011.MWD"
+tmp_stamp="`date -d "2011-02-09 09:45:58 UTC" "+%F %T"`"
 CMDLINE="--symbols --skip-header --format=00100000
 	--exclude-older-than='${tmp_stamp}' '${INFILE}' > '${OUTFILE}'"
 
