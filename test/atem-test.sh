@@ -85,6 +85,8 @@ ts_sha1sum()
 		echo "${tmp}" | (read sum rest; echo "${sum}")
 	elif tmp="`sha1 -n "${file}" 2>/dev/null`"; then
 		echo "${tmp}" | (read sum rest; echo "${sum}")
+	elif tmp="`sha1 -q "${file}" 2>/dev/null`"; then
+		echo "${tmp}"
 	else
 		echo "ts_sha1sum: unable to calculate sha1sums" >&2
 		return 1
