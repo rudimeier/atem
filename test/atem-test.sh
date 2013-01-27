@@ -50,9 +50,10 @@ for arg; do
 	esac
 done
 
-
-## now in ${1} should be the test file
-testfile="${1}"
+if test -z "${testfile}"; then
+	echo "`basename ${0}`: no test file given" >&2
+	exit 1
+fi
 
 ## some helper funs
 xrealpath()
