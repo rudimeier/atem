@@ -48,6 +48,7 @@ msdir_%: msdir_%.tar.xz
 
 clean-local:
 	-rm -rf $(ms_dirs)
+	-rm -rf *.tmpd
 
 # don't run the tests parallel
 .NOTPARALLEL:
