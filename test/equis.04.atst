@@ -3,11 +3,11 @@
 TOOL=atem
 INFILE="msdir_equis_a"
 CMDLINE="--symbols --field-separator=';' --skip-header --format='03777'
-	'${INFILE}' -o '${OUTFILE}'"
+	'${INFILE}' -o '${TS_OUTFILE}'"
 
 ## STDIN
 
 ## STDOUT
 
 ## outfile sum
-OUTFILE_SHA1="1fe6de34b40adc3c0e580e3c837485a1cd164934"
+TS_OUTFILE_SHA1="1fe6de34b40adc3c0e580e3c837485a1cd164934"

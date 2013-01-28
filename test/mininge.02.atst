@@ -2,11 +2,11 @@
 
 TOOL=atem
 INFILE="msdir_mininge"
-CMDLINE="--symbols '${INFILE}' > '${OUTFILE}'"
+CMDLINE="--symbols '${INFILE}' > '${TS_OUTFILE}'"
 
 ## STDIN
 
 ## STDOUT
 
 ## outfile sum
-OUTFILE_SHA1="b109337a5408bf7ddd3d2df858fc031e43c2d147"
+TS_OUTFILE_SHA1="b109337a5408bf7ddd3d2df858fc031e43c2d147"

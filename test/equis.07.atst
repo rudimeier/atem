@@ -6,11 +6,11 @@ INFILE="msdir_equis_a"
 tmp_stamp="`date -d "2011-02-09 09:45:58 UTC" "+%F %T" || \
             date -r "1297244758" "+%F %T"`"
 CMDLINE="--symbols --skip-header --format=00100000
-	--exclude-older-than='-${tmp_stamp}' '${INFILE}' > '${OUTFILE}'"
+	--exclude-older-than='-${tmp_stamp}' '${INFILE}' > '${TS_OUTFILE}'"
 
 ## STDIN
 
 ## STDOUT
 
 ## outfile sum
-OUTFILE_SHA1="cb552560d435f17b43789cfd2e369bc2fa758521"
+TS_OUTFILE_SHA1="cb552560d435f17b43789cfd2e369bc2fa758521"
