@@ -97,7 +97,9 @@ ts_sha1sum()
 
 tsp_create_env()
 {
-	TS_TMPDIR="`mktemp -d "test_suite.XXXX"`" || return 1
+	TS_TMPDIR="`basename "${testfile}"`.tmpd"
+	rm -rf "${TS_TMPDIR}" || return 1
+	mkdir "${TS_TMPDIR}" || return 1
 
 	TS_STDIN="${TS_TMPDIR}/stdin"
 	TS_EXP_STDOUT="${TS_TMPDIR}/exp_stdout"
@@ -112,7 +114,9 @@ tsp_create_env()
 
 myexit()
 {
-	rm -rf "${TS_TMPDIR}"
+	if test "${1}" = "0"; then
+		rm -rf "${TS_TMPDIR}"
+	fi
 	exit ${1:-1}
 }
 
