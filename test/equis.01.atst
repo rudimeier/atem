@@ -2,11 +2,11 @@
 
 TOOL=atem
 INFILE="msdir_equis_a"
-CMDLINE="'${INFILE}' > '${OUTFILE}'"
+CMDLINE="'${INFILE}' > '${TS_OUTFILE}'"
 
 ## STDIN
 
 ## STDOUT
 
 ## outfile sum
-OUTFILE_SHA1="4d40a1e1c00738934aefe464880eedbd3b3434f9"
+TS_OUTFILE_SHA1="4d40a1e1c00738934aefe464880eedbd3b3434f9"

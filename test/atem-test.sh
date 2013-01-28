@@ -50,9 +50,10 @@ for arg; do
 	esac
 done
 
-
-## now in ${1} should be the test file
-testfile="${1}"
+if test -z "${testfile}"; then
+	echo "`basename ${0}`: no test file given" >&2
+	exit 1
+fi
 
 ## some helper funs
 xrealpath()
@@ -85,6 +86,8 @@ ts_sha1sum()
 		echo "${tmp}" | (read sum rest; echo "${sum}")
 	elif tmp="`sha1 -n "${file}" 2>/dev/null`"; then
 		echo "${tmp}" | (read sum rest; echo "${sum}")
+	elif tmp="`sha1 -q "${file}" 2>/dev/null`"; then
+		echo "${tmp}"
 	else
 		echo "ts_sha1sum: unable to calculate sha1sums" >&2
 		return 1
@@ -94,12 +97,14 @@ ts_sha1sum()
 
 tsp_create_env()
 {
-	TS_TMPDIR="`mktemp -d "test_suite.XXXX"`" || return 1
+	TS_TMPDIR="`basename "${testfile}"`.tmpd"
+	rm -rf "${TS_TMPDIR}" || return 1
+	mkdir "${TS_TMPDIR}" || return 1
 
 	TS_STDIN="${TS_TMPDIR}/stdin"
 	TS_EXP_STDOUT="${TS_TMPDIR}/exp_stdout"
 	TS_EXP_STDERR="${TS_TMPDIR}/exp_stderr"
-	OUTFILE="${TS_TMPDIR}/tool_outfile"
+	TS_OUTFILE="${TS_TMPDIR}/tool_outfile"
 	TS_EXP_EXIT_CODE="0"
 	TS_DIFF_OPTS=""
 
@@ -109,7 +114,9 @@ tsp_create_env()
 
 myexit()
 {
-	rm -rf "${TS_TMPDIR}"
+	if test "${1}" = "0"; then
+		rm -rf "${TS_TMPDIR}"
+	fi
 	exit ${1:-1}
 }
 
@@ -197,12 +204,12 @@ elif test -s "${tool_stderr}"; then
 fi
 
 ## check if we need to hash stuff
-if test -n "${OUTFILE_SHA1}"; then
-	if sum="`ts_sha1sum "${OUTFILE}"`"; then
-		if test "${sum}" != "${OUTFILE_SHA1}"; then
+if test -n "${TS_OUTFILE_SHA1}"; then
+	if sum="`ts_sha1sum "${TS_OUTFILE}"`"; then
+		if test "${sum}" != "${TS_OUTFILE_SHA1}"; then
 			cat <<EOF >&2
-outfile (${OUTFILE}) hashes do not match:
-SHOULD BE: ${OUTFILE_SHA1}
+outfile (${TS_OUTFILE}) hashes do not match:
+SHOULD BE: ${TS_OUTFILE_SHA1}
 ACTUAL:    ${sum}
 EOF
 		fail=1
