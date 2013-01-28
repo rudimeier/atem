@@ -19,6 +19,7 @@ LOG_COMPILER = echo
 # ms_dirs must have prefix msdir_
 ms_dirs =
 ms_dirs += msdir_equis_a
+ms_dirs += msdir_equis_b
 ms_dirs += msdir_mininge
 
 TESTS += equis.01.atst
