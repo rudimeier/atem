@@ -11,6 +11,7 @@ Maintenance release.
   - fix, symbol column was not printed if symbol is empty
   - fix, don't print last separator if no data columns given
   - fix, no more segfault if --format string contains spaces only
+  - refactor test suite (reliability, portability)
 
 
 
