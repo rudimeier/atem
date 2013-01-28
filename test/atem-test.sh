@@ -104,7 +104,7 @@ tsp_create_env()
 	TS_STDIN="${TS_TMPDIR}/stdin"
 	TS_EXP_STDOUT="${TS_TMPDIR}/exp_stdout"
 	TS_EXP_STDERR="${TS_TMPDIR}/exp_stderr"
-	OUTFILE="${TS_TMPDIR}/tool_outfile"
+	TS_OUTFILE="${TS_TMPDIR}/tool_outfile"
 	TS_EXP_EXIT_CODE="0"
 	TS_DIFF_OPTS=""
 
@@ -204,12 +204,12 @@ elif test -s "${tool_stderr}"; then
 fi
 
 ## check if we need to hash stuff
-if test -n "${OUTFILE_SHA1}"; then
-	if sum="`ts_sha1sum "${OUTFILE}"`"; then
-		if test "${sum}" != "${OUTFILE_SHA1}"; then
+if test -n "${TS_OUTFILE_SHA1}"; then
+	if sum="`ts_sha1sum "${TS_OUTFILE}"`"; then
+		if test "${sum}" != "${TS_OUTFILE_SHA1}"; then
 			cat <<EOF >&2
-outfile (${OUTFILE}) hashes do not match:
-SHOULD BE: ${OUTFILE_SHA1}
+outfile (${TS_OUTFILE}) hashes do not match:
+SHOULD BE: ${TS_OUTFILE_SHA1}
 ACTUAL:    ${sum}
 EOF
 		fail=1
