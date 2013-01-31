@@ -1,0 +1,23 @@
+## -*- shell-script -*-
+
+TOOL=atem
+
+cp -r msdir_equis_b "${TS_TMPDIR}"
+INFILE="${TS_TMPDIR}/msdir_equis_b"
+rm "${INFILE}/EMASTER"
+
+CMDLINE="-s -F, '${INFILE}'"
+
+## STDOUT
+cat > "${TS_EXP_STDOUT}" <<EOF
+symbol,long_name,barsize,from_date,to_date,file_number,file_name,field_bitset,record_number,kind
+.DJX,1/100 Dow Jones,D,1997-09-23,2011-12-27,1,F1.DAT,127,1,M
+.FCHI,CAC 40 INDICE,D,1988-08-19,2011-12-27,2,F2.DAT,127,2,M
+AZM.L,AZM.L,D,1996-12-31,2009-07-24,256,F256.MWD,127,1,X
+.N225,NIKKEI 225 INDEX,D,1982-01-04,2011-12-27,2853,F2853.MWD,127,2,X
+EOF
+
+## STDERR
+cat > "${TS_EXP_STDERR}" <<EOF
+warning: EMaster file not found
+EOF

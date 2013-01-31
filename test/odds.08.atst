@@ -1,0 +1,27 @@
+## -*- shell-script -*-
+
+TOOL=atem
+
+cp -r msdir_equis_b "${TS_TMPDIR}"
+INFILE="${TS_TMPDIR}/msdir_equis_b"
+echo "more_useless_data" >> "${INFILE}/MASTER"
+echo "more_useless_data" >> "${INFILE}/EMASTER"
+echo "more_useless_data" >> "${INFILE}/XMASTER"
+echo "more_useless_data" >> "${INFILE}/F1.DAT"
+
+CMDLINE="-F, '${INFILE}'"
+
+## STDOUT
+cat > "${TS_EXP_STDOUT}" <<EOF
+symbol,date,time,open,high,low,close,volume,openint
+.DJX,1997-09-23,00:00:00,79.97000,80.04000,79.29000,79.70000,0,0
+.FCHI,1988-08-19,00:00:00,1308.62000,1308.62000,1308.62000,1308.62000,0,0
+.FCHI,1988-08-22,00:00:00,1308.13000,1308.13000,1308.13000,1308.13000,0,0
+AZM.L,1996-12-31,00:00:00,28.58180,28.58180,28.58180,28.58180,0,0
+.N225,1982-01-04,00:00:00,7718.83984,7718.83984,7718.83984,7718.83984,0,0
+.N225,1982-01-05,00:00:00,7719.33984,7719.33984,7719.33984,7719.33984,0,0
+EOF
+
+## STDERR
+cat > "${TS_EXP_STDERR}" <<EOF
+EOF

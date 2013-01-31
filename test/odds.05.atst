@@ -1,0 +1,22 @@
+## -*- shell-script -*-
+
+TOOL=atem
+
+cp -r msdir_equis_b "${TS_TMPDIR}"
+INFILE="${TS_TMPDIR}/msdir_equis_b"
+rm "${INFILE}/XMASTER"
+
+CMDLINE="-F, -f symbol,date '${INFILE}'"
+
+## STDOUT
+cat > "${TS_EXP_STDOUT}" <<EOF
+symbol,date
+.DJX,1997-09-23
+.FCHI,1988-08-19
+.FCHI,1988-08-22
+EOF
+
+## STDERR
+cat > "${TS_EXP_STDERR}" <<EOF
+warning: XMaster file not found
+EOF
