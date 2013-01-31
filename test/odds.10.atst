@@ -1,0 +1,18 @@
+## -*- shell-script -*-
+
+TOOL=atem
+
+cp -r msdir_equis_b "${TS_TMPDIR}"
+INFILE="${TS_TMPDIR}/msdir_equis_b"
+sed -i 's/\.DJX /     /1' "${INFILE}/MASTER"
+
+CMDLINE="-F, -f symbol,date --fdat 1 '${INFILE}'"
+
+## STDOUT
+cat > "${TS_EXP_STDOUT}" <<EOF
+symbol,date
+,1997-09-23
+EOF
+
+## STDERR
+touch "${TS_EXP_STDERR}"

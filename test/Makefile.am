@@ -19,7 +19,7 @@ LOG_COMPILER = echo
 # ms_dirs must have prefix msdir_
 ms_dirs =
 ms_dirs += msdir_equis_a
-ms_dirs += msdir_mininge
+ms_dirs += msdir_equis_b
 
 TESTS += equis.01.atst
 TESTS += equis.02.atst
@@ -39,9 +39,16 @@ TESTS += format.05.atst
 TESTS += format.06.atst
 TESTS += format.07.atst
 TESTS += format.08.atst
-TESTS += format.09.atst
-TESTS += mininge.01.atst
-TESTS += mininge.02.atst
+TESTS += odds.01.atst
+TESTS += odds.02.atst
+TESTS += odds.03.atst
+TESTS += odds.04.atst
+TESTS += odds.05.atst
+TESTS += odds.06.atst
+TESTS += odds.07.atst
+TESTS += odds.08.atst
+TESTS += odds.09.atst
+TESTS += odds.10.atst
 
 msdir_%: msdir_%.tar.xz
 	xz -dc $< | $(am__untar) && touch $@

@@ -1,0 +1,25 @@
+## -*- shell-script -*-
+
+TOOL=atem
+
+cp -r msdir_equis_b "${TS_TMPDIR}"
+INFILE="${TS_TMPDIR}/msdir_equis_b"
+rm "${INFILE}/MASTER"
+
+CMDLINE="-F, -f symbol,date '${INFILE}'"
+
+## STDOUT
+cat > "${TS_EXP_STDOUT}" <<EOF
+symbol,date
+.DJX,1997-09-23
+.FCHI,1988-08-19
+.FCHI,1988-08-22
+AZM.L,1996-12-31
+.N225,1982-01-04
+.N225,1982-01-05
+EOF
+
+## STDERR
+cat > "${TS_EXP_STDERR}" <<EOF
+warning: Master file not found
+EOF
