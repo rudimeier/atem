@@ -50,8 +50,11 @@ TESTS += odds.08.atst
 TESTS += odds.09.atst
 TESTS += odds.10.atst
 
-msdir_%: msdir_%.tar.xz
-	xz -dc $< | $(am__untar) && touch $@
+msdir_equis_a: msdir_equis_a.tar.xz
+	xz -dc $? | $(am__untar) && touch $@
+
+msdir_equis_b: msdir_equis_b.tar.xz
+	xz -dc $? | $(am__untar) && touch $@
 
 clean-local:
 	-rm -rf $(ms_dirs)
