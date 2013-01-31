@@ -574,7 +574,9 @@ bool Metastock::readMasters()
 			return false;
 		}
 	}else {
-		printWarn("EMaster file not found");
+		/* warning disabled because it's confusing for most users,
+		   could be enabled again if we add a verbose mode */
+		// printWarn("EMaster file not found");
 	}
 	
 	if( x_buf->hasName() ) {

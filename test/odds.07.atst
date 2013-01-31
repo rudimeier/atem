@@ -18,6 +18,4 @@ AZM.L,AZM.L,D,1996-12-31,2009-07-24,256,F256.MWD,127,1,X
 EOF
 
 ## STDERR
-cat > "${TS_EXP_STDERR}" <<EOF
-warning: EMaster file not found
-EOF
+touch "${TS_EXP_STDERR}"
