@@ -5,6 +5,7 @@ compiler:
 
 before_script:
   - sudo apt-get install -qq gengetopt
+  - sudo apt-get install -qq help2man
 
 script: autoreconf -vfi && ./configure && make && make check
 
