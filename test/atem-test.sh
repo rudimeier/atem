@@ -32,7 +32,7 @@ for arg; do
 		shift 2
 		;;
 	"--husk")
-		HUSK="${2}"
+		husk="${2}"
 		shift 2
 		;;
 	--)
@@ -173,7 +173,7 @@ fi
 stdout="${TS_EXP_STDOUT}"
 stderr="${TS_EXP_STDERR}"
 
-eval_echo "${HUSK}" "${TOOL}" "${CMDLINE}" \
+eval_echo "${husk}" "${TOOL}" "${CMDLINE}" \
 	< "${stdin:-/dev/null}" \
 	3>&2 \
 	> "${tool_stdout}" 2> "${tool_stderr}"
