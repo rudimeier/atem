@@ -14,7 +14,6 @@ TESTS =
 TEST_EXTENSIONS = .atst
 ATST_LOG_COMPILER = $(srcdir)/atem-test.sh
 AM_ATST_LOG_FLAGS = --builddir $(top_builddir)/src
-LOG_COMPILER = echo
 
 # ms_dirs must have prefix msdir_
 ms_dirs =
