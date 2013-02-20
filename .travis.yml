@@ -2,19 +2,46 @@ language: cpp
 
 compiler:
   - gcc
+  - clang
+
+env:
+  - CONFOPTS=""
+  - CONFOPTS="--disable-fast-printing"
+
+matrix:
+ include:
+   - compiler: i586-mingw32msvc-gcc
+     env: BUILD_MINGW="yes"
+          CONFOPTS="--host=i586-mingw32msvc"
+   - compiler: i586-mingw32msvc-gcc
+     env: BUILD_MINGW="yes"
+          CONFOPTS="--host=i586-mingw32msvc --disable-fast-printing"
+
+before_install:
+  - sudo apt-get -qq update
+
+install:
+  - sudo apt-get -qq install gengetopt
+  - sudo apt-get -qq install help2man
+  - if test "${BUILD_MINGW}" = "yes"; then sudo apt-get -qq install wine; fi
 
 before_script:
-  - sudo apt-get install -qq gengetopt
-  - sudo apt-get install -qq help2man
+  - autoreconf -vfi
 
-script: autoreconf -vfi && ./configure && make && make check
+script:
+  - if test "${BUILD_MINGW}" = "yes"; then
+      unset CC; unset CXX;
+      echo -e '#!/bin/bash\nwine $0.exe "$@"' > src/atem;
+      chmod ugo+x src/atem;
+    fi
+  - ./configure ${CONFOPTS}
+    && make
+    && (make check || (cat test/test-suite.log && false))
+    && if test "${BUILD_MINGW}" != "yes"; then make distcheck; fi
 
 ## whitelist
 branches:
   only:
     - master
     - next
-
-notifications:
-  email:
-    - sweet_f_a@gmx.de
+    - tmp
