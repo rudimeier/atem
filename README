@@ -8,7 +8,12 @@ The most useful tool so far was ms2asc by Mohammed Illyas Mansoor but there are
 several bugs and issues which can't be fixed because Mohammed seems to be
 unreachable and unfortunately he'd never released the source code.
 
-Check out the latest version at https://github.com/rudimeier/atem
+The project homepage (bugtracker, latest git repo) is hosted on github
+ https://github.com/rudimeier/atem
+Released source tarballs and static binaries download here
+ https://bitbucket.org/rudimeier/atem/downloads
+Binary rpms for various Linux distros here
+ http://software.opensuse.org/download.html?project=home:rudi_m&package=atem
 
 
 
