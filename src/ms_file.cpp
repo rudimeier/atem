@@ -897,7 +897,7 @@ void XMasterFile::printRecord( const char *record ) const
 		readChar( record, 62 ), // time frame 'D'
 		readUnsignedChar( record, 70 ), // fields bitset
 		read_int32( record, 80 ), // some date ?
-// 		readInt( record, 84 ), // stupid date? forst 3 bytes equal 
+// 		readInt( record, 84 ), // stupid date? forst 3 bytes equal
 		read_int32( record, 104 ), // some date ?
 		read_int32( record, 108 ), // looks like first date ?
 		read_int32( record, 116 ), // looks like last date ?

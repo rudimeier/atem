@@ -113,7 +113,7 @@ int ftoa( char *outbuf, float f )
 	} else {
 		p += itoa_uint64(p, int_part);
 	}
- 
+	
 	if (frac_part != 0) {
 		*p++ = '.';
 		
@@ -130,7 +130,7 @@ int ftoa( char *outbuf, float f )
 #endif
 		for (char m = 0; m < max; m++) {
 			/* frac_part *= 10; */
-			frac_part = (frac_part << 3) + (frac_part << 1); 
+			frac_part = (frac_part << 3) + (frac_part << 1);
 			
 			*p++ = (frac_part >> (24 + safe_shift)) + '0';
 			frac_part &= safe_mask;
