@@ -854,7 +854,8 @@ bool Metastock::dumpData() const
 
 
 
-bool Metastock::dumpData( unsigned short n, unsigned char fields, const char *pfx ) const
+bool Metastock::dumpData( unsigned short n, unsigned char fields,
+	const char *pfx ) const
 {
 	fdat_buf->setName( mr_list[n].file_name );
 

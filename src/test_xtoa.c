@@ -160,7 +160,8 @@ int compare( long start, long end )
 
 		if( len1 != len2 || strncmp(s1, s2, len1 ) ) {
 			s1[len1] = s2[len2] = '\0';
-			fprintf( stderr, "error: _%s_(%d) != _%s_(%d)\n", s1, len1, s2, len2 );
+			fprintf( stderr, "error: _%s_(%d) != _%s_(%d)\n",
+				s1, len1, s2, len2 );
 			return 1;
 		}
 		if( i % 0xfffff == 0) {

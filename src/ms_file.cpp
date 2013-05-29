@@ -435,7 +435,7 @@ int MasterFile::getRecord( master_record *mr, unsigned short rnum ) const
 	mr->record_number = rnum;
 	mr->kind = 'M';
 	mr->file_number = readUnsignedChar( record, 0 );
-	mr->field_bitset= (unsigned char)0xff >> (8 - readUnsignedChar( record, 4 ));
+	mr->field_bitset= (unsigned char)0xff >> (8 - readUnsignedChar( record, 4));
 	assert( count_bits(mr->field_bitset) == readChar( record, 4 ) );
 	mr->barsize= readChar( record, 33 );
 	trim_end( mr->c_symbol, record + 36, 14);
@@ -568,8 +568,8 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	//  #48, 12b: char*, always zero? (error #1036 and error #1037)
 	//  #60,  1b: char, periodicity, must be 'I', 'D', 'W', 'M' (error #1038)
 	//  #61,  1b: char, always zero (error #1039)
-	//  #62,  2b: short, intraday time frame between 0 and 60 minutes (error #1040)
-	// note, we have only times when intraday time == 'I'
+	//  #62,  2b: short, intraday time frame between 0 and 60 minutes (error
+	//            #1040), note we have only times when intraday time == 'I'
 	//  #64,  4b: float(ieee), first date, valid (error #1041)
 	//  #68,  4b: float(ieee), first time, valid (error #1042)
 	//  #72,  4b: float(ieee), last date, valid (error #1043)
@@ -580,7 +580,8 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	//            valid (error #1046)
 	//  #88, 38b: char*, assume always zero but should something about composite
 	//            ticker stuff, see error #1047 - #1054
-	// #126,  4b: int, first date again as integer, equal to #64 or invalid 19000101
+	// #126,  4b: int, first date again as integer, equal to #64 or invalid
+	//            19000101
 	// #130,  9b: char* assume always zero
 	// #139, 52b: char*, long name, when set it should start like short name
 	// #191,  1b: char, last byte zero
@@ -627,8 +628,10 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 		dateL -= 1000000;
 	}
 	assert( date1 >0 && date2>0 );
-	assert( (record[60] != 'I' && time1 == 0 && time2 == 0 && timeA == 0 && timeB == 0)
-		|| ( record[60] == 'I' && time1 > 0 && time2 > 0 && timeA >= 0 && timeB >= 0) );
+	assert((record[60] != 'I'
+	        && time1 == 0 && time2 == 0 && timeA == 0 && timeB == 0)
+	    || (record[60] == 'I'
+	        && time1 > 0 && time2 > 0 && timeA >= 0 && timeB >= 0));
 	assert( (long) date1*1000000+time1 <= (long) date2*1000000+time2 );
 
 	assert( date1 == dateL || dateL == 19000101 );
