@@ -92,7 +92,7 @@ static void check_display_args()
 	} else {
 		return;
 	}
-	
+
 	exit(0);
 }
 
@@ -115,16 +115,16 @@ int main(int argc, char *argv[])
 	_setmode(_fileno(stderr),_O_BINARY);
 	_setmode(_fileno(stdout),_O_BINARY);
 #endif
-	
+
 	atexit( gengetopt_free );
-	
+
 	if( cmdline_parser(argc, argv, &args_info) != 0 ) {
 		ret = 2;
 		goto end;
 	}
-	
+
 	check_display_args();
-	
+
 	if( args_info.inputs_num == 1 ) {
 		ms_dirp = args_info.inputs[0];
 	} else if( args_info.inputs_num > 1 ) {
@@ -148,13 +148,13 @@ static int ms2csv( const char *ms_dirp )
 {
 	Metastock ms;
 	bool dumpdata = true;
-	
+
 	if( args_info.output_given ) {
 		if( ! ms.set_outfile( args_info.output_arg ) ) {
 			goto ms_error;
 		}
 	}
-	
+
 	if( ! ms.setDir( ms_dirp ) ) {
 		goto ms_error;
 	}
@@ -182,19 +182,19 @@ static int ms2csv( const char *ms_dirp )
 			goto ms_error;
 		}
 	}
-	
+
 	if( args_info.date_from_given ) {
 		if( !ms.setPrintDateFrom( args_info.date_from_arg ) ) {
 			goto ms_error;
 		}
 	}
-	
+
 	if( args_info.exclude_older_than_given ) {
 		if( !ms.excludeFiles( args_info.exclude_older_than_arg ) ) {
 			goto ms_error;
 		}
 	}
-	
+
 	if( args_info.dump_master_given ) {
 		dumpdata = false;
 		ms.dumpMaster();
@@ -209,20 +209,20 @@ static int ms2csv( const char *ms_dirp )
 			ms.dumpXMaster();
 		}
 	}
-	
+
 	if( args_info.symbols_given ) {
 		dumpdata = false;
 		if( ! ms.dumpSymbolInfo() ) {
 			goto ms_error;
 		}
 	}
-	
+
 	if( dumpdata ) {
 		if( ! ms.dumpData() ) {
 			goto ms_error;
 		}
 	}
-	
+
 	return 0;
 
 ms_error:

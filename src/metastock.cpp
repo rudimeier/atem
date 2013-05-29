@@ -65,19 +65,19 @@ class FileBuf
 	public:
 		FileBuf();
 		~FileBuf();
-		
+
 		bool hasName() const;
 		const char* constName() const;
 		const char* constBuf() const;
 		int len() const;
-		
+
 		void setName( const char* file_name );
-		
+
 		int readFile( int fildes );
-		
+
 	private:
 		void resize( int size );
-		
+
 		char name[MAX_LEN_MR_FILENAME + 1];
 		char *buf;
 		int buf_len;
@@ -137,7 +137,7 @@ int FileBuf::readFile( int fildes )
 		buf_len += tmp_len;
 		cp += tmp_len;
 	} while( tmp_len > 0 );
-	
+
 	// tmp_len < 0 is an error with errno set
 	return tmp_len;
 }
@@ -189,13 +189,13 @@ Metastock::~Metastock()
 {
 	free( mr_skip_list );
 	free( mr_list );
-	
+
 	delete( fdat_buf );
 	delete( x_buf );
 	delete( e_buf );
 	delete( m_buf );
 	free( ms_dir );
-	
+
 	/* out is either stdout or a real file which was opened in set_outfile() */
 	if( out != stdout && out != NULL ) {
 		fclose( (FILE*)out );
@@ -213,12 +213,12 @@ bool Metastock::findFiles()
 {
 	DIR *dirh;
 	struct dirent *dirp;
-	
+
 	if ((dirh = opendir( ms_dir )) == NULL) {
 		setError( ms_dir, strerror(errno) );
 		return false;
 	}
-	
+
 	for (dirp = readdir(dirh); dirp != NULL; dirp = readdir(dirh)) {
 		if( ( dirp->d_name[0] == 'F' || dirp->d_name[0] == 'f') &&
 			dirp->d_name[1] >= '1' && dirp->d_name[1] <= '9') {
@@ -236,7 +236,7 @@ bool Metastock::findFiles()
 			CHECK_MASTER( x_buf, "XMASTER" );
 		}
 	}
-	
+
 	closedir( dirh );
 	return true;
 }
@@ -257,13 +257,13 @@ bool Metastock::set_outfile( const char *file )
 		setError( file, strerror(errno) );
 		return false;
 	}
-	
+
 	out = fdopen( fd, "wb");
 	if( out == NULL ) {
 		setError( file, strerror(errno) );
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -278,18 +278,18 @@ bool Metastock::setDir( const char* d )
 		ms_dir[dir_len] = '/';
 		ms_dir[dir_len + 1] = '\0';
 	}
-	
+
 	if( !findFiles() ) {
 		return false;
 	}
-	
+
 	if( !readMasters() ){
 		return false;
 	}
 	if( !parseMasters() ) {
 		return false;
 	}
-	
+
 	FDat::set_outfile( out );
 	return true;
 }
@@ -458,7 +458,7 @@ bool Metastock::readFile( FileBuf *file_buf ) const
 	char *file_path = puff;
 	strcpy( file_path, ms_dir );
 	strcpy( file_path + strlen(ms_dir), file_buf->constName() );
-	
+
 #if defined _WIN32
 	int fd = open( file_path, _O_RDONLY | _O_BINARY );
 #else
@@ -472,9 +472,9 @@ bool Metastock::readFile( FileBuf *file_buf ) const
 	if( err < 0 ) {
 		setError( file_path, strerror(errno) );
 	}
-	
+
 	close( fd );
-	
+
 	return (err >= 0);
 }
 
@@ -502,18 +502,18 @@ bool Metastock::parseMasters()
 	int cntM = mf.countRecords();
 	int cntE = emf.countRecords();
 	int cntX = xmf.countRecords();
-	
+
 	if( cntM <= 0 && cntE <= 0 && cntX <= 0 ) {
 		setError( "all *Master files invalid" );
 		return false;
 	}
-	
+
 	DEBUG_MASTER( m_buf, cntM );
 	DEBUG_MASTER( e_buf, cntE );
 	DEBUG_MASTER( x_buf, cntX );
-	
+
 	master_record *mr;
-	
+
 	if( cntM > 0 ) {
 		/* we prefer to use Master because EMaster is often broken */
 		for( int i = 1; i<=cntM; i++ ) {
@@ -537,7 +537,7 @@ bool Metastock::parseMasters()
 			emf.getRecord( mr, i );
 		}
 	} /* else neither Master or EMaster is valid */
-	
+
 	if( cntX > 0 ) {
 		/* XMaster is optional */
 		for( int i = 1; i<=cntX; i++ ) {
@@ -546,7 +546,7 @@ bool Metastock::parseMasters()
 			xmf.getRecord( mr, i );
 		}
 	}
-	
+
 	return true;
 }
 
@@ -560,7 +560,7 @@ bool Metastock::readMasters()
 		setError( "no *Master files found" );
 		return false;
 	}
-	
+
 	if( m_buf->hasName() ) {
 		if( !readFile( m_buf ) ) {
 			return false;
@@ -568,7 +568,7 @@ bool Metastock::readMasters()
 	} else {
 		printWarn("Master file not found");
 	}
-	
+
 	if( e_buf->hasName() ) {
 		if( !readFile( e_buf ) ) {
 			return false;
@@ -578,7 +578,7 @@ bool Metastock::readMasters()
 		   could be enabled again if we add a verbose mode */
 		// printWarn("EMaster file not found");
 	}
-	
+
 	if( x_buf->hasName() ) {
 		if( !readFile( x_buf ) ) {
 			return false;
@@ -586,7 +586,7 @@ bool Metastock::readMasters()
 	} else if( max_dat_num > 255 ) {
 		printWarn("XMaster file not found");
 	}
-	
+
 	return true;
 }
 
@@ -643,7 +643,7 @@ bool Metastock::incudeFile( int f ) const
 	for( int i = 1; i< mr_len; i++ ) {
 			mr_skip_list[i] = true;
 	}
-	
+
 	if( f > 0 && f < mr_len && mr_list[f].record_number != 0 ) {
 		mr_skip_list[f] = false;
 		return true;
@@ -659,23 +659,22 @@ time_t str2time( const char* s)
 	struct tm dt;
 	time_t dt_t;
 	memset( &dt, 0, sizeof(tm) );
-	
+
 	int ret = sscanf( s, "%d-%d-%d %d:%d:%d", &dt.tm_year,
 		&dt.tm_mon, &dt.tm_mday, &dt.tm_hour, &dt.tm_min, &dt.tm_sec );
-	
+
 	if( ret < 0 ) {
 		return -1;
 	} else if( ret != 6  && ret != 3 ) {
 		return -1;
 	}
-	
-	
+
 	dt.tm_year -= 1900;
 	dt.tm_mon -= 1;
 	dt.tm_isdst = -1;
-	
+
 	dt_t = mktime( &dt );
-	
+
 	return dt_t;
 }
 
@@ -684,17 +683,17 @@ int str2date( const char* s)
 {
 	int y, m, d;
 	y = m = d = 0;
-	
+
 	int ret = sscanf( s, "%d-%d-%d", &y, &m, &d );
-	
+
 	if( ret != 3 ) {
 		return -1;
 	}
-	
+
 	if( !(y>=0 && y<=9999) ||  !(m>=1 && m<=12 ) || !(d>=1 && d<=31) ) {
 		return -1;
 	}
-	
+
 	return 10000 * y + 100 * m + d;
 }
 
@@ -724,18 +723,18 @@ bool Metastock::excludeFiles( const char *stamp ) const
 		setError("parsing date time");
 		return false;
 	}
-	
+
 	for( int i = 1; i<mr_len; i++ ) {
 		if( *mr_list[i].file_name == '\0' || mr_skip_list[i] ) {
 			continue;
 		}
 		assert( mr_list[i].file_number == i );
-		
+
 		char puff[strlen(ms_dir) + strlen( mr_list[i].file_name) + 1];
 		char *file_path = puff;
 		strcpy( file_path, ms_dir );
 		strcpy( file_path + strlen(ms_dir), mr_list[i].file_name );
-		
+
 		struct stat s;
 		int tmp = stat( file_path, &s );
 		if( tmp < 0 ) {
@@ -772,7 +771,7 @@ bool Metastock::dumpSymbolInfo() const
 		buf[len] = '\0';
 		fputs( buf, (FILE*)out );
 	}
-	
+
 	for( int i = 1; i<mr_len; i++ ) {
 		if( mr_list[i].record_number != 0 && !mr_skip_list[i] ) {
 			assert( mr_list[i].file_number == i );
@@ -793,12 +792,12 @@ void Metastock::resize_mr_list( int new_len )
 		new_len * sizeof(master_record) );
 	mr_skip_list = (bool*) realloc( mr_skip_list,
 		new_len * sizeof(bool) );
-	
+
 	memset( mr_list + mr_len, '\0',
 		(new_len - mr_len) * sizeof(master_record) );
 	memset( mr_skip_list + mr_len, '\0',
 		(new_len - mr_len) * sizeof(bool) );
-	
+
 	mr_len = new_len;
 }
 
@@ -835,7 +834,7 @@ bool Metastock::dumpData() const
 		}
 		FDat::print_header( buf );
 	}
-	
+
 	for( int i = 1; i<mr_len; i++ ) {
 		if( mr_list[i].record_number != 0 && !mr_skip_list[i] ) {
 			assert( mr_list[i].file_number == i );
@@ -855,23 +854,24 @@ bool Metastock::dumpData() const
 
 
 
-bool Metastock::dumpData( unsigned short n, unsigned char fields, const char *pfx ) const
+bool Metastock::dumpData( unsigned short n, unsigned char fields,
+	const char *pfx ) const
 {
 	fdat_buf->setName( mr_list[n].file_name );
-	
+
 	if( !fdat_buf->hasName() ) {
 		setError( "no fdat found" );
 		return false;
 	}
-	
+
 	if( ! readFile( fdat_buf ) ) {
 		return false;
 	}
-	
+
 	FDat datfile( fdat_buf->constBuf(), fdat_buf->len(), fields );
 // 	fprintf( stderr, "#%d: %d x %d bytes\n",
 // 		n, datfile.countRecords(), count_bits(fields) * 4 );
-	
+
 	if( datfile.countRecords() < 0 ) {
 		setError( "fdat file unusable", fdat_buf->constName() );
 		return false;
@@ -881,7 +881,7 @@ bool Metastock::dumpData( unsigned short n, unsigned char fields, const char *pf
 		setError( "writing interrupted" );
 		return false;
 	}
-	
+
 	return true;
 }
 

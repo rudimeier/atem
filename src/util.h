@@ -52,8 +52,8 @@ inline unsigned char count_bits( unsigned int fields )
 
 /**
  * copy src to dst string without trailing spaces,
- * src does not need to be zero terminated, dst will be zero terminated so size of
- * dst must be len + 1
+ * src does not need to be zero terminated, dst will be zero terminated so size
+ * of dst must be len + 1
  */
 inline int trim_end( char *dst, const char *src, int len )
 {

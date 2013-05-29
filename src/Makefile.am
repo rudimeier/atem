@@ -25,7 +25,7 @@ BUILT_SOURCES += atem_ggo.c atem_ggo.h
 atem_CPPFLAGS = $(AM_CPPFLAGS)
 atem_LDFLAGS = $(AM_LDFLAGS)
 
-# Build all executables at distribution time to generate the man pages.
+## Build all executables at distribution time to generate the man pages.
 dist-hook: $(bin_PROGRAMS)
 
 CLEANFILES =
@@ -35,9 +35,6 @@ CLEANFILES += *.i
 
 %_ggo.c %_ggo.h: %.ggo
 	gengetopt --no-help --no-version -i $< -F $*_ggo
-
-# 
-# Help the developers get nice post-processed source files
 
 ## Create preprocessor output (debugging purposes only)
 .c.i:
@@ -50,4 +47,3 @@ CLEANFILES += *.i
 	$(COMPILE) -S -c $(cflags) $<
 .cpp.s:
 	$(CXXCOMPILE) -S -c $(cflags) $<
-
