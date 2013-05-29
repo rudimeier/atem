@@ -92,7 +92,6 @@ class Metastock
 		static unsigned short prnt_data_mr_fields;
 		int print_date_from;
 		
-		
 		char *ms_dir;
 		FileBuf *m_buf;
 		FileBuf *e_buf;

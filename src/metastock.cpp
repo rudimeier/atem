@@ -669,7 +669,6 @@ time_t str2time( const char* s)
 		return -1;
 	}
 	
-	
 	dt.tm_year -= 1900;
 	dt.tm_mon -= 1;
 	dt.tm_isdst = -1;

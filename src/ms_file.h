@@ -148,7 +148,6 @@ class MasterFile
 		void printHeader() const;
 		void printRecord( const char *record ) const;
 		
-		
 		static const int record_length = 53;
 		
 		const char * const buf;
@@ -181,7 +180,6 @@ class EMasterFile
 		void printHeader() const;
 		void printRecord( const char *record ) const;
 		
-		
 		static const int record_length = 192;
 		
 		const char * const buf;
@@ -212,7 +210,6 @@ class XMasterFile
 		
 		void printHeader() const;
 		void printRecord( const char *record ) const;
-		
 		
 		static const int record_length = 150;
 		

@@ -157,6 +157,3 @@ int itotimestr( char *s, unsigned int n )
 #endif
 	return 8;
 }
-
-
-

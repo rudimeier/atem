@@ -395,7 +395,6 @@ bool MasterFile::checkRecord( unsigned char r ) const
 	assert( record[51] == ' ' || record[51] == '*' || record[51] == '\0' );
 	assert( record[52] == '\0' );
 	
-	
 	return true;
 }
 
@@ -618,7 +617,6 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 		assert( record[i] == '\0' );
 	}
 	int dateL = read_int32( record, 126 );
-	
 	
 	if( date1 > date2 ) {
 		//HACK premium data have year like 128 (+1900) but should be 28 (+1900)
@@ -1178,6 +1176,3 @@ int FDat::countRecords() const
 
 	return cnt;
 }
-
-
-

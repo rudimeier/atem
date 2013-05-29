@@ -71,7 +71,6 @@ int ftoa( char *outbuf, float f )
 	frac_part = 0;
 	int_part = 0;
 	
-	
 	if( x.L < 0  ) {
 		*p++ = '-';
 	}
@@ -252,7 +251,3 @@ int ftoa_prec_f0( char *outbuf, float f )
 	*p = 0;
 	return p - outbuf;
 }
-
-
-
-

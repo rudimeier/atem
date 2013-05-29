@@ -58,4 +58,3 @@ msdir_equis_b: msdir_equis_b.tar.xz
 clean-local:
 	-rm -rf $(ms_dirs)
 	-rm -rf *.tmpd
-

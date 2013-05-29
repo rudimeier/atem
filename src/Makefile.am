@@ -47,4 +47,3 @@ CLEANFILES += *.i
 	$(COMPILE) -S -c $(cflags) $<
 .cpp.s:
 	$(CXXCOMPILE) -S -c $(cflags) $<
-
