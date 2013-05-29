@@ -118,7 +118,7 @@ int mr_record_to_string( char *dest, const struct master_record* mr,
 	unsigned short prnt_master_fields, char sep )
 {
 	char * cp = dest;
-	
+
 	PRINT_FIELD( strcpy_len, M_SYM, mr->c_symbol );
 	PRINT_FIELD( strcpy_len, M_NAM, mr->c_long_name );
 	PRINT_FIELD( cpychar, M_PER, mr->barsize );
@@ -129,7 +129,7 @@ int mr_record_to_string( char *dest, const struct master_record* mr,
 	PRINT_FIELD( itoa, M_FLD, mr->field_bitset );
 	PRINT_FIELD( itoa, M_RNO, mr->record_number );
 	PRINT_FIELD( cpychar, M_KND, mr->kind );
-	
+
 	// remove last separator if exists
 	if( cp != dest ) {
 		*--cp = '\0';
@@ -145,7 +145,7 @@ int mr_header_to_string( char *dest,
 	unsigned short prnt_master_fields, char sep )
 {
 	char * cp = dest;
-	
+
 	PRINT_FIELD( strcpy_len, M_SYM, STR_M_SYM );
 	PRINT_FIELD( strcpy_len, M_NAM, STR_M_NAM );
 	PRINT_FIELD( strcpy_len, M_PER, STR_M_PER );
@@ -156,7 +156,7 @@ int mr_header_to_string( char *dest,
 	PRINT_FIELD( strcpy_len, M_FLD, STR_M_FLD );
 	PRINT_FIELD( strcpy_len, M_RNO, STR_M_RNO );
 	PRINT_FIELD( strcpy_len, M_KND, STR_M_KND );
-	
+
 	// remove last separator if exists
 	if( cp != dest ) {
 		*--cp = '\0';
@@ -231,13 +231,13 @@ readFloat(const char *c, int offset)
 		uint32_t L;
 		float F;
 	} x;
-	
+
 	x.L = read_uint32(c, offset);
-	
+
 	/* regardless of endianness, that's how these floats look like
 	  MBF:  eeeeeeeeSmmmmmmmmmmmmmmmmmmmmmmm
 	  IEE:  Seeeeeeeemmmmmmmmmmmmmmmmmmmmmmm
-	
+
 	  "MBF is bias 128 and IEEE is bias 127. ALSO, MBF places the decimal
 	  point before the assumed bit, while IEEE places the decimal point
 	  after the assumed bit"
@@ -247,9 +247,9 @@ readFloat(const char *c, int offset)
 		/* "any msbin w/ exponent of zero = zero" */
 		return 0.0;
 	}
-	
+
 	uint32_t ieee_s = (0x00800000 & x.L) << 8;
-	
+
 	/* Adding -2 to MS exponent. We set zero when ms_e is 1 because it would
 	   overflow. The orignal MS code lets overflow it (type unsigned char!)
 	   i.e. _probably_ they set exponent to 0xFF which is an IEEE NaN or INF
@@ -258,7 +258,7 @@ readFloat(const char *c, int offset)
 	   know if MS and IEEE mantissa are compatible in this case. */
 	uint32_t ieee_e = ( (ms_e - 0x02000000) & 0xff000000) >> 1;
 	uint32_t ieee_m = 0x007fffff & x.L;
-	
+
 	x.L = ieee_e | ieee_s | ieee_m;
 	return x.F;
 }
@@ -297,9 +297,9 @@ bool MasterFile::checkHeader() const
 {
 	assert( size % record_length == 0 );
 	assert( countRecords() == (size / record_length - 1) );
-	
+
 	printHeader();
-	
+
 	//  #0,  1b, unsigned char, count records (dat files)
 	//           must be >0 (error #1002)
 	//  #1,  1b, char, always '\0' (~ error #1002)
@@ -308,7 +308,7 @@ bool MasterFile::checkHeader() const
 	//  #3,  1b, char, always '\0' (~ error #1003)
 	//  #4, 45b, char*, always '\0' ?
 	// #49,  4b, int, serial number
-	
+
 	unsigned char cntRec = readUnsignedChar(buf, 0);
 	assert( cntRec == countRecords() && cntRec > 0 );
 	assert( buf[1] == '\0' );
@@ -318,7 +318,7 @@ bool MasterFile::checkHeader() const
 	for( int i=4; i<49; i++ ) {
 		assert( buf[i] == '\0' );
 	}
-	
+
 	return true;
 }
 
@@ -350,7 +350,7 @@ bool MasterFile::checkRecord( unsigned char r ) const
 	assert( r > 0 );
 	const char *record = buf + (record_length * r);
 	printRecord( record );
-	
+
 	//  #0,  1b, unsigned char, dat file number
 	//  #1,  2b, short, file type, always 101 (error #1005)
 	//  #3,  1b, unsigned char, record length
@@ -375,13 +375,13 @@ bool MasterFile::checkRecord( unsigned char r ) const
 	// #51,  1b: char, chart flag, always ' ' or '*' (error #1018)
 	//           note, premium data sets '\0'
 	// #52,  1b: char, always '\0' (error #1019)
-	
+
 	assert( read_uint16( record, 1 ) == 101 );
 	assert( record[3] == 4 * record[4] );
 	assert( record[4] >= 5 && record[4] <= 8 );
 	assert( record[5] == '\0' );
 	assert( record[6] == '\0' );
-	
+
 	assert( read_uint16( record, 23 ) == 0 );
 	int date1 = floatToIntDate_YYY( readFloat( record, 25 ) );
 	int date2 = floatToIntDate_YYY( readFloat( record, 29 ) );
@@ -390,11 +390,11 @@ bool MasterFile::checkRecord( unsigned char r ) const
 	unsigned short intrTimeFrame = read_uint16( record, 34 );
 	assert( intrTimeFrame == 0
 		|| (record[33] == 'I' && intrTimeFrame > 0 && intrTimeFrame <= 60) );
-	
+
 	assert( record[50] == ' ' || record[50] == '\0' );
 	assert( record[51] == ' ' || record[51] == '*' || record[51] == '\0' );
 	assert( record[52] == '\0' );
-	
+
 	return true;
 }
 
@@ -440,7 +440,7 @@ int MasterFile::getRecord( master_record *mr, unsigned short rnum ) const
 	mr->barsize= readChar( record, 33 );
 	trim_end( mr->c_symbol, record + 36, 14);
 	trim_end( mr->c_long_name, record + 7, 16);
-	
+
 	mr->from_date = floatToIntDate_YYY(readFloat(record, 25));
 	mr->to_date = floatToIntDate_YYY(readFloat(record, 29));
 	if( mr->from_date > mr->to_date ) {
@@ -455,7 +455,7 @@ int MasterFile::fileNumber( int r ) const
 {
 	const char *record = buf + (record_length * r);
 	int fileNumber = readUnsignedChar( record, 0);
-	
+
 	assert( fileNumber > 0 && fileNumber <= 255 );
 	return fileNumber;
 }
@@ -493,9 +493,9 @@ bool EMasterFile::checkHeader() const
 {
 	assert( size % record_length == 0 );
 	assert( countRecords() == (size / record_length - 1) );
-	
+
 	printHeader();
-	
+
 	// note, first 53 bytes seems to be identical to MASTER
 	//  #0,  1b, unsigned char, count records (dat files)
 	//           must be >0 (error #1023)
@@ -506,7 +506,7 @@ bool EMasterFile::checkHeader() const
 	//  #4, 45b, char*, always '\0' ?
 	// #49,  4b, int, serial number
 	// #53,139b, char*, seems to be vendor specific
-	
+
 	unsigned char cntRec = readUnsignedChar(buf, 0);
 	assert( cntRec == countRecords() && cntRec > 0 );
 	assert( buf[1] == '\0' );
@@ -516,7 +516,7 @@ bool EMasterFile::checkHeader() const
 	for( int i=4; i<49; i++ ) {
 		assert( buf[i] == '\0' );
 	}
-	
+
 	return true;
 }
 
@@ -549,7 +549,7 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	assert( r > 0 );
 	const char *record = buf + (record_length * r);
 	printRecord( record );
-	
+
 	//   #0,  2b: unsigned short, version number, valid (error #1026)
 	//   #2,  1b: unsigned char, dat file number, valid (error #1027)
 	//   #3,  1b: char, security type always '\0' (error #1028)
@@ -584,7 +584,7 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	// #130,  9b: char* assume always zero
 	// #139, 52b: char*, long name, when set it should start like short name
 	// #191,  1b: char, last byte zero
-	
+
 	unsigned short version = read_uint16( record, 0 );
 	assert( version == 0 || version == 0x3636 );
 	assert( record[3]== '\0' && record[4]== '\0' && record[5]== '\0' );
@@ -606,7 +606,7 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	unsigned short intrTimeFrame = read_uint16( record, 62 );
 	assert( intrTimeFrame == 0
 		|| (record[60] == 'I' && intrTimeFrame > 0 && intrTimeFrame <= 60) );
-	
+
 	int date1 = floatToIntDate_YYY( readFloat_IEEE( record, 64 ) );
 	int time1 = readFloat_IEEE( record, 68 );
 	int date2 = floatToIntDate_YYY( readFloat_IEEE( record, 72 ) );
@@ -617,7 +617,7 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 		assert( record[i] == '\0' );
 	}
 	int dateL = read_int32( record, 126 );
-	
+
 	if( date1 > date2 ) {
 		//HACK premium data have year like 128 (+1900) but should be 28 (+1900)
 		date1 -= 1000000;
@@ -630,19 +630,19 @@ bool EMasterFile::checkRecord( unsigned char r ) const
 	assert( (record[60] != 'I' && time1 == 0 && time2 == 0 && timeA == 0 && timeB == 0)
 		|| ( record[60] == 'I' && time1 > 0 && time2 > 0 && timeA >= 0 && timeB >= 0) );
 	assert( (long) date1*1000000+time1 <= (long) date2*1000000+time2 );
-	
+
 	assert( date1 == dateL || dateL == 19000101 );
-	
+
 	for( int i = 130; i<=138; i++ ) {
 		assert( record[i] == '\0' );
 	}
-	
+
 	if( strlen(record + 139) > 0 ) {
 		assert( strncmp(record + 32, record + 139, strlen(record + 32)) == 0 );
 	}
-	
+
 	assert( record[191] == '\0' );
-	
+
 	return true;
 }
 
@@ -693,7 +693,7 @@ int EMasterFile::getLongName( master_record *mr, unsigned short rnum ) const
 {
 	const char *record = buf + (record_length * rnum);
 	assert( mr->record_number == rnum );
-	
+
 	char lname[ MAX_LEN_MR_LNAME + 1 ];
 	int len_lname = trim_end( lname, record + 139, MAX_LEN_MR_LNAME );
 	if( len_lname > 0 ) {
@@ -701,7 +701,7 @@ int EMasterFile::getLongName( master_record *mr, unsigned short rnum ) const
 		strcpy( mr->c_long_name, lname );
 		mr->kind = 'E';
 	}
-	
+
 	return 0;
 }
 
@@ -716,12 +716,12 @@ int EMasterFile::getRecord( master_record *mr, unsigned short rnum ) const
 	assert( count_bits(mr->field_bitset) == readUnsignedChar( record, 6 ) );
 	mr->barsize= readChar( record, 60 );
 	trim_end( mr->c_symbol, record + 11, MAX_LEN_MR_SYMBOL );
-	
+
 	if( trim_end( mr->c_long_name, record + 139, MAX_LEN_MR_LNAME ) == 0 ) {
 		// long name is empty - using short name
 		trim_end( mr->c_long_name, record + 32, 16 );
 	}
-	
+
 	mr->from_date = floatToIntDate_YYY(readFloat_IEEE(record, 64));
 	mr->to_date = floatToIntDate_YYY(readFloat_IEEE(record, 72));
 	if( mr->from_date > mr->to_date ) {
@@ -738,7 +738,7 @@ int EMasterFile::fileNumber( int r ) const
 	int fileNumber = readUnsignedChar( record, 2);
 	assert( fileNumber > 0 && fileNumber <= 255 );
 	return fileNumber;
-	
+
 }
 
 
@@ -774,9 +774,9 @@ bool XMasterFile::checkHeader() const
 {
 	assert( size % record_length == 0 );
 	assert( countRecords() == (size / record_length - 1) );
-	
+
 	printHeader();
-	
+
 	assert( readChar(buf, 0) == '\x5d' );
 	assert( readChar(buf, 1) == '\xFE' );
 	assert( readChar(buf, 2) == 'X' );
@@ -788,14 +788,14 @@ bool XMasterFile::checkHeader() const
 	assert( read_uint16(buf, 14) ==  countRecords() );
 	assert( readChar( buf, 16 ) == '\x00' );
 	assert( readChar( buf, 17 ) == '\x00' );
-	
+
 	// last used + 1 !?
 	assert( read_uint16(buf, 18) > countRecords() );
 	assert( readChar( buf, 20 ) == '\x00' );
 	assert( readChar( buf, 21 ) == '\x00' );
-	
+
 	// char 22 -191 unknown
-	
+
 	return true;
 }
 
@@ -828,7 +828,7 @@ bool XMasterFile::checkRecord( int r ) const
 	assert( r > 0 );
 	const char *record = buf + (record_length * r);
 	printRecord( record );
-	
+
 	//   #0,  1b: char, record type always '\x01' (error #1107)
 	//   #1, 14b: char*, symbol, always zero terminated?
 	//            only alphanumeric characters (error #1108)
@@ -857,17 +857,17 @@ bool XMasterFile::checkRecord( int r ) const
 	//
 	// note, the unknown fields from #71 on may contain "composite stuff",
 	// whatever it is
-	
+
 	assert( readChar( record, 0) == '\x01' );
 	assert( readChar( record, 15) == '\x00' );
 	assert( readChar( record, 61) == '\x00' );
-	
+
 	char per = record[62];
 	assert( per == 'D' || per == 'I' );
 	unsigned short intrTimeFrame = read_uint16( record, 63 );
 	assert( intrTimeFrame == 0
 		|| (per == 'I' && intrTimeFrame > 0 && intrTimeFrame <= 60) );
-	
+
 	for( int i = 67; i<70; i++ ) {
 		assert( readChar( record, i ) == '\0' );
 	}
@@ -883,7 +883,7 @@ bool XMasterFile::checkRecord( int r ) const
 	for( int i = 124; i<150; i++ ) {
 		assert( readChar( record, i ) == '\0' );
 	}
-	
+
 	return true;
 }
 
@@ -941,7 +941,7 @@ int XMasterFile::fileNumber( int r ) const
 {
 	const char *record = buf + (record_length * r);
 	int fileNumber = read_uint16( record, 65 );
-	
+
 	assert( fileNumber > 255 );
 	return fileNumber;
 }
@@ -1022,7 +1022,7 @@ bool FDat::checkHeader() const
 {
 	assert( size % record_length == 0 );
 	assert( countRecords() == (size / record_length) - 1 );
-	
+
 	return true;
 }
 
@@ -1034,11 +1034,11 @@ int FDat::print( const char* header ) const
 	assert( end - buf <= size );
 	char buf[512];
 	char *buf_p = buf;
-	
+
 	int h_size = strlen( header );
 	memcpy( buf, header, h_size );
 	buf_p += h_size;
-	
+
 	int err = 0;
 	while( record < end ) {
 		int len = record_to_string( record, buf_p );
@@ -1048,12 +1048,12 @@ int FDat::print( const char* header ) const
 		}
 		buf_p[len++] = '\n';
 		buf_p[len] = '\0';
-		
+
 		/* We don't check errors every loop to be fast. Main reason to check
 		   errors at all is because there is no SIGPIPE on WIN32. */
 		err = fputs( buf, (FILE*)out );
 	}
-	
+
 	fflush( (FILE*)out );
 	return err;
 }
@@ -1063,15 +1063,15 @@ void FDat::print_header( const char* symbol_header )
 {
 	char buf[512];
 	char *buf_p = buf;
-	
+
 	int h_size = strlen( symbol_header );
 	memcpy( buf, symbol_header, h_size );
 	buf_p += h_size;
-	
+
 	int len = header_to_string( buf_p );
 	buf_p[len++] = '\n';
 	buf_p[len] = '\0';
-	
+
 	fputs( buf, (FILE*)out );
 }
 
@@ -1096,12 +1096,12 @@ int FDat::record_to_string( const char *record, char *s ) const
 {
 	int offset = 0;
 	char *begin = s;
-	
+
 	int date, time;
 	float open, high , low, close, volume, openint;
 	date = time = 0;
 	open = high = low = close = volume = openint = DEFAULT_FLOAT;
-	
+
 	if( field_bitset & D_DAT ) {
 		date = floatToIntDate_YYY(readFloat(record, offset));
 		if( date < print_date_from ) {
@@ -1109,7 +1109,7 @@ int FDat::record_to_string( const char *record, char *s ) const
 		}
 		offset += 4;
 	}
-	
+
 	READ_FIELD( time, D_TIM );
 	READ_FIELD( open, D_OPE );
 	READ_FIELD( high, D_HIG );
@@ -1117,7 +1117,7 @@ int FDat::record_to_string( const char *record, char *s ) const
 	READ_FIELD( close, D_CLO );
 	READ_FIELD( volume, D_VOL );
 	READ_FIELD( openint, D_OPI );
-	
+
 	PRINT_FIELD( itodatestr, D_DAT, date );
 	PRINT_FIELD( itotimestr, D_TIM, time );
 	PRINT_FIELD( prc_ftoa, D_OPE, open );
@@ -1126,13 +1126,13 @@ int FDat::record_to_string( const char *record, char *s ) const
 	PRINT_FIELD( prc_ftoa, D_CLO, close );
 	PRINT_FIELD( vol_ftoa, D_VOL, volume );
 	PRINT_FIELD( opi_ftoa, D_OPI, openint );
-	
+
 	if( s != begin ) {
 		*(--s) = '\0';
 	} else {
 		*s = '\0';
 	}
-	
+
 	return s - begin;
 }
 
@@ -1142,7 +1142,7 @@ int FDat::record_to_string( const char *record, char *s ) const
 int FDat::header_to_string( char *s )
 {
 	char *begin = s;
-	
+
 	PRINT_FIELD( strcpy_len, D_DAT, STR_D_DAT );
 	PRINT_FIELD( strcpy_len, D_TIM, STR_D_TIM );
 	PRINT_FIELD( strcpy_len, D_OPE, STR_D_OPE );
@@ -1151,13 +1151,13 @@ int FDat::header_to_string( char *s )
 	PRINT_FIELD( strcpy_len, D_CLO, STR_D_CLO );
 	PRINT_FIELD( strcpy_len, D_VOL, STR_D_VOL );
 	PRINT_FIELD( strcpy_len, D_OPI, STR_D_OPI );
-	
+
 	if( s != begin ) {
 		*(--s) = '\0';
 	} else {
 		*s = '\0';
 	}
-	
+
 	return s - begin;
 }
 

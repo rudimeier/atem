@@ -79,13 +79,13 @@ int itodatestr( char *s, unsigned int n )
 		memcpy(s, "0000-00-00", 10);
 		return 10;
 	}
-	
+
 #if defined FAST_PRINTING
 	uint32_t num1 = n, num2, div;
-	
+
 	num2 = num1 / 10000;
 	num1 -= num2 * 10000;
-	
+
 	s[0] = '0' + (char)(div = (num2*8389)>>23);
 	num2 -= div*1000;
 	s[1] = '0' + (char)(div = (num2*5243)>>19);
@@ -94,7 +94,7 @@ int itodatestr( char *s, unsigned int n )
 	num2 -= div*10;
 	s[3] = '0' + (char)(num2);
 	s[4] = '-';
-	
+
 	s[5] = '0' + (char)(div = (num1*8389)>>23);
 	num1 -= div*1000;
 	s[6] = '0' + (char)(div = (num1*5243)>>19);
@@ -122,27 +122,27 @@ int itotimestr( char *s, unsigned int n )
 		memcpy(s, "00:00:00", 8);
 		return 8;
 	}
-	
+
 #if defined FAST_PRINTING
 	uint32_t num2, div;
-	
+
 	num2 = n / 1000;
 	n -= num2 * 1000;
-	
+
 	s[0] = '0' + (char)(div = (num2*5243)>>19);
 	num2 -= div*100;
-	
+
 	s[1] = '0' + (char)(div = (num2*6554)>>16);
 	num2 -= div*10;
-	
+
 	s[2] = ':';
-	
+
 	s[3] = '0' + (char)(num2);
 	s[4] = '0' + (char)(div = (n*5243)>>19);
 	n -= div*100;
-	
+
 	s[5] = ':';
-	
+
 	s[6] = '0' + (char)(div = (n*6554)>>16);
 	n -= div*10;
 	s[7] = '0' + (char)(n);

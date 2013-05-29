@@ -62,19 +62,19 @@ int ftoa( char *outbuf, float f )
 	short exp2;
 	LF_t x;
 	char *p;
-	
+
 	x.F = f;
 	p = outbuf;
-	
+
 	exp2 = (unsigned char)(x.L >> 23) - 127;
 	mantissa = (x.L & 0xFFFFFF) | 0x800000;
 	frac_part = 0;
 	int_part = 0;
-	
+
 	if( x.L < 0  ) {
 		*p++ = '-';
 	}
-	
+
 	/* Our algorithm works only on exponents >= -36 because safe_mask must
 	   start with at least 4 zero bits. So we quickly print 0.0 here. (We could
 	   do this even for bigger exponents dependently on PRECISION but would be
@@ -90,10 +90,10 @@ int ftoa( char *outbuf, float f )
 #endif
 		goto END;
 	}
-	
+
 	safe_shift = -(exp2 + 1);
 	safe_mask = 0xFFFFFFFFFFFFFFFFULL >>(64 - 24 - safe_shift);
-	
+
 	if (exp2 >= 64) {
 		/* |f| >= 2^64 > ULONG_MAX */
 		/* NaNs and +-INF are also handled here*/
@@ -106,16 +106,16 @@ int ftoa( char *outbuf, float f )
 	} else /* if (exp2 < 0) */ {
 		frac_part = (mantissa & 0xFFFFFF);
 	}
-	
+
 	if (int_part == 0) {
 		*p++ = '0';
 	} else {
 		p += itoa_uint64(p, int_part);
 	}
-	
+
 	if (frac_part != 0) {
 		*p++ = '.';
-		
+
 		/* print BCD, calculating digits of frac_part (one more digit is needed
 		   when rounding, less digits are needed when then precision should be
 		   significant*/
@@ -130,15 +130,15 @@ int ftoa( char *outbuf, float f )
 		for (char m = 0; m < max; m++) {
 			/* frac_part *= 10; */
 			frac_part = (frac_part << 3) + (frac_part << 1);
-			
+
 			*p++ = (frac_part >> (24 + safe_shift)) + '0';
 			frac_part &= safe_mask;
 		}
 #if defined DO_ROUNDING
-		
+
 		int round_int = 0;
 		p--;
-		
+
 		if(  *p >= '5' ) {
 			char *w = p-1;
 			if( *w != '.' ) {
@@ -158,7 +158,7 @@ int ftoa( char *outbuf, float f )
 					round_int = 1;
 				}
 			}
-			
+
 			if( round_int ) {
 				// we have to round up int_part too
 				w--;
@@ -191,7 +191,7 @@ int ftoa( char *outbuf, float f )
 		p += PRECISION;
 #endif
 	} /*  if (frac_part != 0) */
-	
+
 END:
 	*p = 0;
 	return p - outbuf;
@@ -214,13 +214,13 @@ int ftoa_prec_f0( char *outbuf, float f )
 	char *p = outbuf;
 	LF_t x;
 	x.F = f;
-	
+
 	short exp2 = (unsigned char)(x.L >> 23) - 127;
-	
+
 	if( x.L < 0  ) {
 		*p++ = '-';
 	}
-	
+
 	if( exp2 < -1 ) {
 		/*  |f| <= 0.5  */
 		*p++ = '0';
@@ -245,7 +245,7 @@ int ftoa_prec_f0( char *outbuf, float f )
 				}
 			}
 		}
-		
+
 		p += itoa_uint64(p, int_part);
 	}
 	*p = 0;

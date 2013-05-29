@@ -63,12 +63,12 @@ int compare2()
 	for( i = start; i <= end; i +=1 ) {
 		char s1[512];
 		char s2[512];
-		
+
 		double f = *( (float*) (&i) );
-		
+
 		sprintf( s1, "%.5f", f );
 		ftoa( s2, f);
-		
+
 		if( strcmp(s1, s2/*, l - 1*/) ) {
 			fprintf( stdout, "error(%d): %.18g  %s != %s\n", i, f, s1, s2 );
 // 			return 1;
@@ -88,12 +88,12 @@ int bench2( unsigned int mant1, unsigned int mant2,
 		unsigned int I;
 		float F;
 	} funi;
-	
+
 	char buf[BUF_LEN];
 	for( int j= 0; j<BUF_LEN; j++ ) {
 		buf[j] = 'a';
 	}
-	
+
 	for( unsigned int e = expnt1; e <= expnt2; e++ ) {
 		printf("EXPNT %u\n", e);
 		funi fe;
@@ -103,17 +103,17 @@ int bench2( unsigned int mant1, unsigned int mant2,
 			char *s = buf;
 			funi fi;
 			fi.I = fe.I | i;
-			
+
 #if 1
 			s += ftoa(s, fi.F);
 			*s++ = '\n';
 #else
 			s += rudi_printf_fp(s, &pinfo, fi.F);
 			*s++ = '\n';
-			
+
 #endif
 			*s = '\0';
-			
+
 			fputs( buf, stdout);
 		}
 	}
@@ -146,18 +146,18 @@ int compare( long start, long end )
 {
 	char s1[BUF_LEN];
 	char s2[BUF_LEN];
-	
+
 	int j;
 	for( j= 0; j<BUF_LEN; j++ ) {
 		s1[j] = s2[j] = 'a';
 	}
-	
+
 	long i = start;
 	do {
-		
+
 		int len1 = CMP_FUNC_1( s1, i );
 		int len2 = CMP_FUNC_2( s2, i );
-		
+
 		if( len1 != len2 || strncmp(s1, s2, len1 ) ) {
 			s1[len1] = s2[len2] = '\0';
 			fprintf( stderr, "error: _%s_(%d) != _%s_(%d)\n", s1, len1, s2, len2 );
@@ -172,7 +172,7 @@ int compare( long start, long end )
 		}
 		i++;
 	} while(1);
-	
+
 	return 0;
 }
 
@@ -180,18 +180,18 @@ int compare( long start, long end )
 int bench( long start, long end )
 {
 	char s2[BUF_LEN];
-	
+
 	int j;
 	for( j= 0; j<BUF_LEN; j++ ) {
 		s2[j] = 'a';
 	}
-	
+
 	long i = start;
 	do{
 		int len2 = BENCH_FUNC( s2, i );
 		s2[len2] = '\n';
 		s2[len2+1] = '\0';
-		
+
 		fputs( s2, stdout);
 		// write seems so be slower here
 		// write( 1, s2, len2+1 );
@@ -200,7 +200,7 @@ int bench( long start, long end )
 		}
 		i++;
 	} while(1);
-	
+
 	return 0;
 }
 
@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
 	long start = - (long)UINT_MAX;
 	long end   = UINT_MAX;
 	printf("test from %ld to %ld\n", start, end);
-	
+
 	return compare( start, end );
 }
 

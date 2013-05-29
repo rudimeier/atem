@@ -130,26 +130,26 @@ class MasterFile
 {
 	public:
 		MasterFile( const char *buf, int size );
-		
+
 		static bool checkHeader( const char* buf );
 		static bool checkRecord( const char* buf, int record  );
-		
+
 		bool check() const;
 		int countRecords() const;
 		int getRecord( master_record *, unsigned short rnum ) const;
 		int fileNumber( int record ) const;
 		int dataLength( int record ) const;
-		
+
 	private:
 		bool checkHeader() const;
 		bool checkRecords() const;
 		bool checkRecord( unsigned char r ) const;
-		
+
 		void printHeader() const;
 		void printRecord( const char *record ) const;
-		
+
 		static const int record_length = 53;
-		
+
 		const char * const buf;
 		const int size;
 };
@@ -161,27 +161,27 @@ class EMasterFile
 {
 	public:
 		EMasterFile( const char *buf, int size );
-		
+
 		static bool checkHeader( const char* buf );
 		static bool checkRecord( const char* buf, int record  );
-		
+
 		bool check() const;
 		int countRecords() const;
 		int getLongName( master_record *, unsigned short rnum ) const;
 		int getRecord( master_record *, unsigned short rnum ) const;
 		int fileNumber( int record ) const;
 		int dataLength( int record ) const;
-		
+
 	private:
 		bool checkHeader() const;
 		bool checkRecords() const;
 		bool checkRecord( unsigned char r ) const;
-		
+
 		void printHeader() const;
 		void printRecord( const char *record ) const;
-		
+
 		static const int record_length = 192;
-		
+
 		const char * const buf;
 		const int size;
 };
@@ -193,26 +193,26 @@ class XMasterFile
 {
 	public:
 		XMasterFile( const char *buf, int size );
-		
+
 		static bool checkHeader( const char* buf );
 		static bool checkRecord( const char* buf, int record  );
-		
+
 		bool check() const;
 		int countRecords() const;
 		int getRecord( master_record *, unsigned short rnum ) const;
 		int fileNumber( int record ) const;
 		int dataLength( int record ) const;
-		
+
 	private:
 		bool checkHeader() const;
 		bool checkRecords() const;
 		bool checkRecord( int r ) const;
-		
+
 		void printHeader() const;
 		void printRecord( const char *record ) const;
-		
+
 		static const int record_length = 150;
-		
+
 		const char * const buf;
 		const int size;
 };
@@ -225,7 +225,7 @@ class FDat
 {
 	public:
 		FDat( const char *buf, int size, unsigned char fields );
-		
+
 		static bool checkHeader( const char* buf );
 		static bool checkRecord( const char* buf, int record  );
 		static void set_outfile( void *file );
@@ -233,15 +233,15 @@ class FDat
 		static void setPrintDateFrom( int date );
 		static void setForceFloat( ms_data_field );
 		static void print_header( const char* symbol_header );
-		
+
 		bool checkHeader() const;
 		int print( const char* header ) const;
 		int countRecords() const;
-		
+
 	private:
 		static int header_to_string( char *s );
 		int record_to_string( const char *record, char *s ) const;
-		
+
 		static void *out;
 		static char print_sep;
 		static unsigned int print_bitset;
@@ -249,10 +249,10 @@ class FDat
 		static ftoa_func prc_ftoa;
 		static ftoa_func vol_ftoa;
 		static ftoa_func opi_ftoa;
-		
+
 		const unsigned char field_bitset;
 		const int record_length;
-		
+
 		const char * const buf;
 		const int size;
 };

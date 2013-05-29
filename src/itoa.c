@@ -45,7 +45,7 @@ void reverse( char *s, int l )
 {
 	int i, j;
 	char c;
-	
+
 	for (i = 0, j = l-1; i<j; i++, j--) {
 		c = s[i];
 		s[i] = s[j];
@@ -65,20 +65,20 @@ int ltoa_simple( char *s, long num )
 	char *begin = s;
 	char *rev = s;
 	unsigned long n = num;
-	
+
 	if( num < 0 ) {
 		 // forget about the sign, don't reverse it later
 		n = -num;
 		*s++ = '-';
 		rev++;
 	}
-	
+
 	do {       /* generate digits in reverse order */
 		*s++ = (n % 10) + '0';   /* get next digit */
 	} while ((n /= 10) > 0);     /* delete it */
-	
+
 	reverse( rev, s - rev);
-	
+
 	return s - begin;
 }
 
@@ -141,7 +141,7 @@ L2:
 	num1 -= div*10;
 L1:
 	*ps++ = '0' + (char)(num1);
-	
+
 	return ps - s;
 }
 
@@ -152,12 +152,12 @@ int itoa_int64( char *s, int64_t snum )
 {
 	char *ps = s;
 	uint64_t num1 = snum, num2, num3, num4, num5, div;
-	
+
 	if (snum < 0) {
 		*ps++ = '-';
 		num1 = -snum;
 	}
-	
+
 	if (num1 < 10000) {
 		if (num1 < 10) goto L1;
 		if (num1 < 100) goto L2;
@@ -241,7 +241,7 @@ L2:
 	num1 -= div*10;
 L1:
 	*ps++ = '0' + (char)(num1);
-	
+
 	return ps - s;
 
 }
@@ -253,7 +253,7 @@ int itoa_uint64( char *s, uint64_t snum )
 {
 	char *ps = s;
 	uint64_t num1 = snum, num2, num3, num4, num5, div;
-	
+
 	if (num1 < 10000) {
 		if (num1 < 10) goto L1;
 		if (num1 < 100) goto L2;
@@ -287,7 +287,7 @@ int itoa_uint64( char *s, uint64_t snum )
 						if (num5 < 100) goto L18;
 						if (num5 < 1000) goto L19;
 					}
-					
+
 					*ps++ = '0' + (char)(div = (num5*8389UL)>>23);
 					num5 -= div*1000;
 L19:
@@ -342,7 +342,7 @@ L2:
 	num1 -= div*10;
 L1:
 	*ps++ = '0' + (char)(num1);
-	
+
 	return ps - s;
 
 }
