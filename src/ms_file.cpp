@@ -435,9 +435,18 @@ int MasterFile::getRecord( master_record *mr, unsigned short rnum ) const
 	mr->record_number = rnum;
 	mr->kind = 'M';
 	mr->file_number = readUnsignedChar( record, 0 );
-	mr->field_bitset= (unsigned char)0xff >> (8 - readUnsignedChar( record, 4));
+	mr->barsize = readChar( record, 33 );
+
+	/* MASTER file has no field bitset available, create it from field count */
+	unsigned char field_count = readUnsignedChar( record, 4);
+	mr->field_bitset = 0;
+	if( mr->barsize == 'I' && field_count > 0 ) {
+		mr->field_bitset |= D_TIM;
+		--field_count;
+	}
+	mr->field_bitset |= (unsigned char)0xff >> (8 - field_count);
 	assert( count_bits(mr->field_bitset) == readChar( record, 4 ) );
-	mr->barsize= readChar( record, 33 );
+
 	trim_end( mr->c_symbol, record + 36, 14);
 	trim_end( mr->c_long_name, record + 7, 16);
 
