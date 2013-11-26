@@ -873,8 +873,8 @@ bool Metastock::dumpData( unsigned short n, unsigned char fields,
 // 		n, datfile.countRecords(), count_bits(fields) * 4 );
 
 	if( datfile.countRecords() < 0 ) {
-		setError( "fdat file unusable", fdat_buf->constName() );
-		return false;
+		printWarn( "fdat file unusable", fdat_buf->constName() );
+		return true;
 	}
 	if( datfile.print( pfx ) < 0) {
 		/* This is should only happen on WIN32 instead of SIGPIPE */
