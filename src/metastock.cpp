@@ -541,7 +541,11 @@ bool Metastock::parseMasters()
 			/* EMaster seems to be usable - fill up long names */
 			for( int i = 1; i<=cntE; i++ ) {
 				SELECT_MR( emf );
-				assert( mr->record_number != 0 );
+				if( mr->record_number != i ) {
+					printWarn( "inconsistent EMASTER and MASTER files, "
+						"consider option --ignore-emaster");
+					break;
+				}
 				emf.getLongName( mr, i );
 			}
 		}
