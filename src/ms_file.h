@@ -39,7 +39,12 @@
 #define ATEM_MS_FILE_H
 
 
-
+enum ms_master_file {
+	MF_MASTER = 01,
+	MF_EMASTER = 02,
+	MF_XMASTER = 04,
+	MF_ALL = 07,
+};
 
 enum ms_master_field {
 	// master fields

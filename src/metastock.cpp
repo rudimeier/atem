@@ -154,6 +154,7 @@ void FileBuf::resize( int size )
 
 bool Metastock::print_header = true;
 char Metastock::print_sep = '\t';
+unsigned short Metastock::use_master_files = MF_ALL;
 unsigned short Metastock::prnt_master_fields = 0xFFFF;
 unsigned char Metastock::prnt_data_fields = 0xFF;
 unsigned short Metastock::prnt_data_mr_fields = M_SYM;
@@ -203,8 +204,9 @@ Metastock::~Metastock()
 }
 
 
-#define CHECK_MASTER( _file_buf_, _gen_name_ ) \
-	if( strcasecmp(_gen_name_, dirp->d_name) == 0 ) { \
+#define CHECK_MASTER( _file_buf_, _gen_name_, _master_type_ ) \
+	if( (_master_type_ & use_master_files) \
+			&& strcasecmp(_gen_name_, dirp->d_name) == 0 ) { \
 		assert( !_file_buf_->hasName() ); \
 		_file_buf_->setName( dirp->d_name ); \
 	}
@@ -231,9 +233,9 @@ bool Metastock::findFiles()
 				add_mr_list_datfile( number, dirp->d_name );
 			}
 		} else {
-			CHECK_MASTER( m_buf, "MASTER" );
-			CHECK_MASTER( e_buf, "EMASTER" );
-			CHECK_MASTER( x_buf, "XMASTER" );
+			CHECK_MASTER( m_buf, "MASTER", MF_MASTER );
+			CHECK_MASTER( e_buf, "EMASTER", MF_EMASTER );
+			CHECK_MASTER( x_buf, "XMASTER", MF_XMASTER );
 		}
 	}
 

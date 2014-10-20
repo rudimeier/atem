@@ -87,6 +87,7 @@ class Metastock
 
 		static bool print_header;
 		static char print_sep;
+		static unsigned short use_master_files;
 		static unsigned short prnt_master_fields;
 		static unsigned char prnt_data_fields;
 		static unsigned short prnt_data_mr_fields;
