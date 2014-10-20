@@ -441,6 +441,20 @@ end:
 	return true;
 }
 
+bool Metastock::set_ignore_masters( bool master, bool emaster, bool xmaster )
+{
+	if( master ) {
+		use_master_files &= ~MF_MASTER;
+	}
+	if( emaster ) {
+		use_master_files &= ~MF_EMASTER;
+	}
+	if( xmaster ) {
+		use_master_files &= ~MF_XMASTER;
+	}
+	return true;
+}
+
 bool Metastock::setForceFloat( bool opi, bool vol )
 {
 	if( opi ) {

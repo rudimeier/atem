@@ -81,6 +81,17 @@ option "fdat" -
 "Process specified dat file number only."
 int optional
 
+option "ignore-master" -
+"Ignore MASTER file."
+optional
+
+option "ignore-emaster" -
+"Ignore EMASTER file."
+optional
+
+option "ignore-xmaster" -
+"Ignore XMASTER file."
+optional
 
 # section
 section "Debug options"

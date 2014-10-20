@@ -58,6 +58,7 @@ class Metastock
 		void set_skip_header( int skipheader );
 		void set_out_format( int fmt_data );
 		bool set_out_format( const char *columns );
+		bool set_ignore_masters( bool master, bool emaster, bool xmaster );
 		bool setForceFloat( bool opi, bool vol );
 		bool setPrintDateFrom( const char *date );
 
