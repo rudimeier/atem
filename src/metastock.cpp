@@ -581,7 +581,7 @@ bool Metastock::readMasters()
 		if( !readFile( m_buf ) ) {
 			return false;
 		}
-	} else {
+	} else if( use_master_files & MF_MASTER ) {
 		printWarn("Master file not found");
 	}
 
@@ -599,7 +599,7 @@ bool Metastock::readMasters()
 		if( !readFile( x_buf ) ) {
 			return false;
 		}
-	} else if( max_dat_num > 255 ) {
+	} else if( (use_master_files & MF_XMASTER) && max_dat_num > 255 ) {
 		printWarn("XMaster file not found");
 	}
 
