@@ -892,8 +892,10 @@ bool Metastock::dumpData( unsigned short n, unsigned char fields,
 	fdat_buf->setName( mr_list[n].file_name );
 
 	if( !fdat_buf->hasName() ) {
-		setError( "no fdat found" );
-		return false;
+		char msg[64];
+		snprintf( msg, sizeof(msg), "F%u.dat (or .mwd)", n);
+		printWarn( "missing data file", msg );
+		return true;
 	}
 
 	if( ! readFile( fdat_buf ) ) {
