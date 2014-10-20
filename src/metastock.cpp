@@ -912,9 +912,3 @@ bool Metastock::dumpData( unsigned short n, unsigned char fields,
 
 	return true;
 }
-
-
-bool Metastock::hasXMaster() const
-{
-	return( x_buf->hasName() );
-}

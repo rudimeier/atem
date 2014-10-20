@@ -50,8 +50,6 @@ class Metastock
 		Metastock();
 		~Metastock();
 
-		bool hasXMaster() const;
-
 		bool set_outfile( const char *file );
 		bool setDir( const char* dir );
 		bool set_field_sep( const char *sep );
