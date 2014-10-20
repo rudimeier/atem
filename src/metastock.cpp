@@ -154,6 +154,7 @@ void FileBuf::resize( int size )
 
 bool Metastock::print_header = true;
 char Metastock::print_sep = '\t';
+unsigned short Metastock::use_master_files = MF_ALL;
 unsigned short Metastock::prnt_master_fields = 0xFFFF;
 unsigned char Metastock::prnt_data_fields = 0xFF;
 unsigned short Metastock::prnt_data_mr_fields = M_SYM;
@@ -203,8 +204,9 @@ Metastock::~Metastock()
 }
 
 
-#define CHECK_MASTER( _file_buf_, _gen_name_ ) \
-	if( strcasecmp(_gen_name_, dirp->d_name) == 0 ) { \
+#define CHECK_MASTER( _file_buf_, _gen_name_, _master_type_ ) \
+	if( (_master_type_ & use_master_files) \
+			&& strcasecmp(_gen_name_, dirp->d_name) == 0 ) { \
 		assert( !_file_buf_->hasName() ); \
 		_file_buf_->setName( dirp->d_name ); \
 	}
@@ -231,9 +233,9 @@ bool Metastock::findFiles()
 				add_mr_list_datfile( number, dirp->d_name );
 			}
 		} else {
-			CHECK_MASTER( m_buf, "MASTER" );
-			CHECK_MASTER( e_buf, "EMASTER" );
-			CHECK_MASTER( x_buf, "XMASTER" );
+			CHECK_MASTER( m_buf, "MASTER", MF_MASTER );
+			CHECK_MASTER( e_buf, "EMASTER", MF_EMASTER );
+			CHECK_MASTER( x_buf, "XMASTER", MF_XMASTER );
 		}
 	}
 
@@ -439,6 +441,20 @@ end:
 	return true;
 }
 
+bool Metastock::set_ignore_masters( bool master, bool emaster, bool xmaster )
+{
+	if( master ) {
+		use_master_files &= ~MF_MASTER;
+	}
+	if( emaster ) {
+		use_master_files &= ~MF_EMASTER;
+	}
+	if( xmaster ) {
+		use_master_files &= ~MF_XMASTER;
+	}
+	return true;
+}
+
 bool Metastock::setForceFloat( bool opi, bool vol )
 {
 	if( opi ) {
@@ -525,7 +541,11 @@ bool Metastock::parseMasters()
 			/* EMaster seems to be usable - fill up long names */
 			for( int i = 1; i<=cntE; i++ ) {
 				SELECT_MR( emf );
-				assert( mr->record_number != 0 );
+				if( mr->record_number != i ) {
+					printWarn( "inconsistent EMASTER and MASTER files, "
+						"consider option --ignore-emaster");
+					break;
+				}
 				emf.getLongName( mr, i );
 			}
 		}
@@ -565,7 +585,7 @@ bool Metastock::readMasters()
 		if( !readFile( m_buf ) ) {
 			return false;
 		}
-	} else {
+	} else if( use_master_files & MF_MASTER ) {
 		printWarn("Master file not found");
 	}
 
@@ -583,7 +603,7 @@ bool Metastock::readMasters()
 		if( !readFile( x_buf ) ) {
 			return false;
 		}
-	} else if( max_dat_num > 255 ) {
+	} else if( (use_master_files & MF_XMASTER) && max_dat_num > 255 ) {
 		printWarn("XMaster file not found");
 	}
 
@@ -619,6 +639,10 @@ void Metastock::setError( const char* e1, const char* e2 ) const
 
 void Metastock::dumpMaster() const
 {
+	if( ! m_buf->hasName() ) {
+		printWarn( "no MASTER found" );
+		return;
+	}
 	MasterFile mf( m_buf->constBuf(), m_buf->len() );
 	mf.check();
 }
@@ -626,6 +650,10 @@ void Metastock::dumpMaster() const
 
 void Metastock::dumpEMaster() const
 {
+	if( ! e_buf->hasName() ) {
+		printWarn( "no EMASTER found" );
+		return;
+	}
 	EMasterFile emf( e_buf->constBuf(), e_buf->len() );
 	emf.check();
 }
@@ -633,6 +661,10 @@ void Metastock::dumpEMaster() const
 
 void Metastock::dumpXMaster() const
 {
+	if( ! x_buf->hasName() ) {
+		printWarn( "no XMASTER found" );
+		return;
+	}
 	XMasterFile xmf( x_buf->constBuf(), x_buf->len() );
 	xmf.check();
 }
@@ -860,8 +892,10 @@ bool Metastock::dumpData( unsigned short n, unsigned char fields,
 	fdat_buf->setName( mr_list[n].file_name );
 
 	if( !fdat_buf->hasName() ) {
-		setError( "no fdat found" );
-		return false;
+		char msg[64];
+		snprintf( msg, sizeof(msg), "F%u.dat (or .mwd)", n);
+		printWarn( "missing data file", msg );
+		return true;
 	}
 
 	if( ! readFile( fdat_buf ) ) {
@@ -883,10 +917,4 @@ bool Metastock::dumpData( unsigned short n, unsigned char fields,
 	}
 
 	return true;
-}
-
-
-bool Metastock::hasXMaster() const
-{
-	return( x_buf->hasName() );
 }

@@ -50,14 +50,13 @@ class Metastock
 		Metastock();
 		~Metastock();
 
-		bool hasXMaster() const;
-
 		bool set_outfile( const char *file );
 		bool setDir( const char* dir );
 		bool set_field_sep( const char *sep );
 		void set_skip_header( int skipheader );
 		void set_out_format( int fmt_data );
 		bool set_out_format( const char *columns );
+		bool set_ignore_masters( bool master, bool emaster, bool xmaster );
 		bool setForceFloat( bool opi, bool vol );
 		bool setPrintDateFrom( const char *date );
 
@@ -87,6 +86,7 @@ class Metastock
 
 		static bool print_header;
 		static char print_sep;
+		static unsigned short use_master_files;
 		static unsigned short prnt_master_fields;
 		static unsigned char prnt_data_fields;
 		static unsigned short prnt_data_mr_fields;

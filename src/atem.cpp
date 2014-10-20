@@ -155,6 +155,11 @@ static int ms2csv( const char *ms_dirp )
 		}
 	}
 
+	if( !ms.set_ignore_masters( args_info.ignore_master_given,
+		  args_info.ignore_emaster_given, args_info.ignore_xmaster_given) ) {
+		goto ms_error;
+	}
+
 	if( ! ms.setDir( ms_dirp ) ) {
 		goto ms_error;
 	}
@@ -205,9 +210,7 @@ static int ms2csv( const char *ms_dirp )
 	}
 	if( args_info.dump_xmaster_given ) {
 		dumpdata = false;
-		if( ms.hasXMaster() ) {
-			ms.dumpXMaster();
-		}
+		ms.dumpXMaster();
 	}
 
 	if( args_info.symbols_given ) {
