@@ -635,6 +635,10 @@ void Metastock::setError( const char* e1, const char* e2 ) const
 
 void Metastock::dumpMaster() const
 {
+	if( ! m_buf->hasName() ) {
+		printWarn( "no MASTER found" );
+		return;
+	}
 	MasterFile mf( m_buf->constBuf(), m_buf->len() );
 	mf.check();
 }
@@ -642,6 +646,10 @@ void Metastock::dumpMaster() const
 
 void Metastock::dumpEMaster() const
 {
+	if( ! e_buf->hasName() ) {
+		printWarn( "no EMASTER found" );
+		return;
+	}
 	EMasterFile emf( e_buf->constBuf(), e_buf->len() );
 	emf.check();
 }
@@ -649,6 +657,10 @@ void Metastock::dumpEMaster() const
 
 void Metastock::dumpXMaster() const
 {
+	if( ! x_buf->hasName() ) {
+		printWarn( "no XMASTER found" );
+		return;
+	}
 	XMasterFile xmf( x_buf->constBuf(), x_buf->len() );
 	xmf.check();
 }

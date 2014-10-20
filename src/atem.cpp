@@ -210,9 +210,7 @@ static int ms2csv( const char *ms_dirp )
 	}
 	if( args_info.dump_xmaster_given ) {
 		dumpdata = false;
-		if( ms.hasXMaster() ) {
-			ms.dumpXMaster();
-		}
+		ms.dumpXMaster();
 	}
 
 	if( args_info.symbols_given ) {
