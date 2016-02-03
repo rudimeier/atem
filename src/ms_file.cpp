@@ -536,7 +536,7 @@ void EMasterFile::printHeader() const
 		readUnsignedChar(buf, 0), // count records (stored in master?)
 		readUnsignedChar(buf, 2), // count records (existing dat files?)
 		read_int32(buf, 49), // unknown - just print as hex
-		buf + 53 // unkown, equis sends a string
+		buf + 53 // unknown, equis sends a string
 		);
 }
 
@@ -818,7 +818,7 @@ void XMasterFile::printHeader() const
 		read_uint16(buf, 10), // count records (stored in master?)
 		read_uint16(buf, 14), // count records (the same?)
 		read_uint16(buf, 18), // last used record
-		buf + 22 //  // unkown, equis sends a string
+		buf + 22 //  // unknown, equis sends a string
 		);
 }
 
