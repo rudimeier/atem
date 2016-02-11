@@ -13,6 +13,9 @@ bin/
 src/atem
 src/atem_ggo.h
 src/atem_ggo.c
+doc/atem.1
+atem-*/
+atem-*.tar.gz
 
 # core dumps etc.
 .nfs*
