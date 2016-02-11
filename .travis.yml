@@ -1,5 +1,7 @@
 language: cpp
 
+sudo: required
+
 compiler:
   - gcc
   - clang
@@ -9,39 +11,43 @@ env:
   - CONFOPTS="--disable-fast-printing"
 
 matrix:
- include:
-   - compiler: i586-mingw32msvc-gcc
-     env: BUILD_MINGW="yes"
-          CONFOPTS="--host=i586-mingw32msvc"
-   - compiler: i586-mingw32msvc-gcc
-     env: BUILD_MINGW="yes"
-          CONFOPTS="--host=i586-mingw32msvc --disable-fast-printing"
-
-before_install:
-  - sudo apt-get -qq update
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+      compiler: gcc
+      env: TRUSTY="yes"
+           CONFOPTS=""
+    - os: osx
+      compiler: gcc
+      env: CONFOPTS=""
+    - os: osx
+      compiler: clang
+      env: CONFOPTS=""
+    - os: linux
+      compiler: gcc
+      env: BUILD_MINGW="yes"
+           CONFOPTS="--host=i586-mingw32msvc"
+    - os: linux
+      compiler: clang
+      env: BUILD_MINGW="yes"
+           CONFOPTS="--host=i586-mingw32msvc --disable-fast-printing"
 
 install:
-  - sudo apt-get -qq install gengetopt
-  - sudo apt-get -qq install help2man
-  - if test "${BUILD_MINGW}" = "yes"; then sudo apt-get -qq install wine; fi
+  - env
+  - source ./.travis-functions.sh
+  - travis_have_sudo
+  - travis_install_script
 
 before_script:
-  - autoreconf -vfi
+  - travis_before_script
 
 script:
-  - if test "${BUILD_MINGW}" = "yes"; then
-      unset CC; unset CXX;
-      echo -e '#!/bin/bash\nwine $0.exe "$@"' > src/atem;
-      chmod ugo+x src/atem;
-    fi
-  - ./configure ${CONFOPTS}
-    && make
-    && (make check || (cat test/test-suite.log && false))
-    && if test "${BUILD_MINGW}" != "yes"; then make distcheck; fi
+  - travis_script
 
-## whitelist
 branches:
   only:
     - master
     - next
-    - tmp
+    - /^travis.*/
+    - /^tmp.*/
