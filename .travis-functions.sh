@@ -12,63 +12,60 @@ if [ ! -f "configure.ac" ]; then
 fi
 
 # some config settings
-MAKE="make -j1"
+MAKE="make -j2"
 DUMP_CONFIG_LOG="short"
 
-# We could test (exotic) out-of-tree build dirs using relative or abs paths.
-# After sourcing this script we are living in build dir. Tasks for source dir
-# have to use $SOURCE_DIR.
-SOURCE_DIR="."
-BUILD_DIR="."
-CONFIGURE="$SOURCE_DIR/configure"
-
-mkdir -p "$BUILD_DIR"
-cd "$BUILD_DIR" || return 1 || exit 1
-
-function configure_travis
+function xconfigure
 {
-	"$CONFIGURE" "$@"
-	err=$?
+	local ret
+	./configure "$@"
+	ret=$?
 	if [ "$DUMP_CONFIG_LOG" = "short" ]; then
 		grep -B1 -A10000 "^## Output variables" config.log | grep -v "_FALSE="
 	elif [ "$DUMP_CONFIG_LOG" = "full" ]; then
 		cat config.log
 	fi
-	return $err
+	return $ret
 }
 
-function script_linux
+function script_generic
 {
-	if test "${BUILD_MINGW}" = "yes"; then
-		unset CC; unset CXX;
-		echo -e '#!/bin/bash\nwine $0.exe "$@"' > src/atem;
-		chmod ugo+x src/atem;
-	fi
+	xconfigure ${CONFOPTS} || return
 
-	configure_travis ${CONFOPTS} || return
+	if test "${DISTCHECK}" = "yes"; then
+		$MAKE distcheck || return
+	else
+		$MAKE || return
+		$MAKE check || { cat test/test-suite.log; return 1; }
+	fi
+}
+
+function script_mingw
+{
+	local md5a md5b
+
+	unset CC; unset CXX;
+
+	# Create a fake executable to use wine in the test suite.
+	echo -e '#!/bin/bash\nwine $0.exe "$@"' > src/atem;
+	md5a=($(md5sum src/atem))
+	chmod ugo+x src/atem;
+
+	xconfigure ${CONFOPTS} || return
 	$MAKE || return
-	$MAKE check || (cat test/test-suite.log && false) || return
+	$MAKE check || { cat test/test-suite.log; return 1; }
 
-	if test "${BUILD_MINGW}" != "yes"; then
-		$MAKE distcheck || return false
+	# Is this still our fake executable?
+	md5b=($(md5sum src/atem))
+	if [ "$md5a" != "$md5b" ]; then
+		echo "error: probably a non-windows compiler was used!"
 	fi
-}
-
-function script_osx
-{
-	configure_travis ${CONFOPTS} \
-		|| return
-	$MAKE distcheck || return
 }
 
 function install_deps_linux
 {
-	# install some packages from Ubuntu's default sources
-	sudo apt-get -qq update || return
-	sudo apt-get install -qq >/dev/null \
-		gengetopt \
-		help2man \
-		|| return
+	# the default packages are installed via apt addon in .travis.yml
+
 	if test "${BUILD_MINGW}" = "yes"; then
 		sudo apt-get -qq install wine || return
 	fi
@@ -104,14 +101,13 @@ function travis_install_script
 
 function travis_before_script
 {
-	pushd "$SOURCE_DIR" || return
+	local ret
 	set -o xtrace
 
 	autoreconf -vfi
 	ret=$?
 
 	set +o xtrace
-	popd
 	return $ret
 }
 
@@ -120,10 +116,10 @@ function travis_script
 	local ret
 	set -o xtrace
 
-	if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-		script_osx
+	if test "${BUILD_MINGW}" = "yes"; then
+		script_mingw
 	else
-		script_linux
+		script_generic
 	fi
 
 	# We exit here with if-else return value!

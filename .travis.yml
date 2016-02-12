@@ -2,6 +2,10 @@ language: cpp
 
 sudo: required
 
+os:
+  - linux
+  - osx
+
 compiler:
   - gcc
   - clang
@@ -12,29 +16,38 @@ env:
 
 matrix:
   include:
+    ## make distcheck
+    - os: linux
+      compiler: gcc
+      env: DISTCHECK="yes"
+           CONFOPTS=""
+    ## Ubuntu 14.04 Trusty (beta), sudo required!
     - os: linux
       dist: trusty
       sudo: required
       compiler: gcc
       env: TRUSTY="yes"
            CONFOPTS=""
-    - os: osx
-      compiler: gcc
-      env: CONFOPTS=""
-    - os: osx
-      compiler: clang
-      env: CONFOPTS=""
+    ## MinGW / wine
     - os: linux
-      compiler: gcc
+      sudo: required
+      compiler: i586-mingw32msvc-gcc
       env: BUILD_MINGW="yes"
            CONFOPTS="--host=i586-mingw32msvc"
     - os: linux
-      compiler: clang
+      sudo: required
+      compiler: i586-mingw32msvc-gcc
       env: BUILD_MINGW="yes"
            CONFOPTS="--host=i586-mingw32msvc --disable-fast-printing"
+addons:
+  apt:
+    packages:
+      - gengetopt
+      - help2man
 
 install:
-  - env
+  - env | grep -v "encrypted" | LC_ALL=C sort
+  - lscpu || sysctl hw
   - source ./.travis-functions.sh
   - travis_have_sudo
   - travis_install_script
