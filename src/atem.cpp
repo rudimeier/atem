@@ -1,6 +1,6 @@
 /*** atem.cpp -- convert metastock to text
  *
- * Copyright (C) 2010-2013 Ruediger Meier
+ * Copyright (C) 2010-2016 Ruediger Meier
  *
  * Author:  Ruediger Meier <sweet_f_a@gmx.de>
  *
@@ -71,7 +71,7 @@ Homepage: https://github.com/rudimeier/atem/\n"
 
 #define VERSION_MSG \
 PACKAGE_NAME " - metastock reverse (" PACKAGE_VERSION ")\n\
-Copyright (C) 2010-2013 Ruediger Meier <sweet_f_a@gmx.de>\n\
+Copyright (C) 2010-2016 Ruediger Meier <sweet_f_a@gmx.de>\n\
 License: BSD 3-Clause\n"
 
 

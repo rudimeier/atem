@@ -1,6 +1,6 @@
 /*** itoa.c -- fast integer to text converters
  *
- * Copyright (C) 2010-2013 Ruediger Meier
+ * Copyright (C) 2010-2016 Ruediger Meier
  *
  * Author:  Ruediger Meier <sweet_f_a@gmx.de>
  *
