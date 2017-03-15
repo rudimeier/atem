@@ -1,7 +1,7 @@
 /*** boobs.h -- byte-order oberations
  *
  * Copyright (C) 2012 Sebastian Freundt
- * Copyright (C) 2012-2016 Ruediger Meier
+ * Copyright (C) 2012-2017 Ruediger Meier
  *
  * Author:  Sebastian Freundt <freundt@ga-group.nl>
  *
