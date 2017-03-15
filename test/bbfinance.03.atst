@@ -1,0 +1,20 @@
+## -*- shell-script -*-
+
+TOOL=atem
+INFILE="msdir_bbfinance"
+CMDLINE="--ignore-master --ignore-emaster '${INFILE}' "
+
+TS_DIFF_OPTS="-I \"^Try \\\`.* --help' for more information.\$\""
+TS_EXP_EXIT_CODE="2"
+
+## STDIN
+
+## STDOUT
+cat > "${TS_EXP_STDOUT}" <<EOF
+EOF
+
+## STDERR
+cat > "${TS_EXP_STDERR}" <<EOF
+error: all *Master files invalid
+EOF
+

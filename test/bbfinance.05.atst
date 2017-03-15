@@ -1,0 +1,20 @@
+## -*- shell-script -*-
+
+TOOL=atem
+INFILE="msdir_bbfinance"
+CMDLINE="-F, -o '${TS_OUTFILE}' --ignore-emaster --ignore-xmaster '${INFILE}' "
+
+TS_DIFF_OPTS="-I \"^Try \\\`.* --help' for more information.\$\""
+TS_EXP_EXIT_CODE="0"
+
+## STDIN
+
+## STDOUT
+cat > "${TS_EXP_STDOUT}" <<EOF
+EOF
+
+## STDERR
+cat > "${TS_EXP_STDERR}" <<EOF
+EOF
+
+TS_OUTFILE_SHA1="121cebc59e7e040edccb5e3aba7431159880ae5d"
