@@ -2,70 +2,74 @@
 atem -- metastock reverse
 =========================
 
-atem converts metastock binary data to ASCII text. It was written due to the
-lack of a fast and reliable tool.
-The most useful tool so far was ms2asc by Mohammed Illyas Mansoor but there are
-several bugs and issues which can't be fixed because Mohammed seems to be
-unreachable and unfortunately he'd never released the source code.
+atem converts metastock financial data to CSV text, fast and reliable.
 
-The project homepage (bugtracker, latest git repo) is hosted on github
- https://github.com/rudimeier/atem
-Released source tarballs and static binaries download here
+Download source and binary releases:
  https://bitbucket.org/rudimeier/atem/downloads
-Binary rpms for various Linux distros here
+
+RPM Packages for Linux distros (Fedora, CentOS, RHEL, Fedora, openSUSE, SLE):
  http://software.opensuse.org/download.html?project=home:rudi_m&package=atem
 
+The project homepage, bugtracker, git repo:
+ https://github.com/rudimeier/atem
 
 
-Reasons to use atem
--------------------
+Why use atem?
+-------------
 
- - It's fast, factor 15-20 compared with ms2asc.
- - Full support of EMaster files. Most other tools are just ignoring them which
+ - Very portable, should work on any system.
+ - Works for many metastock flavors (Equis, Norgate, stooq.com,
+   bbfinance.com, etc.)
+ - It's fast, factor 15-20 compared with the well known "ms2asc".
+ - Support of EMaster files. Most other tools are just ignoring them which
    may results in wrong dates and loss of symbol descriptions.
- - Correct handling case sensitivity of file names.
  - Simple but powerful command line interface.
  - BSD open source license.
- - Support for both big and little endian systems.
 
+
+Similar other tools
+-------------------
+
+ - ms2asc by Mohammed Illyas Mansoor
+ - ms2txt by Jacek 'Mech' Woźniak
 
 
 Installation
 ------------
 
-Building from source requires a C++ compiler (tested with icc/icpc and gcc/g++).
-Windows has been successfully tested using cygwin and mingw.
+Building from source requires a C++ compiler, like gcc/g++, clang/clang++
+or icc/icpc. On Windows you could use cygwin or mingw.
 
-When building from git checkout you need the autotools and gengetopt and don't
-forget to type "autoreconf -vfi" first.
+Build from tar tarball works as usually:
 
  ./configure
  make
  make install
 
+When building from git checkout you also need autoconf and gengetopt and don't
+forget to type "autoreconf -vfi" first.
 
 
 Usage
 -----
 
-By default atem reads metastock data from current directory and writes complete
-time series to stdout, see
- atem --help
-You'll find some sample data in the test directory.
+By default atem reads metastock data from the current or given directory and
+writes complete time series to stdout. Comma separated like this
+
+$ atem -F, /path/to/msdata
+ANY.HU,2013-11-18,09:05:00,626.00000,633.00000,626.00000,633.00000,5036,0
+ANY.HU,2013-11-18,09:10:00,633.00000,634.00000,633.00000,633.00000,1479,0
+ANY.HU,2013-11-18,09:25:00,632.00000,632.00000,632.00000,632.00000,120,0
+FHB.HU,2013-11-18,09:05:00,375.00000,375.00000,375.00000,375.00000,1500,0
+FHB.HU,2013-11-18,09:20:00,375.00000,375.00000,375.00000,375.00000,300,0
+FHB.HU,2013-11-18,09:30:00,379.00000,379.00000,379.00000,379.00000,4407,0
+
+See "atem --help" for more options, how to format the output and select the right
+colums, etc. You'll also find some example data in the test directory.
 
 
-
-Known issues / TODO (feedback is welcome)
------------------------------------------
-
- - So far atem has been extensively tested on x86_64 Linux only. There might be
-   problems on other architectures because of the optimized to_string functions.
-   In this case try './configure --disable-fast-printing'.
-
-
-
-Contact Information
--------------------
+Contact
+-------
 
   If you have questions, bug reports, patches etc., contact
   Ruediger Meier <sweet_f_a@gmx.de> (in English or German).
