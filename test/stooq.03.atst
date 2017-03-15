@@ -1,0 +1,21 @@
+## -*- shell-script -*-
+
+TOOL=atem
+INFILE="msdir_stooq"
+CMDLINE="-F, -f symbol,time,close,volume '${INFILE}' "
+
+TS_EXP_EXIT_CODE="0"
+
+## STDIN
+
+## STDOUT
+cat > "${TS_EXP_STDOUT}" <<EOF
+symbol,time,close,volume
+2HR.DE,09:05:00,8.65000,1713
+2HR.DE,09:15:00,8.59000,296
+EOF
+
+## STDERR
+cat > "${TS_EXP_STDERR}" <<EOF
+EOF
+

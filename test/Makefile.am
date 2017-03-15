@@ -20,6 +20,7 @@ ms_dirs =
 ms_dirs += msdir_equis_a
 ms_dirs += msdir_equis_b
 ms_dirs += msdir_bbfinance
+ms_dirs += msdir_stooq
 
 TESTS += equis.01.atst
 TESTS += equis.02.atst
@@ -55,6 +56,9 @@ TESTS += bbfinance.03.atst
 TESTS += bbfinance.04.atst
 TESTS += bbfinance.05.atst
 TESTS += bbfinance.06.atst
+TESTS += stooq.01.atst
+TESTS += stooq.02.atst
+TESTS += stooq.03.atst
 
 msdir_equis_a: msdir_equis_a.tar.xz
 	xz -dc $? | $(am__untar) && touch $@
@@ -63,6 +67,9 @@ msdir_equis_b: msdir_equis_b.tar.xz
 	xz -dc $? | $(am__untar) && touch $@
 
 msdir_bbfinance: msdir_bbfinance.tar.xz
+	xz -dc $? | $(am__untar) && touch $@
+
+msdir_stooq: msdir_stooq.tar.xz
 	xz -dc $? | $(am__untar) && touch $@
 
 clean-local:
