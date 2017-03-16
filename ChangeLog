@@ -3,6 +3,18 @@ ChangeLog, atem -- metastock reverse
 ====================================
 
 
+0.4.0 - 2017-03-16  ------------------------------------------------------------
+
+Some new options and minor bug fixes.
+
+  - fix: better handling of inconsistent or broken master files
+  - fix: don't abort, just skip missing or broken *.dat files
+  - fix: set permissions of output file correctly on WIN32
+  - add options to ignore certain master files (--ignore-*master)
+  - cleanup source code (style and typos)
+  - improve automatic testing on travis build farm (OSX, WIN32)
+
+
 0.3.5 - 2013-02-05  ------------------------------------------------------------
 
 Bugfix release.
@@ -14,7 +26,6 @@ Bugfix release.
   - refactor test suite (reliability, portability)
 
 
-
 0.3.4 - 2012-05-23  ------------------------------------------------------------
 
 Minor fixes and cleanups.
@@ -23,7 +34,6 @@ Minor fixes and cleanups.
   - fix, reading wrongly aligned numbers (bus error on sparc)
   - fix, build failed when BSD tar was used
   - cleanup byteorder code using system headers if possible (boobs.h magic)
-
 
 
 0.3.3 - 2012-03-23  ------------------------------------------------------------
@@ -51,14 +61,12 @@ This release makes it possible to distribute static windows binaries.
   - Hide debug options in --help message and add option --full-help
 
 
-
 0.3.1 - 2011-08-13  ------------------------------------------------------------
 
 This release just adds minor build fixes.
 
   - Build on win32 mingw.
   - Distribute missing README and ChangeLog.
-
 
 
 0.3.0 - 2011-06-24  ------------------------------------------------------------
