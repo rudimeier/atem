@@ -16,6 +16,8 @@ src/atem_ggo.c
 doc/atem.1
 atem-*/
 atem-*.tar.gz
+test/*.trs
+test/msdir_*/
 
 # core dumps etc.
 .nfs*
