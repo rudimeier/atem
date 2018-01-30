@@ -6,6 +6,7 @@ AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_SRCDIR([src/])
 
 AM_INIT_AUTOMAKE([1.11 foreign parallel-tests color-tests])
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 if test -z "$CXXFLAGS"; then
 	CXXFLAGS="-O3 -g"
