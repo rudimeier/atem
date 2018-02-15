@@ -1,11 +1,12 @@
 AC_PREREQ([2.61])
 AC_INIT([atem], [0.4.0], [http://www.ga-group.nl/])
-AC_CONFIG_AUX_DIR([.])
+AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_SRCDIR([src/])
 
-AM_INIT_AUTOMAKE([1.11 foreign parallel-tests color-tests])
+AM_INIT_AUTOMAKE([1.11 -Wall -Wno-portability foreign dist-xz no-dist-gzip
+                  parallel-tests color-tests])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 if test -z "$CXXFLAGS"; then
